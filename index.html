@@ -3,189 +3,961 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Pull Architecture - Animated Network Diagram</title>
+<title>Secure Pull Architecture - Enterprise Patching Solution</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0d1b2a 0%,#1b2838 50%,#0d1b2a 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-x:hidden}
-.title-banner{background:linear-gradient(90deg,#00bceb,#0076d5);border-radius:50px;padding:15px 60px;margin-bottom:30px;box-shadow:0 4px 20px rgba(0,188,235,0.4);animation:pulseGlow 3s ease-in-out infinite}
-.title-banner h1{color:#fff;font-size:2.2em;font-weight:700;text-align:center;letter-spacing:2px}
-@keyframes pulseGlow{0%,100%{box-shadow:0 4px 20px rgba(0,188,235,0.4)}50%{box-shadow:0 4px 40px rgba(0,188,235,0.8)}}
-.container{width:100%;max-width:1400px;position:relative}
-.zone-badge{position:absolute;top:10px;padding:8px 20px;border-radius:8px;font-weight:700;font-size:0.9em;color:#fff;z-index:10}
-.zone-dmz{right:20px;background:#00bceb}
-.zone-dc{right:20px;background:#6cc04a;bottom:10px;top:auto}
-.secure-pull-tag{position:fixed;top:20px;left:20px;background:rgba(0,0,0,0.7);border:2px solid #00bceb;border-radius:10px;padding:10px 15px;color:#00bceb;font-weight:700;font-size:0.85em;z-index:100;animation:pulseGlow 3s ease-in-out infinite}
-.layer{position:relative;display:flex;align-items:center;padding:20px 20px 20px 150px;margin-bottom:4px;border-radius:12px;opacity:0;transform:translateX(-50px);animation:slideIn 0.8s ease forwards;min-height:130px}
-.layer:nth-child(1){animation-delay:0.2s}
-.layer:nth-child(3){animation-delay:0.4s}
-.layer:nth-child(5){animation-delay:0.6s}
-.layer:nth-child(7){animation-delay:0.8s}
-.layer:nth-child(9){animation-delay:1.0s}
-@keyframes slideIn{to{opacity:1;transform:translateX(0)}}
-.layer-5{background:linear-gradient(90deg,rgba(220,53,69,0.15),rgba(220,53,69,0.05));border:1px solid rgba(220,53,69,0.3)}
-.layer-4{background:linear-gradient(90deg,rgba(255,165,0,0.15),rgba(255,165,0,0.05));border:1px solid rgba(255,165,0,0.3)}
-.layer-3{background:linear-gradient(90deg,rgba(0,188,235,0.15),rgba(0,188,235,0.05));border:1px solid rgba(0,188,235,0.3)}
-.layer-2{background:linear-gradient(90deg,rgba(108,192,74,0.15),rgba(108,192,74,0.05));border:1px solid rgba(108,192,74,0.3)}
-.layer-1{background:linear-gradient(90deg,rgba(108,192,74,0.2),rgba(108,192,74,0.08));border:1px solid rgba(108,192,74,0.4)}
-.layer-badge{width:70px;height:70px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-right:15px;flex-shrink:0;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
-.layer-badge .lbl{font-size:0.55em;opacity:0.9}
-.layer-badge .num{font-size:1.4em;line-height:1}
-.badge-red{background:linear-gradient(135deg,#dc3545,#a71d2a)}
-.badge-orange{background:linear-gradient(135deg,#fd7e14,#e8590c)}
-.badge-cyan{background:linear-gradient(135deg,#00bceb,#0076d5)}
-.badge-green{background:linear-gradient(135deg,#6cc04a,#3d8b37)}
-.badge-darkgreen{background:linear-gradient(135deg,#198754,#0f5132)}
-.layer-title{font-size:1.3em;font-weight:700;color:#fff;min-width:130px;margin-right:10px}
-.layer-content{display:flex;align-items:center;flex:1;justify-content:center}
-.layer-details{color:rgba(255,255,255,0.85);font-size:0.8em;line-height:1.7;min-width:300px;margin-left:auto;padding-left:20px}
-.layer-details li{list-style:none;padding-left:15px;position:relative}
-.layer-details li::before{content:"\2022";position:absolute;left:0;color:#00bceb}
-.left-note{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,188,235,0.08);border:1px solid rgba(0,188,235,0.25);border-radius:8px;padding:8px 10px;color:rgba(255,255,255,0.65);font-size:0.65em;font-style:italic;max-width:125px;text-align:center}
-.conn-svg{display:block;width:100%;height:28px;overflow:visible}
-.icon-fw{width:55px;height:55px;position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-.icon-fw::before{content:'';width:48px;height:48px;background:linear-gradient(135deg,#dc3545,#a71d2a);border-radius:4px;position:absolute}
-.icon-fw::after{content:'';width:35px;height:3px;background:#fff;position:absolute;box-shadow:0 8px 0 #fff,0 -8px 0 #fff}
-.icon-proxy{width:55px;height:55px;background:linear-gradient(135deg,#fd7e14,#e8590c);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.6em;text-align:center;line-height:1.2;flex-shrink:0}
-.icon-server{width:45px;height:55px;position:relative;display:inline-flex;flex-shrink:0}
-.icon-server::before{content:'';width:45px;height:50px;background:linear-gradient(180deg,#2196F3,#1565C0);border-radius:4px;position:absolute;top:0;left:0}
-.icon-server::after{content:'';width:28px;height:3px;background:rgba(255,255,255,0.7);position:absolute;top:10px;left:8px;box-shadow:0 10px 0 rgba(255,255,255,0.7),0 20px 0 rgba(255,255,255,0.7)}
-.icon-switch{width:65px;height:28px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:4px;position:relative;display:inline-flex;flex-shrink:0}
-.icon-switch::after{content:'';width:5px;height:5px;background:#6cc04a;border-radius:50%;position:absolute;top:50%;left:8px;transform:translateY(-50%);box-shadow:10px 0 0 #6cc04a,20px 0 0 #6cc04a,30px 0 0 #fd7e14,40px 0 0 #6cc04a}
-.icon-cloud{width:65px;height:42px;background:rgba(0,188,235,0.15);border:2px solid #00bceb;border-radius:22px;display:inline-flex;align-items:center;justify-content:center;color:#00bceb;font-size:0.7em;font-weight:600;flex-shrink:0}
-.icon-aci{width:55px;height:55px;border:3px solid #6cc04a;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#6cc04a;font-size:0.55em;font-weight:700}
-.icon-vm{width:42px;height:42px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.65em;font-weight:700;flex-shrink:0}
-.flow-svg{margin:0 8px;overflow:visible;flex-shrink:0}
-#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
-.particle{position:absolute;border-radius:50%;animation:pfloat 15s ease-in-out infinite}
-@keyframes pfloat{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(20px,-20px) scale(1.3)}50%{transform:translate(-15px,25px) scale(0.7)}75%{transform:translate(18px,10px) scale(1.1)}}
-@media(max-width:1200px){.layer{flex-wrap:wrap;padding-left:20px}.layer-details{min-width:200px}.left-note{display:none}}
+:root{--red:#dc3545;--orange:#fd7e14;--cyan:#00bceb;--blue:#0076d5;--green:#6cc04a;--darkgreen:#198754;--dark:#0d1b2a;--darker:#1b2838;--light:#e8e8e8;--gold:#ffc107}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--dark);color:var(--light);overflow-x:hidden}
+.page{min-height:100vh;padding:60px 40px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.page::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,188,235,0.05) 0%,transparent 70%);pointer-events:none}
+.page-title{background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:50px;padding:15px 50px;margin-bottom:40px;box-shadow:0 4px 30px rgba(0,188,235,0.3);animation:glow 3s ease-in-out infinite}
+.page-title h2{color:#fff;font-size:1.8em;font-weight:700;text-align:center;letter-spacing:1px}
+@keyframes glow{0%,100%{box-shadow:0 4px 20px rgba(0,188,235,0.3)}50%{box-shadow:0 4px 50px rgba(0,188,235,0.6)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes flowRight{0%{transform:translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(100px);opacity:0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.content{width:100%;max-width:1400px;animation:slideUp 0.8s ease}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:100%}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:25px;width:100%}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px;width:100%}
+.card{background:rgba(27,40,56,0.8);border:1px solid rgba(0,188,235,0.2);border-radius:16px;padding:25px;backdrop-filter:blur(10px);transition:all 0.3s ease;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 40px rgba(0,188,235,0.2);border-color:rgba(0,188,235,0.5)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--blue));opacity:0;transition:opacity 0.3s}
+.card:hover::before{opacity:1}
+.card h3{color:var(--cyan);font-size:1.1em;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.card p,.card li{color:rgba(255,255,255,0.75);font-size:0.88em;line-height:1.7}
+.card ul{list-style:none;padding:0}
+.card ul li{padding-left:18px;position:relative;margin-bottom:4px}
+.card ul li::before{content:"\25B8";position:absolute;left:0;color:var(--cyan);font-size:0.8em}
+.icon-badge{width:45px;height:45px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;flex-shrink:0}
+.badge-red{background:linear-gradient(135deg,var(--red),#a71d2a)}
+.badge-orange{background:linear-gradient(135deg,var(--orange),#e8590c)}
+.badge-cyan{background:linear-gradient(135deg,var(--cyan),var(--blue))}
+.badge-green{background:linear-gradient(135deg,var(--green),#3d8b37)}
+.badge-darkgreen{background:linear-gradient(135deg,var(--darkgreen),#0f5132)}
+.badge-gold{background:linear-gradient(135deg,var(--gold),#e0a800)}
+.stat-box{text-align:center;padding:20px;border-radius:12px;background:rgba(0,188,235,0.05);border:1px solid rgba(0,188,235,0.15)}
+.stat-box .number{font-size:2.2em;font-weight:700;color:var(--cyan);display:block}
+.stat-box .label{font-size:0.8em;color:rgba(255,255,255,0.6);margin-top:5px}
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--cyan),var(--green))}
+.timeline-item{position:relative;margin-bottom:25px;padding-left:25px}
+.timeline-item::before{content:'';position:absolute;left:-22px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.layer-row{display:flex;align-items:center;padding:18px 20px;border-radius:12px;margin-bottom:6px;position:relative;animation:slideLeft 0.6s ease both}
+.layer-row:nth-child(1){animation-delay:0.1s}
+.layer-row:nth-child(2){animation-delay:0.2s}
+.layer-row:nth-child(3){animation-delay:0.3s}
+.layer-row:nth-child(4){animation-delay:0.4s}
+.layer-row:nth-child(5){animation-delay:0.5s}
+.l5{background:linear-gradient(90deg,rgba(220,53,69,0.15),rgba(220,53,69,0.03));border:1px solid rgba(220,53,69,0.3)}
+.l4{background:linear-gradient(90deg,rgba(253,126,20,0.15),rgba(253,126,20,0.03));border:1px solid rgba(253,126,20,0.3)}
+.l3{background:linear-gradient(90deg,rgba(0,188,235,0.15),rgba(0,188,235,0.03));border:1px solid rgba(0,188,235,0.3)}
+.l2{background:linear-gradient(90deg,rgba(108,192,74,0.15),rgba(108,192,74,0.03));border:1px solid rgba(108,192,74,0.3)}
+.l1{background:linear-gradient(90deg,rgba(25,135,84,0.18),rgba(25,135,84,0.05));border:1px solid rgba(25,135,84,0.4)}
+.layer-badge{width:60px;height:60px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-right:15px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.3)}
+.layer-badge .lbl{font-size:0.5em;opacity:0.85}
+.layer-badge .num{font-size:1.3em;line-height:1}
+.layer-title{font-size:1.15em;font-weight:700;color:#fff;min-width:120px}
+.layer-icons{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
+.layer-details{font-size:0.78em;color:rgba(255,255,255,0.8);line-height:1.6;min-width:280px;margin-left:auto;padding-left:15px}
+.layer-details li{list-style:none;padding-left:14px;position:relative}
+.layer-details li::before{content:"\2022";position:absolute;left:0;color:var(--cyan)}
+.icon-fw{width:45px;height:45px;position:relative;display:inline-flex;align-items:center;justify-content:center}
+.icon-fw::before{content:'';width:40px;height:40px;background:linear-gradient(135deg,var(--red),#a71d2a);border-radius:3px;position:absolute}
+.icon-fw::after{content:'';width:28px;height:2.5px;background:#fff;position:absolute;box-shadow:0 7px 0 #fff,0 -7px 0 #fff}
+.icon-proxy{width:45px;height:45px;background:linear-gradient(135deg,var(--orange),#e8590c);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.5em;text-align:center}
+.icon-switch{width:55px;height:22px;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:3px;display:inline-flex;align-items:center;padding-left:6px;gap:4px}
+.icon-switch::after{content:'';width:4px;height:4px;background:var(--green);border-radius:50%;box-shadow:7px 0 0 var(--green),14px 0 0 var(--green),21px 0 0 var(--orange),28px 0 0 var(--green)}
+.icon-vm{width:35px;height:35px;background:linear-gradient(135deg,var(--cyan),var(--blue));border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.55em;font-weight:700}
+.icon-cloud{width:55px;height:35px;background:rgba(0,188,235,0.1);border:2px solid var(--cyan);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;color:var(--cyan);font-size:0.6em;font-weight:600}
+.icon-aci{width:45px;height:45px;border:2.5px solid var(--green);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--green);font-size:0.5em;font-weight:700}
+.flow-arrow{display:inline-flex;align-items:center;color:var(--cyan);font-size:0.8em;margin:0 4px}
+.conn-line{display:flex;justify-content:center;padding:4px 0}
+.conn-line .dot{width:6px;height:6px;border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+.nav{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:1000;display:flex;flex-direction:column;gap:8px}
+.nav a{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.2);border:1px solid rgba(0,188,235,0.3);display:block;transition:all 0.3s}
+.nav a:hover,.nav a.active{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7em;font-weight:600;margin:2px}
+.tag-red{background:rgba(220,53,69,0.2);color:var(--red);border:1px solid rgba(220,53,69,0.3)}
+.tag-orange{background:rgba(253,126,20,0.2);color:var(--orange);border:1px solid rgba(253,126,20,0.3)}
+.tag-cyan{background:rgba(0,188,235,0.2);color:var(--cyan);border:1px solid rgba(0,188,235,0.3)}
+.tag-green{background:rgba(108,192,74,0.2);color:var(--green);border:1px solid rgba(108,192,74,0.3)}
+.tag-gold{background:rgba(255,193,7,0.2);color:var(--gold);border:1px solid rgba(255,193,7,0.3)}
+.comparison-table{width:100%;border-collapse:collapse;margin-top:20px}
+.comparison-table th{background:rgba(0,188,235,0.1);color:var(--cyan);padding:12px;text-align:left;font-size:0.85em;border-bottom:2px solid rgba(0,188,235,0.3)}
+.comparison-table td{padding:10px 12px;font-size:0.82em;border-bottom:1px solid rgba(255,255,255,0.05);color:rgba(255,255,255,0.8)}
+.comparison-table tr:hover td{background:rgba(0,188,235,0.03)}
+.risk-high{color:var(--red);font-weight:600}
+.risk-med{color:var(--orange);font-weight:600}
+.risk-low{color:var(--green);font-weight:600}
+.vendor-flow{display:flex;align-items:center;gap:15px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.vendor-step{background:rgba(27,40,56,0.9);border:1px solid rgba(0,188,235,0.2);border-radius:12px;padding:15px 20px;text-align:center;min-width:140px;transition:all 0.3s}
+.vendor-step:hover{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,188,235,0.2)}
+.vendor-step .step-num{font-size:0.65em;color:var(--cyan);font-weight:700;margin-bottom:5px}
+.vendor-step .step-title{font-size:0.85em;font-weight:600;color:#fff}
+.vendor-step .step-desc{font-size:0.7em;color:rgba(255,255,255,0.6);margin-top:4px}
+.arrow-right{color:var(--cyan);font-size:1.5em;animation:flowRight 2s ease-in-out infinite}
+.section-subtitle{color:rgba(255,255,255,0.5);font-size:0.9em;text-align:center;margin-bottom:30px;max-width:800px}
+@media(max-width:1100px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.layer-row{flex-wrap:wrap}.layer-details{min-width:auto;margin-top:10px}}
 </style>
 </head>
 <body>
-<div class="secure-pull-tag">SECURE PULL</div>
-<div class="title-banner"><h1>Secure Pull Architecture</h1></div>
-<div class="container">
-<div class="zone-badge zone-dmz">DMZ</div>
 
-<!-- LAYER 5: Internet Firewall (Palo Alto) -->
-<div class="layer layer-5">
+<!-- Navigation dots -->
+<nav class="nav">
+<a href="#s1" title="Patching Challenges"></a>
+<a href="#s2" title="Cybersecurity Requirements"></a>
+<a href="#s3" title="Risk & Lessons Learned"></a>
+<a href="#s4" title="Secure Pull Architecture"></a>
+<a href="#s5" title="Update Types"></a>
+<a href="#s6" title="Auto vs Manual Updates"></a>
+<a href="#s7" title="Secure Vendor Access"></a>
+</nav>
+
+<!-- ============================================ -->
+<!-- SECTION 1: PATCHING CHALLENGES AT SCALE -->
+<!-- ============================================ -->
+<div class="page" id="s1">
+<div class="page-title"><h2>&#x1F527; Patching Challenges at Scale</h2></div>
+<p class="section-subtitle">Managing patches across 3 datacenters with diverse technology stacks presents unique challenges in coordination, risk management, and operational continuity.</p>
+
+<div class="grid-4" style="margin-bottom:30px">
+<div class="stat-box"><span class="number">3</span><span class="label">Datacenters</span></div>
+<div class="stat-box"><span class="number">6+</span><span class="label">Technology Domains</span></div>
+<div class="stat-box"><span class="number">1000s</span><span class="label">Endpoints to Patch</span></div>
+<div class="stat-box"><span class="number">24/7</span><span class="label">Uptime Requirement</span></div>
+</div>
+
+<div class="grid-3">
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.1s">
+<h3><span class="icon-badge badge-cyan">&#x1F310;</span> Networking</h3>
+<ul>
+<li>Cisco IOS/IOS-XE/NX-OS firmware updates</li>
+<li>Palo Alto PAN-OS upgrades</li>
+<li>F5 BIG-IP TMOS patches</li>
+<li>SD-WAN controller updates</li>
+<li>Switch/Router firmware across 3 DCs</li>
+<li>ACI fabric upgrades (APIC + Leafs/Spines)</li>
+</ul>
+</div>
+
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.2s">
+<h3><span class="icon-badge badge-green">&#x1F4DE;</span> Collaboration</h3>
+<ul>
+<li>Cisco UCM/CUCM version upgrades</li>
+<li>Expressway/VCS gateway patches</li>
+<li>Unity Connection updates</li>
+<li>Webex endpoints firmware</li>
+<li>SBC (Session Border Controller) patches</li>
+<li>Contact Center (UCCX/UCCE) updates</li>
+</ul>
+</div>
+
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.3s">
+<h3><span class="icon-badge badge-orange">&#x1F4BB;</span> HCI (Hyper-Converged)</h3>
+<ul>
+<li>Nutanix AOS/AHV upgrades</li>
+<li>Nutanix Prism Central patches</li>
+<li>VMware ESXi/vCenter updates</li>
+<li>Firmware (BIOS, BMC, NIC, HBA)</li>
+<li>Storage controller firmware</li>
+<li>HCI cluster rolling upgrades</li>
+</ul>
+</div>
+
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.4s">
+<h3><span class="icon-badge badge-red">&#x1F6E1;</span> Security Products</h3>
+<ul>
+<li>Trellix/McAfee EPO & DAT updates</li>
+<li>CrowdStrike Falcon sensor updates</li>
+<li>Firewall signature updates (IPS/IDS)</li>
+<li>WAF rule updates</li>
+<li>Certificate renewals</li>
+<li>SIEM/SOAR platform patches</li>
+</ul>
+</div>
+
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.5s">
+<h3><span class="icon-badge badge-gold">&#x1F4CA;</span> Monitoring Tools</h3>
+<ul>
+<li>SolarWinds Orion platform updates</li>
+<li>Splunk forwarder/indexer patches</li>
+<li>Nagios/Zabbix core upgrades</li>
+<li>PRTG sensor updates</li>
+<li>Grafana/Prometheus stack</li>
+<li>Network flow collectors</li>
+</ul>
+</div>
+
+<div class="card" style="animation:slideUp 0.6s ease both;animation-delay:0.6s">
+<h3><span class="icon-badge badge-cyan">&#x1F4E6;</span> Microsoft Ecosystem</h3>
+<ul>
+<li>Windows Server monthly patches (WSUS)</li>
+<li>Active Directory DC updates</li>
+<li>Exchange Server CUs & SUs</li>
+<li>SQL Server patches</li>
+<li>Microsoft 365/Azure AD sync</li>
+<li>.NET Framework & runtime updates</li>
+</ul>
+</div>
+</div>
+
+<div class="card" style="margin-top:25px;border-color:rgba(220,53,69,0.3)">
+<h3 style="color:var(--red)">&#x26A0; Key Challenges</h3>
+<div class="grid-3" style="margin-top:10px">
+<div><p><strong style="color:var(--orange)">Coordination Complexity</strong></p><p>Scheduling maintenance windows across 3 DCs with different time zones and SLA requirements</p></div>
+<div><p><strong style="color:var(--orange)">Dependency Chains</strong></p><p>Firmware must precede software updates; interdependent services require ordered patching</p></div>
+<div><p><strong style="color:var(--orange)">Rollback Planning</strong></p><p>Each technology requires different rollback strategies; some are irreversible (firmware)</p></div>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: CYBERSECURITY REQUIREMENTS -->
+<!-- ============================================ -->
+<div class="page" id="s2">
+<div class="page-title"><h2>&#x1F512; Cybersecurity Requirements</h2></div>
+<p class="section-subtitle">Enterprise patching must comply with strict cybersecurity frameworks and standards to maintain security posture and regulatory compliance.</p>
+
+<div class="grid-2">
+<div class="card">
+<h3><span class="icon-badge badge-red">&#x1F6E1;</span> Regulatory & Compliance</h3>
+<ul>
+<li><strong>ISO 27001</strong> - Information Security Management</li>
+<li><strong>NIST CSF</strong> - Cybersecurity Framework</li>
+<li><strong>PCI-DSS</strong> - Payment Card Industry Standards</li>
+<li><strong>CIS Controls</strong> - Center for Internet Security Benchmarks</li>
+<li><strong>SOC 2 Type II</strong> - Service Organization Controls</li>
+<li><strong>NCA ECC</strong> - Essential Cybersecurity Controls</li>
+<li><strong>GDPR</strong> - Data Protection Requirements</li>
+</ul>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-cyan">&#x23F1;</span> Patch SLA Requirements</h3>
+<table class="comparison-table">
+<tr><th>Severity</th><th>SLA</th><th>Scope</th></tr>
+<tr><td class="risk-high">Critical (CVSS 9.0+)</td><td>24-72 hours</td><td>Internet-facing systems</td></tr>
+<tr><td class="risk-high">Critical (CVSS 9.0+)</td><td>7 days</td><td>Internal systems</td></tr>
+<tr><td class="risk-med">High (CVSS 7.0-8.9)</td><td>14 days</td><td>All systems</td></tr>
+<tr><td class="risk-med">Medium (CVSS 4.0-6.9)</td><td>30 days</td><td>All systems</td></tr>
+<tr><td class="risk-low">Low (CVSS 0-3.9)</td><td>90 days</td><td>Next maintenance window</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-green">&#x2705;</span> Security Controls for Patching</h3>
+<ul>
+<li><strong>Network Segmentation</strong> - Isolated patch delivery network</li>
+<li><strong>Integrity Verification</strong> - Hash/signature validation for all patches</li>
+<li><strong>Least Privilege</strong> - Minimal access for patch deployment accounts</li>
+<li><strong>Audit Trail</strong> - Full logging of patch activities (who, what, when)</li>
+<li><strong>Change Management</strong> - CAB approval for production patches</li>
+<li><strong>Vulnerability Scanning</strong> - Pre/post patch vulnerability assessment</li>
+<li><strong>Rollback Procedures</strong> - Documented and tested rollback plans</li>
+<li><strong>Encryption in Transit</strong> - All patch downloads over encrypted channels</li>
+</ul>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-orange">&#x1F50D;</span> Continuous Monitoring</h3>
+<ul>
+<li><strong>Vulnerability Management</strong> - Qualys/Tenable/Rapid7 scanning</li>
+<li><strong>Patch Compliance Reporting</strong> - Dashboard with real-time status</li>
+<li><strong>Threat Intelligence Feeds</strong> - Zero-day awareness and prioritization</li>
+<li><strong>Asset Inventory</strong> - CMDB accuracy for patch targeting</li>
+<li><strong>Exception Management</strong> - Risk-accepted unpatched systems tracking</li>
+<li><strong>KPI Metrics</strong> - Mean time to patch, compliance percentage</li>
+</ul>
+</div>
+</div>
+
+<div class="card" style="margin-top:25px;border-color:rgba(0,188,235,0.4)">
+<h3 style="color:var(--cyan)">&#x1F3AF; Zero Trust Patching Principles</h3>
+<div class="grid-4" style="margin-top:15px">
+<div class="stat-box"><span class="number">&#x1F512;</span><span class="label">Never Trust<br>Always Verify</span></div>
+<div class="stat-box"><span class="number">&#x1F4E6;</span><span class="label">Verify Patch<br>Integrity</span></div>
+<div class="stat-box"><span class="number">&#x1F441;</span><span class="label">Monitor All<br>Patch Traffic</span></div>
+<div class="stat-box"><span class="number">&#x26A1;</span><span class="label">Assume Breach<br>Isolate Systems</span></div>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: RISK, HUMAN ERROR & LESSONS LEARNED -->
+<!-- ============================================ -->
+<div class="page" id="s3">
+<div class="page-title"><h2>&#x26A0; Risk, Human Error & Lessons Learned</h2></div>
+<p class="section-subtitle">Real-world incidents demonstrate why manual patching at scale is unsustainable. Automation reduces human error and ensures consistency across environments.</p>
+
+<div class="grid-2" style="margin-bottom:30px">
+<div class="card" style="border-color:rgba(220,53,69,0.4)">
+<h3 style="color:var(--red)">&#x1F4A5; Real-World Incidents - Manual Patching Failures</h3>
+<div class="timeline">
+<div class="timeline-item">
+<strong style="color:var(--red)">Equifax Breach (2017)</strong>
+<p>Failed to patch Apache Struts CVE-2017-5638. Manual process missed critical server. 147M records exposed. Cost: $1.4B+</p>
+</div>
+<div class="timeline-item">
+<strong style="color:var(--red)">WannaCry Ransomware (2017)</strong>
+<p>MS17-010 patch available 2 months before attack. Manual deployment too slow. 200K+ systems in 150 countries affected.</p>
+</div>
+<div class="timeline-item">
+<strong style="color:var(--red)">SolarWinds (2020)</strong>
+<p>Compromised update channel exploited trust in vendor updates. Highlighted need for update integrity verification.</p>
+</div>
+<div class="timeline-item">
+<strong style="color:var(--red)">Log4Shell (2021)</strong>
+<p>CVE-2021-44228 required emergency patching of thousands of Java apps. Manual inventory was incomplete across DCs.</p>
+</div>
+<div class="timeline-item">
+<strong style="color:var(--orange)">CrowdStrike Outage (2024)</strong>
+<p>Faulty content update caused global BSOD. Auto-update without staged rollout caused 8.5M systems to crash simultaneously.</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-orange">&#x1F46E;</span> Human Error at Scale</h3>
+<ul style="margin-bottom:20px">
+<li><strong>Missed Systems</strong> - Incomplete asset inventory leads to unpatched servers</li>
+<li><strong>Wrong Patch Applied</strong> - Version mismatch on production systems</li>
+<li><strong>Skipped Testing</strong> - Pressure to meet SLA bypasses QA</li>
+<li><strong>Incorrect Sequence</strong> - Dependency order violated causing outages</li>
+<li><strong>Forgotten Rollback</strong> - No pre-patch snapshot taken</li>
+<li><strong>Credential Exposure</strong> - Admin passwords shared for manual patching</li>
+<li><strong>Documentation Gaps</strong> - Post-patch validation not recorded</li>
+<li><strong>Communication Failure</strong> - Team unaware of ongoing patch activity</li>
+</ul>
+
+<h3 style="margin-top:20px"><span class="icon-badge badge-green">&#x2705;</span> Why Automated Updates Win</h3>
+<table class="comparison-table">
+<tr><th>Factor</th><th class="risk-high">Manual</th><th class="risk-low">Automated</th></tr>
+<tr><td>Consistency</td><td>Varies by engineer</td><td>100% repeatable</td></tr>
+<tr><td>Speed</td><td>Days to weeks</td><td>Hours to minutes</td></tr>
+<tr><td>Audit Trail</td><td>Incomplete logs</td><td>Full automation logs</td></tr>
+<tr><td>Coverage</td><td>Missed systems</td><td>Complete inventory</td></tr>
+<tr><td>Rollback</td><td>Often forgotten</td><td>Auto-snapshot</td></tr>
+<tr><td>Off-hours</td><td>Engineer fatigue</td><td>Scheduled precision</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card" style="border-color:rgba(108,192,74,0.4)">
+<h3 style="color:var(--green)">&#x1F4A1; Key Lessons & Mitigations</h3>
+<div class="grid-3" style="margin-top:15px">
+<div>
+<p><strong style="color:var(--cyan)">Staged Rollouts</strong></p>
+<p>Deploy to dev/test &#x2192; staging &#x2192; 10% canary &#x2192; full production. Never push to all systems simultaneously.</p>
+</div>
+<div>
+<p><strong style="color:var(--cyan)">Integrity Verification</strong></p>
+<p>Validate hash/signature of every patch before deployment. Isolated download through secure pull architecture.</p>
+</div>
+<div>
+<p><strong style="color:var(--cyan)">Automated Compliance</strong></p>
+<p>Continuous scanning confirms patch status. Exceptions auto-escalate. Dashboards show real-time posture.</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 4: SECURE PULL ARCHITECTURE - 5 LAYERS -->
+<!-- ============================================ -->
+<div class="page" id="s4">
+<div class="page-title"><h2>&#x1F3F0; Secure Pull Architecture - 5 Layer Security</h2></div>
+<p class="section-subtitle">The Secure Pull model ensures all patch/update traffic flows through 5 distinct security layers, each enforcing strict isolation and inspection of DMZ VMs and traffic.</p>
+
+<div style="width:100%;max-width:1300px">
+
+<!-- Layer 5 -->
+<div class="layer-row l5">
 <div class="layer-badge badge-red"><span class="lbl">LAYER</span><span class="num">5</span></div>
 <div class="layer-title">Internet<br>Firewall</div>
-<div class="layer-content">
+<div class="layer-icons">
 <div class="icon-cloud">Internet</div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#fd7e14" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="4" fill="#fd7e14"><animateMotion path="M0,20 L80,20" dur="1.5s" repeatCount="indefinite"/></circle></svg>
+<svg width="70" height="30" style="overflow:visible"><line x1="0" y1="15" x2="70" y2="15" stroke="#fd7e14" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="4" fill="#fd7e14"><animateMotion path="M0,15 L70,15" dur="1.5s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-fw"></div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="4" fill="#00bceb"><animateMotion path="M0,20 L80,20" dur="1.8s" repeatCount="indefinite"/></circle></svg>
-<div class="icon-server"></div>
+<svg width="70" height="30" style="overflow:visible"><line x1="0" y1="15" x2="70" y2="15" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#00bceb"><animateMotion path="M0,15 L70,15" dur="1.8s" repeatCount="indefinite"/></circle></svg>
+<div class="icon-switch"></div>
 </div>
 <div class="layer-details">
+<li>Palo Alto Next-Gen Firewall (Internet Edge)</li>
 <li>Source IP Whitelisting &ndash; Only from Web Proxy</li>
 <li>Destination Server IP &amp; URL Whitelisting</li>
-<li>IPS, Web Filtering &amp; Anti-malware Security</li>
-<li>Zoning &amp; Multi-tenancy</li>
-<li>Unidirectional Flow</li>
+<li>IPS, Web Filtering &amp; Anti-malware</li>
+<li>Zoning &amp; Multi-tenancy | Unidirectional Flow</li>
 </div>
 </div>
 
-<!-- Connection L5-L4 -->
-<svg class="conn-svg"><line x1="50%" y1="0" x2="50%" y2="28" stroke="#fd7e14" stroke-width="2" stroke-dasharray="4,4"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#fd7e14"><animateMotion path="M 700,0 L 700,28" dur="1s" repeatCount="indefinite"/></circle><text x="52%" y="16" fill="rgba(255,255,255,0.5)" font-size="9" font-weight="600">Proxy</text></svg>
+<div class="conn-line"><div class="dot" style="background:var(--orange)"></div></div>
 
-<!-- LAYER 4: Web Proxy -->
-<div class="layer layer-4">
-<div class="left-note">Only Proxy can communicate unidirectionally with Internet</div>
+<!-- Layer 4 -->
+<div class="layer-row l4">
 <div class="layer-badge badge-orange"><span class="lbl">LAYER</span><span class="num">4</span></div>
 <div class="layer-title">Web<br>Proxy</div>
-<div class="layer-content">
+<div class="layer-icons">
 <div class="icon-proxy">WWW<br>Proxy</div>
-<svg class="flow-svg" width="100" height="40"><line x1="0" y1="20" x2="100" y2="20" stroke="#fd7e14" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.8s" repeatCount="indefinite"/></line><circle r="4" fill="#fd7e14"><animateMotion path="M0,20 L100,20" dur="2s" repeatCount="indefinite"/></circle><circle r="3" fill="#6cc04a"><animateMotion path="M0,20 L100,20" dur="2s" begin="0.7s" repeatCount="indefinite"/></circle></svg>
-<div class="icon-server"></div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#00bceb"><animateMotion path="M0,20 L80,20" dur="1.5s" repeatCount="indefinite"/></circle></svg>
+<svg width="90" height="30" style="overflow:visible"><line x1="0" y1="15" x2="90" y2="15" stroke="#fd7e14" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.8s" repeatCount="indefinite"/></line><circle r="4" fill="#fd7e14"><animateMotion path="M0,15 L90,15" dur="2s" repeatCount="indefinite"/></circle><circle r="3" fill="#6cc04a"><animateMotion path="M0,15 L90,15" dur="2s" begin="0.7s" repeatCount="indefinite"/></circle></svg>
+<div class="icon-switch"></div>
+<svg width="60" height="30" style="overflow:visible"><line x1="0" y1="15" x2="60" y2="15" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#00bceb"><animateMotion path="M0,15 L60,15" dur="1.5s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-vm"></div>
 </div>
 <div class="layer-details">
-<li>Source IP Whitelisting &ndash; Only from Specific DMZ Servers</li>
-<li>Destination Server IP &amp; URL Whitelisting</li>
+<li>All traffic routed through forward proxy</li>
+<li>Source IP Whitelisting &ndash; Only from DMZ Servers</li>
 <li>Web Reputation &amp; Web Usage Control</li>
 <li>Anti-malware Analysis &amp; HTTPS Inspection</li>
+<li>URL categorization &amp; content filtering</li>
 </div>
 </div>
 
-<!-- Connection L4-L3 -->
-<svg class="conn-svg"><line x1="50%" y1="0" x2="50%" y2="28" stroke="#00bceb" stroke-width="2" stroke-dasharray="4,4"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#00bceb"><animateMotion path="M 700,0 L 700,28" dur="1.2s" repeatCount="indefinite"/></circle><text x="52%" y="16" fill="rgba(255,255,255,0.5)" font-size="9" font-weight="600">Proxy</text></svg>
+<div class="conn-line"><div class="dot" style="background:var(--cyan)"></div></div>
 
-<!-- LAYER 3: DMZ Firewall -->
-<div class="layer layer-3">
-<div class="left-note">Only specific DMZ servers can communicate unidirectionally with Proxy</div>
+<!-- Layer 3 -->
+<div class="layer-row l3">
 <div class="layer-badge badge-cyan"><span class="lbl">LAYER</span><span class="num">3</span></div>
 <div class="layer-title">DMZ<br>Firewall</div>
-<div class="layer-content">
-<div class="icon-fw"></div>
-<svg class="flow-svg" width="90" height="40"><line x1="0" y1="20" x2="90" y2="20" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.9s" repeatCount="indefinite"/></line><circle r="4" fill="#00bceb"><animateMotion path="M0,20 L90,20" dur="1.5s" repeatCount="indefinite"/></circle><circle r="3" fill="#6cc04a"><animateMotion path="M0,20 L90,20" dur="1.5s" begin="0.5s" repeatCount="indefinite"/></circle></svg>
+<div class="layer-icons">
+<div class="icon-fw" style="transform:scale(0.9)"></div>
+<svg width="80" height="30" style="overflow:visible"><line x1="0" y1="15" x2="80" y2="15" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.9s" repeatCount="indefinite"/></line><circle r="4" fill="#00bceb"><animateMotion path="M0,15 L80,15" dur="1.5s" repeatCount="indefinite"/></circle><circle r="3" fill="#6cc04a"><animateMotion path="M0,15 L80,15" dur="1.5s" begin="0.5s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-switch"></div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M0,20 L80,20" dur="1.2s" repeatCount="indefinite"/></circle></svg>
+<svg width="60" height="30" style="overflow:visible"><line x1="0" y1="15" x2="60" y2="15" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M0,15 L60,15" dur="1.2s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-vm"></div>
 </div>
 <div class="layer-details">
-<li>Source IP Whitelisting &ndash; Only from Specific DMZ Servers</li>
-<li>Destination Server IP &amp; URL Whitelisting</li>
+<li>Protects all DMZ VMs from internal &amp; external threats</li>
+<li>Only specific DMZ servers reach proxy (unidirectional)</li>
 <li>IPS, Web Filtering &amp; Anti-malware Security</li>
-<li>Zoning &amp; Unidirectional Flow</li>
+<li>Zone-based policy enforcement</li>
+<li>DMZ isolation from DC network</li>
 </div>
 </div>
 
-<!-- Connection L3-L2 -->
-<svg class="conn-svg"><line x1="50%" y1="0" x2="50%" y2="28" stroke="#6cc04a" stroke-width="2" stroke-dasharray="4,4"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M 700,0 L 700,28" dur="1s" repeatCount="indefinite"/></circle><text x="52%" y="16" fill="rgba(255,255,255,0.5)" font-size="9" font-weight="600">DC</text></svg>
+<div class="conn-line"><div class="dot" style="background:var(--green)"></div></div>
 
-<!-- LAYER 2: DC Firewall -->
-<div class="layer layer-2">
+<!-- Layer 2 -->
+<div class="layer-row l2">
 <div class="layer-badge badge-green"><span class="lbl">LAYER</span><span class="num">2</span></div>
 <div class="layer-title">DC<br>Firewall</div>
-<div class="layer-content">
-<div class="icon-fw"></div>
-<svg class="flow-svg" width="110" height="40"><line x1="0" y1="20" x2="110" y2="20" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.8s" repeatCount="indefinite"/></line><circle r="4" fill="#6cc04a"><animateMotion path="M0,20 L110,20" dur="1.8s" repeatCount="indefinite"/></circle><circle r="3" fill="#00bceb"><animateMotion path="M110,20 L0,20" dur="2s" repeatCount="indefinite"/></circle></svg>
+<div class="layer-icons">
+<div class="icon-fw" style="transform:scale(0.85)"></div>
+<svg width="90" height="30" style="overflow:visible"><line x1="0" y1="15" x2="90" y2="15" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.8s" repeatCount="indefinite"/></line><circle r="4" fill="#6cc04a"><animateMotion path="M0,15 L90,15" dur="1.8s" repeatCount="indefinite"/></circle><circle r="3" fill="#00bceb"><animateMotion path="M90,15 L0,15" dur="2s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-switch"></div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M0,20 L80,20" dur="1.5s" repeatCount="indefinite"/></circle></svg>
-<div class="icon-server"></div>
+<svg width="60" height="30" style="overflow:visible"><line x1="0" y1="15" x2="60" y2="15" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M0,15 L60,15" dur="1.5s" repeatCount="indefinite"/></circle></svg>
+<div class="icon-vm"></div>
 </div>
 <div class="layer-details">
-<li>Source &amp; Destination Server IP Whitelisting</li>
-<li>Only from Specific Server to Specific DMZ Server</li>
+<li>Datacenter Firewall for internal east-west traffic</li>
+<li>Source &amp; Destination IP Whitelisting</li>
+<li>Only specific DC servers &#x2192; specific DMZ servers</li>
 <li>IPS, Zoning &amp; Multi-Instance</li>
 <li>Unidirectional Flow from DC to DMZ</li>
 </div>
 </div>
 
-<!-- Connection L2-L1 -->
-<svg class="conn-svg"><line x1="50%" y1="0" x2="50%" y2="28" stroke="#6cc04a" stroke-width="2" stroke-dasharray="4,4"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#6cc04a"><animateMotion path="M 700,0 L 700,28" dur="1.2s" repeatCount="indefinite"/></circle></svg>
+<div class="conn-line"><div class="dot" style="background:var(--darkgreen)"></div></div>
 
-<!-- LAYER 1: ACI -->
-<div class="layer layer-1">
-<div class="left-note">Only specific DC servers can communicate unidirectionally with DMZ Servers</div>
+<!-- Layer 1 -->
+<div class="layer-row l1">
 <div class="layer-badge badge-darkgreen"><span class="lbl">LAYER</span><span class="num">1</span></div>
-<div class="layer-title">ACI</div>
-<div class="layer-content">
+<div class="layer-title">ACI<br>Fabric</div>
+<div class="layer-icons">
 <div class="icon-aci">APIC</div>
-<svg class="flow-svg" width="100" height="40"><line x1="0" y1="20" x2="100" y2="20" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.7s" repeatCount="indefinite"/></line><circle r="4" fill="#6cc04a"><animateMotion path="M0,20 L100,20" dur="1.5s" repeatCount="indefinite"/></circle><circle r="3" fill="#198754"><animateMotion path="M0,20 L100,20" dur="1.5s" begin="0.5s" repeatCount="indefinite"/></circle></svg>
+<svg width="80" height="30" style="overflow:visible"><line x1="0" y1="15" x2="80" y2="15" stroke="#6cc04a" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.7s" repeatCount="indefinite"/></line><circle r="4" fill="#6cc04a"><animateMotion path="M0,15 L80,15" dur="1.5s" repeatCount="indefinite"/></circle><circle r="3" fill="#198754"><animateMotion path="M0,15 L80,15" dur="1.5s" begin="0.5s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-switch"></div>
-<svg class="flow-svg" width="80" height="40"><line x1="0" y1="20" x2="80" y2="20" stroke="#198754" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#198754"><animateMotion path="M0,20 L80,20" dur="1.2s" repeatCount="indefinite"/></circle></svg>
+<svg width="60" height="30" style="overflow:visible"><line x1="0" y1="15" x2="60" y2="15" stroke="#198754" stroke-width="2" stroke-dasharray="5,5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line><circle r="3" fill="#198754"><animateMotion path="M0,15 L60,15" dur="1.2s" repeatCount="indefinite"/></circle></svg>
 <div class="icon-vm"></div>
 </div>
 <div class="layer-details">
-<li>Source Whitelisting &ndash; Only from specific EPG to DMZ</li>
+<li>Cisco ACI micro-segmentation at fabric level</li>
+<li>Source Whitelisting &ndash; Only specific EPG to DMZ</li>
 <li>Service Graphs, PBR, VRFs</li>
 <li>EPGs, ESGs &amp; Multi-tenancy</li>
 <li>Unidirectional Flow from EPG to DMZ</li>
 </div>
 </div>
-
-<div class="zone-badge zone-dc">DC</div>
 </div>
 
+<div class="grid-2" style="margin-top:25px">
+<div class="card" style="border-color:rgba(0,188,235,0.4)">
+<h3 style="color:var(--cyan)">&#x1F310; DMZ Zone Security</h3>
+<ul>
+<li>DMZ VMs completely isolated from internal DC network</li>
+<li>No direct internet access for DMZ servers</li>
+<li>All external communication via proxy only</li>
+<li>Patch downloads pulled through authenticated proxy sessions</li>
+<li>Each VM has explicit firewall rules (whitelist only)</li>
+<li>East-west traffic within DMZ monitored and controlled</li>
+</ul>
+</div>
+<div class="card" style="border-color:rgba(108,192,74,0.4)">
+<h3 style="color:var(--green)">&#x1F3E2; DC Zone Security</h3>
+<ul>
+<li>DC servers initiate pull requests to DMZ staging servers</li>
+<li>No direct DMZ-to-DC traffic allowed (unidirectional)</li>
+<li>ACI fabric enforces micro-segmentation per application</li>
+<li>Service graphs route traffic through inspection points</li>
+<li>VRF isolation between different business units</li>
+<li>PBR (Policy-Based Routing) for granular traffic steering</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5: UPDATE TYPES -->
+<!-- ============================================ -->
+<div class="page" id="s5">
+<div class="page-title"><h2>&#x1F4E6; Update Types & Technologies</h2></div>
+<p class="section-subtitle">Different products require different update mechanisms, repositories, and validation methods. The Secure Pull architecture supports all update types through unified secure channels.</p>
+
+<div class="grid-3">
+<div class="card">
+<h3><span class="icon-badge badge-cyan">&#x1F4BB;</span> WSUS (Windows Updates)</h3>
+<span class="tag tag-cyan">Microsoft</span><span class="tag tag-green">Auto</span>
+<ul>
+<li>Windows Server monthly quality updates</li>
+<li>Cumulative Updates (CUs)</li>
+<li>Security-only updates</li>
+<li>Servicing Stack Updates (SSU)</li>
+<li>.NET Framework patches</li>
+<li>Feature updates & upgrades</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> WSUS server syncs from Microsoft Update via proxy. Clients pull from internal WSUS.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-orange">&#x1F527;</span> Ivanti (Patch Management)</h3>
+<span class="tag tag-orange">Multi-Platform</span><span class="tag tag-green">Auto</span>
+<ul>
+<li>Third-party application patches</li>
+<li>Linux/Unix system patches</li>
+<li>Custom application updates</li>
+<li>Driver updates</li>
+<li>BIOS/firmware orchestration</li>
+<li>Patch compliance reporting</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> Ivanti console downloads patches to DMZ relay. Agents pull from relay servers.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-green">&#x1F4A0;</span> Nutanix (HCI Platform)</h3>
+<span class="tag tag-green">Infrastructure</span><span class="tag tag-gold">Semi-Auto</span>
+<ul>
+<li>AOS (Acropolis OS) upgrades</li>
+<li>AHV hypervisor updates</li>
+<li>Prism Central patches</li>
+<li>NCC (Nutanix Cluster Check)</li>
+<li>Foundation updates</li>
+<li>LCM (Life Cycle Manager) firmware</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> LCM connects to Nutanix portal via proxy. Dark site: manual upload to Prism.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-red">&#x1F6E1;</span> Trellix (Endpoint Security)</h3>
+<span class="tag tag-red">Security</span><span class="tag tag-green">Auto</span>
+<ul>
+<li>DAT/AMCore content updates (hourly)</li>
+<li>Engine updates (monthly)</li>
+<li>EPO platform patches</li>
+<li>Product hotfixes</li>
+<li>Exploit prevention content</li>
+<li>Threat intelligence feeds</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> EPO server pulls DATs from Trellix cloud via proxy. Agents pull from EPO repository.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-cyan">&#x1F525;</span> Firewall Updates</h3>
+<span class="tag tag-red">Security</span><span class="tag tag-gold">Semi-Auto</span>
+<ul>
+<li>PAN-OS software upgrades</li>
+<li>Threat Prevention signatures (daily)</li>
+<li>WildFire updates (every 5 min)</li>
+<li>URL filtering database</li>
+<li>GlobalProtect agent updates</li>
+<li>App-ID signature updates</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> Firewalls pull signatures from Palo Alto update servers. PAN-OS upgrades staged manually.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-gold">&#x1F511;</span> IAM / PAM / NAC</h3>
+<span class="tag tag-gold">Identity</span><span class="tag tag-orange">Manual+Auto</span>
+<ul>
+<li><strong>IAM:</strong> Azure AD / Entra ID sync updates</li>
+<li><strong>PAM:</strong> CyberArk Vault/CPM/PSM patches</li>
+<li><strong>NAC:</strong> Cisco ISE node upgrades</li>
+<li>Certificate rotation & renewal</li>
+<li>MFA provider updates (RSA/Duo)</li>
+<li>RADIUS/TACACS+ server patches</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> Staged upgrades with HA failover. Critical identity systems require CAB approval.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-green">&#x1F4DE;</span> Collaboration</h3>
+<span class="tag tag-green">Unified Comms</span><span class="tag tag-orange">Manual</span>
+<ul>
+<li>CUCM/UCM major version upgrades</li>
+<li>COP file installations</li>
+<li>Expressway/VCS patches</li>
+<li>Jabber/Webex client updates</li>
+<li>IP Phone firmware loads</li>
+<li>Contact Center patches (UCCX)</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> ISO/COP files downloaded to DMZ staging. Uploaded to CUCM via SFTP during maintenance.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-cyan">&#x1F4E6;</span> Microsoft Products</h3>
+<span class="tag tag-cyan">Enterprise</span><span class="tag tag-green">Auto+Manual</span>
+<ul>
+<li>Exchange Server CUs & SUs</li>
+<li>SQL Server cumulative updates</li>
+<li>SharePoint patches</li>
+<li>SCCM/MECM updates</li>
+<li>Active Directory schema updates</li>
+<li>Office/M365 Apps updates</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> WSUS/SCCM for automated. Manual CU installation for Exchange/SQL during windows.</p>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-orange">&#x1F4CA;</span> Monitoring & Tools</h3>
+<span class="tag tag-orange">Operations</span><span class="tag tag-orange">Manual</span>
+<ul>
+<li>SolarWinds Orion platform hotfixes</li>
+<li>Splunk forwarder/indexer upgrades</li>
+<li>Grafana/Prometheus updates</li>
+<li>SNMP MIB updates</li>
+<li>Syslog collector patches</li>
+<li>Flow collector firmware</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(255,255,255,0.5)"><strong>Pull Method:</strong> Staged upgrade with monitoring failover. Secondary collectors take over during primary upgrade.</p>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 6: AUTO vs MANUAL UPDATES -->
+<!-- ============================================ -->
+<div class="page" id="s6">
+<div class="page-title"><h2>&#x2699; Automated vs Manual Update Strategy</h2></div>
+<p class="section-subtitle">A hybrid approach balances speed and safety. Automated updates for routine content, manual staged rollouts for infrastructure-impacting changes.</p>
+
+<div class="grid-2" style="margin-bottom:30px">
+<div class="card" style="border-color:rgba(108,192,74,0.5)">
+<h3 style="color:var(--green)">&#x2705; Automated Updates (Scheduled/Continuous)</h3>
+<table class="comparison-table">
+<tr><th>System</th><th>Update Type</th><th>Frequency</th></tr>
+<tr><td>Trellix DAT/Signatures</td><td>Content update</td><td>Every 4 hours</td></tr>
+<tr><td>Palo Alto WildFire</td><td>Threat signatures</td><td>Every 5 minutes</td></tr>
+<tr><td>Palo Alto Threat Prevention</td><td>IPS signatures</td><td>Daily</td></tr>
+<tr><td>Windows Defender definitions</td><td>AV signatures</td><td>Every 2 hours</td></tr>
+<tr><td>WSUS security patches</td><td>OS patches</td><td>Monthly (Patch Tuesday)</td></tr>
+<tr><td>CrowdStrike sensor</td><td>Agent update</td><td>Weekly (staged)</td></tr>
+<tr><td>URL filtering DB</td><td>Category update</td><td>Daily</td></tr>
+<tr><td>Certificate auto-renewal</td><td>PKI</td><td>30 days before expiry</td></tr>
+</table>
+<div style="margin-top:15px;padding:12px;background:rgba(108,192,74,0.08);border-radius:8px;border:1px solid rgba(108,192,74,0.2)">
+<p style="font-size:0.82em"><strong style="color:var(--green)">Benefits:</strong> Zero human intervention, consistent timing, complete coverage, immediate threat response, reduced attack window</p>
+</div>
+</div>
+
+<div class="card" style="border-color:rgba(253,126,20,0.5)">
+<h3 style="color:var(--orange)">&#x1F6E0; Manual Updates (CAB Approved)</h3>
+<table class="comparison-table">
+<tr><th>System</th><th>Update Type</th><th>Cadence</th></tr>
+<tr><td>PAN-OS major upgrade</td><td>Firewall OS</td><td>Quarterly</td></tr>
+<tr><td>Nutanix AOS upgrade</td><td>HCI platform</td><td>Bi-annual</td></tr>
+<tr><td>CUCM version upgrade</td><td>Collab platform</td><td>Annual</td></tr>
+<tr><td>Exchange CU</td><td>Email platform</td><td>Quarterly</td></tr>
+<tr><td>Cisco ISE upgrade</td><td>NAC platform</td><td>Bi-annual</td></tr>
+<tr><td>CyberArk PAM</td><td>Vault/CPM/PSM</td><td>Bi-annual</td></tr>
+<tr><td>ACI fabric upgrade</td><td>Network fabric</td><td>Bi-annual</td></tr>
+<tr><td>SQL Server CU</td><td>Database</td><td>Quarterly</td></tr>
+</table>
+<div style="margin-top:15px;padding:12px;background:rgba(253,126,20,0.08);border-radius:8px;border:1px solid rgba(253,126,20,0.2)">
+<p style="font-size:0.82em"><strong style="color:var(--orange)">Requirements:</strong> Change Advisory Board approval, maintenance window, rollback plan, pre/post validation, stakeholder communication</p>
+</div>
+</div>
+</div>
+
+<div class="card" style="margin-bottom:25px">
+<h3><span class="icon-badge badge-cyan">&#x1F504;</span> Update Workflow Pipeline</h3>
+<div class="vendor-flow" style="margin-top:15px">
+<div class="vendor-step">
+<div class="step-num">STEP 1</div>
+<div class="step-title">Vendor Release</div>
+<div class="step-desc">Patch published to vendor portal/CDN</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step">
+<div class="step-num">STEP 2</div>
+<div class="step-title">Secure Pull</div>
+<div class="step-desc">Downloaded via proxy to DMZ staging</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step">
+<div class="step-num">STEP 3</div>
+<div class="step-title">Integrity Check</div>
+<div class="step-desc">Hash/signature verification</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step">
+<div class="step-num">STEP 4</div>
+<div class="step-title">Lab/Dev Test</div>
+<div class="step-desc">Deploy to non-prod first</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step">
+<div class="step-num">STEP 5</div>
+<div class="step-title">Staged Rollout</div>
+<div class="step-desc">Canary &#x2192; 25% &#x2192; 100%</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step">
+<div class="step-num">STEP 6</div>
+<div class="step-title">Validation</div>
+<div class="step-desc">Post-patch scanning & monitoring</div>
+</div>
+</div>
+</div>
+
+<div class="grid-3">
+<div class="card">
+<h3 style="color:var(--green)">&#x1F7E2; Auto-Approved (Low Risk)</h3>
+<ul>
+<li>Antivirus definition updates</li>
+<li>IPS/IDS signature updates</li>
+<li>URL category database refresh</li>
+<li>Threat intelligence feeds</li>
+<li>Endpoint agent minor updates</li>
+<li>Certificate auto-renewals</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(108,192,74,0.8)">No downtime | No approval needed | Automated rollback on failure</p>
+</div>
+
+<div class="card">
+<h3 style="color:var(--orange)">&#x1F7E1; Semi-Automated (Medium Risk)</h3>
+<ul>
+<li>OS security patches (monthly)</li>
+<li>Application patches (scheduled)</li>
+<li>Agent major version upgrades</li>
+<li>Plugin/extension updates</li>
+<li>Driver updates</li>
+<li>Runtime/framework patches</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(253,126,20,0.8)">Maintenance window | Auto-deploy after approval | Staged groups</p>
+</div>
+
+<div class="card">
+<h3 style="color:var(--red)">&#x1F534; Manual Only (High Risk)</h3>
+<ul>
+<li>Platform major upgrades (CUCM, ACI)</li>
+<li>Database engine upgrades</li>
+<li>Hypervisor upgrades (ESXi/AHV)</li>
+<li>Firewall OS major versions</li>
+<li>Identity platform upgrades (ISE/CyberArk)</li>
+<li>Firmware updates (BIOS/BMC)</li>
+</ul>
+<p style="margin-top:10px;font-size:0.75em;color:rgba(220,53,69,0.8)">CAB approval | Full rollback plan | Dedicated team | Extended window</p>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 7: SECURE VENDOR ACCESS - BEYONDTRUST PRA -->
+<!-- ============================================ -->
+<div class="page" id="s7">
+<div class="page-title"><h2>&#x1F510; Secure Vendor Access - BeyondTrust PRA</h2></div>
+<p class="section-subtitle">BeyondTrust Privileged Remote Access (PRA) provides secure, audited vendor access for maintenance and patching activities without exposing internal credentials or infrastructure.</p>
+
+<div class="grid-2" style="margin-bottom:25px">
+<div class="card">
+<h3><span class="icon-badge badge-cyan">&#x1F3AF;</span> Why BeyondTrust PRA?</h3>
+<ul>
+<li><strong>Zero Trust Access</strong> - Vendors never get VPN or direct network access</li>
+<li><strong>Session Recording</strong> - Full video recording of all vendor sessions</li>
+<li><strong>Credential Injection</strong> - Vendors never see actual passwords</li>
+<li><strong>Time-Limited Access</strong> - JIT (Just-In-Time) access with auto-expiry</li>
+<li><strong>Approval Workflow</strong> - Multi-level approval before access granted</li>
+<li><strong>Granular Permissions</strong> - Access only to specific systems needed</li>
+<li><strong>Real-time Monitoring</strong> - Live session viewing by security team</li>
+<li><strong>Compliance Audit</strong> - Complete audit trail for every vendor action</li>
+</ul>
+</div>
+
+<div class="card">
+<h3><span class="icon-badge badge-red">&#x26D4;</span> Without PRA (Traditional Risks)</h3>
+<ul>
+<li class="risk-high">Shared VPN credentials for vendor access</li>
+<li class="risk-high">No visibility into vendor actions on systems</li>
+<li class="risk-high">Persistent access not revoked after work</li>
+<li class="risk-med">No session recording for audit</li>
+<li class="risk-med">Vendor has broad network access via VPN</li>
+<li class="risk-med">Credentials stored on vendor laptops</li>
+<li class="risk-med">No approval workflow for access</li>
+<li class="risk-med">Lateral movement risk if vendor compromised</li>
+</ul>
+</div>
+</div>
+
+<div class="card" style="margin-bottom:25px">
+<h3><span class="icon-badge badge-green">&#x1F504;</span> BeyondTrust PRA - Vendor Access Flow</h3>
+<div class="vendor-flow">
+<div class="vendor-step" style="border-color:rgba(253,126,20,0.4)">
+<div class="step-num">&#x2460;</div>
+<div class="step-title">Vendor Request</div>
+<div class="step-desc">Vendor requests access via PRA portal with justification</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step" style="border-color:rgba(0,188,235,0.4)">
+<div class="step-num">&#x2461;</div>
+<div class="step-title">Approval</div>
+<div class="step-desc">IT Security/Manager approves with time window</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step" style="border-color:rgba(108,192,74,0.4)">
+<div class="step-num">&#x2462;</div>
+<div class="step-title">Secure Session</div>
+<div class="step-desc">Vendor connects via PRA jump point (no VPN)</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step" style="border-color:rgba(0,188,235,0.4)">
+<div class="step-num">&#x2463;</div>
+<div class="step-title">Credential Inject</div>
+<div class="step-desc">PRA injects credentials (vendor never sees them)</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step" style="border-color:rgba(108,192,74,0.4)">
+<div class="step-num">&#x2464;</div>
+<div class="step-title">Work Performed</div>
+<div class="step-desc">Session recorded, keystrokes logged, screenshots captured</div>
+</div>
+<div class="arrow-right">&#x27A1;</div>
+<div class="vendor-step" style="border-color:rgba(220,53,69,0.4)">
+<div class="step-num">&#x2465;</div>
+<div class="step-title">Auto-Terminate</div>
+<div class="step-desc">Session ends at approved time. Access auto-revoked</div>
+</div>
+</div>
+</div>
+
+<div class="grid-3">
+<div class="card">
+<h3 style="color:var(--cyan)">&#x1F465; Vendor Use Cases</h3>
+<ul>
+<li><strong>Nutanix Support</strong> - AOS/AHV troubleshooting & upgrades</li>
+<li><strong>Cisco TAC</strong> - UCM/ACI/ISE remote support</li>
+<li><strong>Palo Alto</strong> - Firewall configuration & upgrades</li>
+<li><strong>CyberArk</strong> - PAM vault maintenance</li>
+<li><strong>Microsoft Premier</strong> - Exchange/SQL critical fixes</li>
+<li><strong>Trellix Support</strong> - EPO server troubleshooting</li>
+</ul>
+</div>
+
+<div class="card">
+<h3 style="color:var(--green)">&#x1F512; Security Controls</h3>
+<ul>
+<li><strong>MFA Required</strong> - Vendor must authenticate with MFA</li>
+<li><strong>Geo-restriction</strong> - Access only from approved countries</li>
+<li><strong>Protocol Control</strong> - Only RDP/SSH/HTTPS allowed</li>
+<li><strong>Clipboard Disabled</strong> - No data exfiltration via copy/paste</li>
+<li><strong>File Transfer Audit</strong> - All file uploads/downloads logged</li>
+<li><strong>Session Watermark</strong> - Vendor identity visible on screen</li>
+</ul>
+</div>
+
+<div class="card">
+<h3 style="color:var(--gold)">&#x1F4C8; Compliance & Reporting</h3>
+<ul>
+<li><strong>Session Recordings</strong> - Stored for 12 months minimum</li>
+<li><strong>Access Reports</strong> - Who accessed what, when, for how long</li>
+<li><strong>Anomaly Detection</strong> - Alerts on unusual vendor behavior</li>
+<li><strong>Regulatory Mapping</strong> - ISO 27001, NCA ECC, PCI-DSS evidence</li>
+<li><strong>Real-time Dashboards</strong> - Active sessions & approval queue</li>
+<li><strong>Integration</strong> - Feeds into SIEM (Splunk/QRadar)</li>
+</ul>
+</div>
+</div>
+
+<div class="card" style="margin-top:25px;border-color:rgba(0,188,235,0.4)">
+<h3 style="color:var(--cyan)">&#x1F3D7; Architecture Integration</h3>
+<div class="grid-2" style="margin-top:10px">
+<div>
+<p><strong style="color:#fff">PRA Jump Points in DMZ</strong></p>
+<p>BeyondTrust jump points deployed in DMZ zone, accessible through Layer 3 (DMZ Firewall). Vendors connect to jump points which broker access to internal systems through controlled channels.</p>
+</div>
+<div>
+<p><strong style="color:#fff">Integration with Secure Pull</strong></p>
+<p>Vendor patching sessions are routed through the same 5-layer security model. PRA sessions are logged and correlated with change tickets. Credential rotation happens automatically post-session.</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- FOOTER & ANIMATIONS -->
+<!-- ============================================ -->
 <div id="particles"></div>
+
 <script>
+// Floating particles
 (function(){
-var c=document.getElementById('particles'),cols=['#00bceb','#6cc04a','#fd7e14','#dc3545'];
-for(var i=0;i<25;i++){var p=document.createElement('div');p.className='particle';var s=Math.random()*4+2;p.style.cssText='width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';top:'+Math.random()*100+'vh;left:'+Math.random()*100+'vw;opacity:'+(Math.random()*0.25+0.05)+';animation-delay:'+Math.random()*8+'s;animation-duration:'+(Math.random()*12+10)+'s;';c.appendChild(p);}
+var c=document.getElementById('particles');
+c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#ffc107'];
+for(var i=0;i<30;i++){
+var p=document.createElement('div');
+var s=Math.random()*3+1;
+p.style.cssText='position:absolute;width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';border-radius:50%;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.2+0.05)+';animation:pfloat '+(Math.random()*15+10)+'s ease-in-out infinite;animation-delay:'+Math.random()*8+'s;';
+c.appendChild(p);
+}
+var st=document.createElement('style');
+st.textContent='@keyframes pfloat{0%,100%{transform:translate(0,0)}25%{transform:translate(20px,-20px)}50%{transform:translate(-15px,25px)}75%{transform:translate(18px,10px)}}'
+document.head.appendChild(st);
+})();
+
+// Navigation active state
+(function(){
+var sections=document.querySelectorAll('.page');
+var navLinks=document.querySelectorAll('.nav a');
+window.addEventListener('scroll',function(){
+var current='';
+sections.forEach(function(s){
+var top=s.offsetTop-200;
+if(window.pageYOffset>=top){current=s.getAttribute('id');}
+});
+navLinks.forEach(function(a){
+a.classList.remove('active');
+if(a.getAttribute('href')==='#'+current){a.classList.add('active');}
+});
+});
+})();
+
+// Intersection Observer for animations
+(function(){
+var observer=new IntersectionObserver(function(entries){
+entries.forEach(function(entry){
+if(entry.isIntersecting){
+entry.target.style.animationPlayState='running';
+entry.target.classList.add('visible');
+}
+});
+},{threshold:0.1});
+document.querySelectorAll('.card,.layer-row,.stat-box').forEach(function(el){
+observer.observe(el);
+});
 })();
 </script>
 </body>
