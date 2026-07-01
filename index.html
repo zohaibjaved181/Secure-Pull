@@ -46,12 +46,19 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .el-label[contenteditable=true]:focus,.el-sub[contenteditable=true]:focus{outline:1px dashed #00bceb;border-radius:2px;white-space:normal}
 
 /* BOXES */
-.box{position:absolute;border-radius:12px;z-index:5;cursor:move}
+.box{position:absolute;border-radius:12px;z-index:5;cursor:move;display:flex;align-items:stretch}
 .box.selected{outline:3px solid #ffc107;outline-offset:-1px}
-.box .box-label{position:absolute;top:-9px;left:12px;background:#1e1e2e;padding:0 6px;font-size:0.62em;font-weight:700;outline:none}
+.box .box-label{position:absolute;top:-9px;left:90px;background:#1e1e2e;padding:0 6px;font-size:0.62em;font-weight:700;outline:none}
 .box .box-label[contenteditable=true]:focus{outline:1px dashed #ffc107}
 .box .resize-handle{position:absolute;bottom:-4px;right:-4px;width:12px;height:12px;background:#ffc107;border-radius:2px;cursor:nwse-resize;opacity:0;transition:opacity 0.2s}
 .box.selected .resize-handle{opacity:1}
+.box .lyr-badge{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.3);z-index:6}
+.box .lyr-badge .bl{font-size:0.4em;opacity:0.8}
+.box .lyr-badge .bn{font-size:1em;line-height:1}
+.box .lyr-badge[contenteditable=true]:focus{outline:2px dashed #ffc107}
+.box .lyr-details{position:absolute;right:12px;top:50%;transform:translateY(-50%);max-width:260px;font-size:0.65em;line-height:1.7;color:rgba(255,255,255,0.7);outline:none;padding:5px}
+.box .lyr-details[contenteditable=true]:focus{outline:1px dashed currentColor;border-radius:4px}
+.box .lyr-details .dt{font-weight:700;margin-bottom:2px}
 .box.anim-pulse{animation:bPulse 2s ease-in-out infinite}
 .box.anim-glow{animation:bGlow 2.5s ease-in-out infinite}
 @keyframes bPulse{0%,100%{opacity:0.7}50%{opacity:1}}
@@ -60,13 +67,25 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 /* SHAPES */
 .shape{position:absolute;z-index:15;cursor:grab}
 .shape.selected{outline:2px solid #ffc107;outline-offset:3px}
-.shape-arrow{width:0;height:0;border:15px solid transparent}
+.shape .sh-resize{position:absolute;bottom:-4px;right:-4px;width:10px;height:10px;background:#ffc107;border-radius:2px;cursor:nwse-resize;opacity:0;transition:opacity 0.2s}
+.shape.selected .sh-resize{opacity:1}
+.shape-arrow{border:15px solid transparent}
 .shape-arrow.right{border-left:25px solid #00bceb}
 .shape-arrow.down{border-top:25px solid #00bceb}
 .shape-arrow.left{border-right:25px solid #00bceb}
 .shape-arrow.up{border-bottom:25px solid #00bceb}
-.shape-note{background:rgba(255,255,200,0.92);border:1px solid #cca;border-radius:6px;padding:8px 10px;font-size:0.65em;color:#333;font-weight:500;min-width:80px;min-height:30px;outline:none}
+.shape-note{background:rgba(255,255,200,0.92);border:1px solid #cca;border-radius:6px;padding:8px 10px;font-size:0.65em;color:#333;font-weight:500;min-width:80px;min-height:30px;outline:none;resize:both;overflow:auto}
 .shape-text{font-size:0.85em;color:#fff;font-weight:600;outline:none;min-width:40px}
+.shape-circle{width:60px;height:60px;border:2px solid #00bceb;border-radius:50%;resize:both;overflow:hidden}
+.shape-rect{width:100px;height:60px;border:2px solid #00bceb;border-radius:6px;resize:both;overflow:hidden}
+.shape-diamond{width:50px;height:50px;border:2px solid #fd7e14;transform:rotate(45deg);resize:both;overflow:hidden}
+.shape-line-h{width:120px;height:3px;background:#00bceb;min-width:20px;resize:horizontal;overflow:hidden}
+.shape-line-v{width:3px;height:100px;background:#00bceb;min-height:20px;resize:vertical;overflow:hidden}
+.shape-bracket-l{width:15px;height:80px;border:2px solid #888;border-right:none;border-radius:8px 0 0 8px;resize:vertical;overflow:hidden}
+.shape-bracket-r{width:15px;height:80px;border:2px solid #888;border-left:none;border-radius:0 8px 8px 0;resize:vertical;overflow:hidden}
+.shape-hexagon{width:60px;height:52px;background:#198754;clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);resize:both;overflow:hidden}
+.shape-pill{padding:5px 15px;background:rgba(0,188,235,0.15);border:1.5px solid #00bceb;border-radius:20px;font-size:0.6em;color:#00bceb;font-weight:600;text-align:center;outline:none;white-space:nowrap}
+.shape-star{width:40px;height:40px;background:#ffc107;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 
 /* DEVICE ICONS */
 .ico{display:flex;align-items:center;justify-content:center}
@@ -138,7 +157,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 </div>
 <div class="tb">
 <label>Shape:</label>
-<select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option></select>
+<select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option><option value="circle">Circle</option><option value="rectangle">Rectangle</option><option value="diamond">Diamond</option><option value="line-h">Line Horizontal</option><option value="line-v">Line Vertical</option><option value="bracket-l">Bracket Left</option><option value="bracket-r">Bracket Right</option><option value="hexagon">Hexagon</option><option value="pill">Pill/Badge</option><option value="star">Star</option></select>
 <button class="btn-purple" onclick="addShape()">+Shape</button>
 </div>
 <div class="tb">
@@ -181,15 +200,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="el" style="top:150px;left:500px" data-id="mainnet"><div class="el-icon"><div class="ico-bar">Main NETWORK</div></div></div>
 
 <!-- L5 box -->
-<div class="box" style="top:210px;left:50px;width:1200px;height:150px;border:2px solid rgba(220,53,69,0.4);color:#dc3545" data-bid="l5"><div class="box-label" contenteditable="true">Layer 5 - Internet Firewall | Source IP Whitelisting | IPS & Anti-malware | Unidirectional Flow</div><div class="resize-handle"></div></div>
+<div class="box" style="top:210px;left:50px;width:1200px;height:150px;border:2px solid rgba(220,53,69,0.4);color:#dc3545" data-bid="l5"><div class="lyr-badge" style="background:linear-gradient(135deg,#dc3545,#a71d2a)" contenteditable="false"><span class="bl">LAYER</span><span class="bn">5</span></div><div class="box-label" contenteditable="true">Internet Firewall</div><div class="lyr-details" contenteditable="true"><div class="dt" style="color:#dc3545">Internet Firewall (Palo Alto)</div>&#x25B8; Source IP Whitelisting - Only from Web Proxy<br>&#x25B8; Destination Server IP &amp; URL Whitelisting<br>&#x25B8; IPS, Web Filtering &amp; Anti-malware Security<br>&#x25B8; Zoning &amp; Multi-tenancy<br>&#x25B8; Unidirectional Flow</div><div class="resize-handle"></div></div>
 <div class="el" style="top:260px;left:540px" data-id="intfw"><div class="el-icon"><div class="ico-fw fw-red"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">INT FW</div><div class="el-sub" contenteditable="true">Palo Alto</div></div>
 
 <!-- L4 box -->
-<div class="box" style="top:380px;left:50px;width:1200px;height:150px;border:2px solid rgba(253,126,20,0.4);color:#fd7e14" data-bid="l4"><div class="box-label" contenteditable="true">Layer 4 - Web Proxy | HTTPS Inspection | Anti-malware | Web Reputation | URL Filtering</div><div class="resize-handle"></div></div>
+<div class="box" style="top:380px;left:50px;width:1200px;height:150px;border:2px solid rgba(253,126,20,0.4);color:#fd7e14" data-bid="l4"><div class="lyr-badge" style="background:linear-gradient(135deg,#fd7e14,#e8590c)" contenteditable="false"><span class="bl">LAYER</span><span class="bn">4</span></div><div class="box-label" contenteditable="true">Web Proxy</div><div class="lyr-details" contenteditable="true"><div class="dt" style="color:#fd7e14">Web Proxy</div>&#x25B8; Source IP Whitelisting - Only from DMZ Servers<br>&#x25B8; Destination Server IP &amp; URL Whitelisting<br>&#x25B8; Web Reputation &amp; Web Usage Control<br>&#x25B8; Anti-malware Analysis &amp; HTTPS Inspection<br>&#x25B8; URL Categorization &amp; Content Filtering</div><div class="resize-handle"></div></div>
 <div class="el" style="top:420px;left:540px" data-id="proxy"><div class="el-icon"><div class="ico-proxy">Web<br>Proxy</div></div><div class="el-label" contenteditable="true">Web Proxy</div><div class="el-sub" contenteditable="true">Forward Proxy</div></div>
 
 <!-- L3 box -->
-<div class="box" style="top:550px;left:50px;width:1200px;height:180px;border:2px solid rgba(0,188,235,0.4);color:#00bceb" data-bid="l3"><div class="box-label" contenteditable="true">Layer 3 - DMZ Firewall | Zoning | Unidirectional Flow | DMZ VM Isolation</div><div class="resize-handle"></div></div>
+<div class="box" style="top:550px;left:50px;width:1200px;height:180px;border:2px solid rgba(0,188,235,0.4);color:#00bceb" data-bid="l3"><div class="lyr-badge" style="background:linear-gradient(135deg,#00bceb,#0076d5)" contenteditable="false"><span class="bl">LAYER</span><span class="bn">3</span></div><div class="box-label" contenteditable="true">DMZ Firewall</div><div class="lyr-details" contenteditable="true"><div class="dt" style="color:#00bceb">DMZ Firewall</div>&#x25B8; Only specific DMZ servers reach Proxy<br>&#x25B8; Destination Server IP &amp; URL Whitelisting<br>&#x25B8; IPS, Web Filtering &amp; Anti-malware Security<br>&#x25B8; Zoning &amp; Unidirectional Flow<br>&#x25B8; DMZ VM Isolation &amp; Protection</div><div class="resize-handle"></div></div>
 <div class="el" style="top:600px;left:520px" data-id="dmzfw"><div class="el-icon"><div class="ico-fw fw-blue"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">DMZ FW</div><div class="el-sub" contenteditable="true">DMZ Firewall</div></div>
 
 <!-- DMZ Zone -->
@@ -199,11 +218,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="el" style="top:665px;left:195px" data-id="trellix"><div class="el-icon"><div class="ico-trellix">X</div></div><div class="el-label" contenteditable="true">Trellix TIE</div><div class="el-sub" contenteditable="true">Threat Intel</div></div>
 
 <!-- L2 box -->
-<div class="box" style="top:755px;left:50px;width:1200px;height:150px;border:2px solid rgba(108,192,74,0.4);color:#6cc04a" data-bid="l2"><div class="box-label" contenteditable="true">Layer 2 - DC Firewall | Source/Dest IP Whitelisting | IPS | Unidirectional DC to DMZ</div><div class="resize-handle"></div></div>
+<div class="box" style="top:755px;left:50px;width:1200px;height:150px;border:2px solid rgba(108,192,74,0.4);color:#6cc04a" data-bid="l2"><div class="lyr-badge" style="background:linear-gradient(135deg,#6cc04a,#3d8b37)" contenteditable="false"><span class="bl">LAYER</span><span class="bn">2</span></div><div class="box-label" contenteditable="true">DC Firewall</div><div class="lyr-details" contenteditable="true"><div class="dt" style="color:#6cc04a">DC Firewall</div>&#x25B8; Source &amp; Destination Server IP Whitelisting<br>&#x25B8; Only Specific Server to Specific DMZ Server<br>&#x25B8; IPS, Zoning &amp; Multi-Instance<br>&#x25B8; Unidirectional Flow from DC to DMZ</div><div class="resize-handle"></div></div>
 <div class="el" style="top:800px;left:540px" data-id="dcfw"><div class="el-icon"><div class="ico-fw fw-green"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">DC FW</div><div class="el-sub" contenteditable="true">DC Firewall</div></div>
 
 <!-- L1 box -->
-<div class="box" style="top:930px;left:50px;width:1200px;height:155px;border:2px solid rgba(25,135,84,0.4);color:#198754" data-bid="l1"><div class="box-label" contenteditable="true">Layer 1 - ACI Fabric | EPG Whitelisting | Service Graphs | PBR | VRFs | Multi-tenancy</div><div class="resize-handle"></div></div>
+<div class="box" style="top:930px;left:50px;width:1200px;height:155px;border:2px solid rgba(25,135,84,0.4);color:#198754" data-bid="l1"><div class="lyr-badge" style="background:linear-gradient(135deg,#198754,#0f5132)" contenteditable="false"><span class="bl">LAYER</span><span class="bn">1</span></div><div class="box-label" contenteditable="true">ACI Fabric</div><div class="lyr-details" contenteditable="true"><div class="dt" style="color:#198754">ACI Fabric</div>&#x25B8; Source Whitelisting - Only specific EPG to DMZ<br>&#x25B8; Service Graphs, PBR, VRFs<br>&#x25B8; EPGs, ESGs &amp; Multi-tenancy<br>&#x25B8; Unidirectional Flow from EPG to DMZ</div><div class="resize-handle"></div></div>
 <div class="el" style="top:975px;left:480px" data-id="aci"><div class="el-icon"><div class="ico-aci">ACI<br>APIC</div></div><div class="el-label" contenteditable="true">ACI APIC</div><div class="el-sub" contenteditable="true">Controller</div></div>
 <div class="el" style="top:985px;left:600px" data-id="leafspine"><div class="el-icon"><div class="ico-sw"></div></div><div class="el-label" contenteditable="true">Leaf / Spine</div><div class="el-sub" contenteditable="true">ACI Fabric</div></div>
 
@@ -281,12 +300,22 @@ function addFlow(){if(selConn===null){alert('Select a connection first');return;
 function addBox(){boxC++;const lb=document.getElementById('boxLbl').value||'Zone';const cl=document.getElementById('boxClr').value;const bd=document.getElementById('boxBdr').value;const an=document.getElementById('boxAnm').value;const b=document.createElement('div');b.className='box '+(an||'');b.dataset.bid='b'+boxC;b.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${bd} ${cl};color:${cl}`;b.innerHTML=`<div class="box-label" contenteditable="true">${lb}</div><div class="resize-handle"></div>`;document.getElementById('canvas').appendChild(b);initBox(b);}
 
 function addShape(){const t=document.getElementById('shapeSel').value;if(!t)return;shapeC++;const s=document.createElement('div');s.className='shape';s.dataset.sid='s'+shapeC;s.style.cssText='top:500px;left:700px';
-if(t==='arrow-right')s.innerHTML='<div class="shape-arrow right"></div>';
-else if(t==='arrow-down')s.innerHTML='<div class="shape-arrow down"></div>';
-else if(t==='arrow-left')s.innerHTML='<div class="shape-arrow left"></div>';
-else if(t==='arrow-up')s.innerHTML='<div class="shape-arrow up"></div>';
-else if(t==='note')s.innerHTML='<div class="shape-note" contenteditable="true">Note text here</div>';
-else if(t==='text')s.innerHTML='<div class="shape-text" contenteditable="true">Text</div>';
+if(t==='arrow-right')s.innerHTML='<div class="shape-arrow right"></div><div class="sh-resize"></div>';
+else if(t==='arrow-down')s.innerHTML='<div class="shape-arrow down"></div><div class="sh-resize"></div>';
+else if(t==='arrow-left')s.innerHTML='<div class="shape-arrow left"></div><div class="sh-resize"></div>';
+else if(t==='arrow-up')s.innerHTML='<div class="shape-arrow up"></div><div class="sh-resize"></div>';
+else if(t==='note')s.innerHTML='<div class="shape-note" contenteditable="true">Note text here</div><div class="sh-resize"></div>';
+else if(t==='text')s.innerHTML='<div class="shape-text" contenteditable="true">Text</div><div class="sh-resize"></div>';
+else if(t==='circle')s.innerHTML='<div class="shape-circle"></div><div class="sh-resize"></div>';
+else if(t==='rectangle')s.innerHTML='<div class="shape-rect"></div><div class="sh-resize"></div>';
+else if(t==='diamond')s.innerHTML='<div class="shape-diamond"></div><div class="sh-resize"></div>';
+else if(t==='line-h')s.innerHTML='<div class="shape-line-h"></div><div class="sh-resize"></div>';
+else if(t==='line-v')s.innerHTML='<div class="shape-line-v"></div><div class="sh-resize"></div>';
+else if(t==='bracket-l')s.innerHTML='<div class="shape-bracket-l"></div><div class="sh-resize"></div>';
+else if(t==='bracket-r')s.innerHTML='<div class="shape-bracket-r"></div><div class="sh-resize"></div>';
+else if(t==='hexagon')s.innerHTML='<div class="shape-hexagon"></div><div class="sh-resize"></div>';
+else if(t==='pill')s.innerHTML='<div class="shape-pill" contenteditable="true">Label</div><div class="sh-resize"></div>';
+else if(t==='star')s.innerHTML='<div class="shape-star"></div><div class="sh-resize"></div>';
 document.getElementById('canvas').appendChild(s);initShape(s);}
 
 function addDevice(){const t=document.getElementById('devSel').value;if(!t)return;idC++;const id=t+'-'+idC;const d=document.createElement('div');d.className='el';d.style.cssText='top:500px;left:650px';d.dataset.id=id;let ico='',nm=t;
@@ -377,6 +406,7 @@ e.preventDefault();boxDrag=b;clearSel();b.classList.add('selected');selBox=b;sel
 function initShape(s){
 s.addEventListener('mousedown',function(e){
 if(e.target.getAttribute('contenteditable'))return;
+if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note')||s;rStart={x:e.clientX,y:e.clientY,w:resizing.offsetWidth||60,h:resizing.offsetHeight||60};return;}
 e.preventDefault();drag=s;s.classList.add('dragging');clearSel();s.classList.add('selected');selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 }
 
