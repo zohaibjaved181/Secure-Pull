@@ -3,409 +3,631 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Pull Architecture - Network Diagram</title>
+<title>Secure Pull Architecture - Interactive Network Diagram</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 20px;color:#fff}
-.diagram-title{background:linear-gradient(90deg,#00bceb,#0076d5);border-radius:40px;padding:12px 50px;margin-bottom:30px;box-shadow:0 4px 25px rgba(0,188,235,0.4);animation:titleGlow 3s ease-in-out infinite}
-.diagram-title h1{font-size:1.8em;font-weight:700;letter-spacing:1px}
-@keyframes titleGlow{0%,100%{box-shadow:0 4px 25px rgba(0,188,235,0.4)}50%{box-shadow:0 4px 50px rgba(0,188,235,0.7)}}
-.diagram-container{position:relative;width:1200px;height:2200px}
-.layer{position:absolute;left:50px;right:50px;border-radius:16px;border:2px solid;display:flex;align-items:flex-start;justify-content:center;padding-top:20px}
-.layer-label{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:80px;height:80px;border-radius:50%;border:3px solid;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9em;background:rgba(0,0,0,0.3)}
-.net-cloud{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:160px;height:80px;background:rgba(0,188,235,0.08);border:2px solid #00bceb;border-radius:40px;display:flex;align-items:center;justify-content:center;font-size:1.1em;font-weight:700;color:#00bceb}
-.main-network{position:absolute;top:120px;left:50%;transform:translateX(-50%);width:350px;height:50px;background:rgba(255,255,255,0.03);border:2px solid #666;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#ccc;font-size:0.95em}
-/* Layer colors */
-.layer-5{top:200px;height:240px;background:rgba(220,53,69,0.04);border-color:rgba(220,53,69,0.3)}
-.layer-5 .layer-label{border-color:#dc3545;color:#dc3545}
-.layer-4{top:460px;height:220px;background:rgba(253,126,20,0.04);border-color:rgba(253,126,20,0.3)}
-.layer-4 .layer-label{border-color:#fd7e14;color:#fd7e14}
-.layer-3{top:700px;height:260px;background:rgba(0,188,235,0.04);border-color:rgba(0,188,235,0.3)}
-.layer-3 .layer-label{border-color:#00bceb;color:#00bceb}
-.layer-2{top:980px;height:220px;background:rgba(108,192,74,0.04);border-color:rgba(108,192,74,0.3)}
-.layer-2 .layer-label{border-color:#6cc04a;color:#6cc04a}
-.layer-1{top:1220px;height:280px;background:rgba(25,135,84,0.04);border-color:rgba(25,135,84,0.3)}
-.layer-1 .layer-label{border-color:#198754;color:#198754}
-/* DC Zone */
-.dc-zone{position:absolute;top:1520px;left:200px;right:200px;height:320px;background:rgba(40,40,60,0.6);border:2px solid #555;border-radius:16px}
-.dc-label{position:absolute;right:20px;bottom:20px;font-size:1.1em;font-weight:700;color:#888;border:2px solid #888;border-radius:8px;padding:5px 15px}
-/* Device styles */
-.device{position:absolute;display:flex;flex-direction:column;align-items:center;text-align:center;z-index:10}
-.device-name{font-size:0.7em;color:rgba(255,255,255,0.8);margin-top:4px;font-weight:600;white-space:nowrap}
-.device-sub{font-size:0.6em;color:rgba(255,255,255,0.5);margin-top:1px}
-/* Firewall icon */
-.icon-firewall{width:70px;height:70px;position:relative;display:flex;align-items:center;justify-content:center}
-.icon-firewall .fw-body{width:60px;height:60px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.icon-firewall .fw-body::after{content:'';position:absolute;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 8px,rgba(255,255,255,0.15) 8px,rgba(255,255,255,0.15) 9px)}
-.icon-firewall .flame{font-size:1.8em}
-.fw-red .fw-body{background:linear-gradient(135deg,#dc3545,#a71d2a);box-shadow:0 4px 15px rgba(220,53,69,0.4)}
-.fw-blue .fw-body{background:linear-gradient(135deg,#0076d5,#004080);box-shadow:0 4px 15px rgba(0,118,213,0.4)}
-.fw-green .fw-body{background:linear-gradient(135deg,#198754,#0f5132);box-shadow:0 4px 15px rgba(25,135,84,0.4)}
-/* Switch icon */
-.icon-switch{width:65px;height:35px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:5px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 10px rgba(0,118,213,0.3)}
-.icon-switch::before{content:'';position:absolute;top:50%;left:8px;width:5px;height:5px;background:#6cc04a;border-radius:50%;transform:translateY(-50%);box-shadow:9px 0 0 #6cc04a,18px 0 0 #6cc04a,27px 0 0 #fd7e14,36px 0 0 #6cc04a}
-.icon-switch .arrows{color:#fff;font-size:1.2em;font-weight:700}
-/* Proxy / WSA icon */
-.icon-proxy{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.55em;text-align:center;line-height:1.3;color:#fff}
-.proxy-orange{background:linear-gradient(135deg,#fd7e14,#e8590c);box-shadow:0 4px 15px rgba(253,126,20,0.4)}
-.proxy-blue{background:linear-gradient(135deg,#00bceb,#0076d5);box-shadow:0 4px 15px rgba(0,188,235,0.4)}
-/* BeyondTrust PRA */
-.icon-pra{width:60px;height:55px;background:linear-gradient(135deg,#e85d04,#dc2f02);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:700;color:#fff;box-shadow:0 4px 12px rgba(232,93,4,0.4)}
-/* WSUS */
-.icon-wsus{width:55px;height:55px;background:linear-gradient(135deg,#0078d4,#005a9e);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 4px 12px rgba(0,120,212,0.4)}
-.icon-wsus::after{content:'';width:20px;height:20px;border:3px solid #fff;border-radius:50%;position:absolute;border-top-color:transparent;animation:spin 2s linear infinite}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#12141d;min-height:100vh;overflow:auto;color:#fff}
+#canvas-area{position:relative;width:1300px;min-height:2000px;margin:0 auto;padding:30px 0}
+.diagram-title{text-align:center;margin-bottom:25px}
+.diagram-title h1{display:inline-block;background:linear-gradient(90deg,#00bceb,#0076d5);border-radius:40px;padding:12px 50px;font-size:1.7em;box-shadow:0 4px 25px rgba(0,188,235,0.4);animation:tGlow 3s ease-in-out infinite}
+@keyframes tGlow{0%,100%{box-shadow:0 4px 25px rgba(0,188,235,0.3)}50%{box-shadow:0 4px 50px rgba(0,188,235,0.7)}}
+
+/* Toolbar */
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(18,20,29,0.95);border-bottom:1px solid #333;padding:8px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;backdrop-filter:blur(10px)}
+.toolbar-section{display:flex;align-items:center;gap:8px;padding:0 12px;border-right:1px solid #333}
+.toolbar-section:last-child{border-right:none}
+.toolbar label{font-size:0.75em;color:#888;font-weight:600}
+.toolbar select,.toolbar input[type=color]{background:#1e2030;border:1px solid #444;color:#fff;border-radius:4px;padding:4px 8px;font-size:0.75em;cursor:pointer}
+.toolbar input[type=color]{width:30px;height:26px;padding:2px}
+.toolbar button{background:linear-gradient(135deg,#0076d5,#00bceb);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer;transition:all 0.2s}
+.toolbar button:hover{transform:scale(1.05);box-shadow:0 2px 10px rgba(0,188,235,0.4)}
+.toolbar button.danger{background:linear-gradient(135deg,#dc3545,#a71d2a)}
+.toolbar .mode-indicator{font-size:0.7em;padding:4px 10px;border-radius:12px;background:rgba(108,192,74,0.15);color:#6cc04a;border:1px solid rgba(108,192,74,0.3)}
+
+/* Layers */
+.layer-box{position:absolute;left:40px;right:40px;border-radius:14px;border:2px solid;display:flex;align-items:stretch}
+.layer-left{display:flex;align-items:center;padding:0 15px;min-width:90px}
+.layer-badge{width:60px;height:60px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;box-shadow:0 3px 12px rgba(0,0,0,0.3)}
+.layer-badge .lbl{font-size:0.45em;opacity:0.85}
+.layer-badge .num{font-size:1.2em;line-height:1}
+.layer-center{flex:1;display:flex;align-items:center;justify-content:center;padding:15px 10px;position:relative;min-height:160px}
+.layer-right{min-width:250px;padding:15px;display:flex;flex-direction:column;justify-content:center;font-size:0.72em;line-height:1.7;color:rgba(255,255,255,0.7);border-left:1px solid rgba(255,255,255,0.05)}
+.layer-right .lr-title{font-weight:700;margin-bottom:4px}
+.layer-right li{list-style:none;padding-left:12px;position:relative}
+.layer-right li::before{content:"\25B8";position:absolute;left:0;font-size:0.8em}
+
+.l5{background:rgba(220,53,69,0.04);border-color:rgba(220,53,69,0.35)}
+.l5 .layer-badge{background:linear-gradient(135deg,#dc3545,#a71d2a)}
+.l5 .lr-title{color:#dc3545}
+.l5 .layer-right li::before{color:#dc3545}
+
+.l4{background:rgba(253,126,20,0.04);border-color:rgba(253,126,20,0.35)}
+.l4 .layer-badge{background:linear-gradient(135deg,#fd7e14,#e8590c)}
+.l4 .lr-title{color:#fd7e14}
+.l4 .layer-right li::before{color:#fd7e14}
+
+.l3{background:rgba(0,188,235,0.04);border-color:rgba(0,188,235,0.35)}
+.l3 .layer-badge{background:linear-gradient(135deg,#00bceb,#0076d5)}
+.l3 .lr-title{color:#00bceb}
+.l3 .layer-right li::before{color:#00bceb}
+
+.l2{background:rgba(108,192,74,0.04);border-color:rgba(108,192,74,0.35)}
+.l2 .layer-badge{background:linear-gradient(135deg,#6cc04a,#3d8b37)}
+.l2 .lr-title{color:#6cc04a}
+.l2 .layer-right li::before{color:#6cc04a}
+
+.l1{background:rgba(25,135,84,0.04);border-color:rgba(25,135,84,0.35)}
+.l1 .layer-badge{background:linear-gradient(135deg,#198754,#0f5132)}
+.l1 .lr-title{color:#198754}
+.l1 .layer-right li::before{color:#198754}
+
+/* Device icons */
+.device{position:absolute;cursor:grab;z-index:20;display:flex;flex-direction:column;align-items:center;transition:filter 0.2s}
+.device:hover{filter:brightness(1.2)}
+.device.dragging{cursor:grabbing;z-index:100;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.5))}
+.device-icon{display:flex;align-items:center;justify-content:center}
+.device-name{font-size:0.65em;color:rgba(255,255,255,0.85);margin-top:3px;font-weight:600;white-space:nowrap;text-align:center}
+.device-sub{font-size:0.55em;color:rgba(255,255,255,0.5);text-align:center}
+
+/* Specific device icons */
+.dev-firewall{width:60px;height:56px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.dev-firewall::after{content:'';position:absolute;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 7px,rgba(255,255,255,0.1) 7px,rgba(255,255,255,0.1) 8px)}
+.dev-firewall .flame{font-size:1.6em}
+.fw-paloalto{background:linear-gradient(135deg,#dc3545,#8b0000);box-shadow:0 3px 12px rgba(220,53,69,0.4)}
+.fw-dmz{background:linear-gradient(135deg,#0076d5,#003d73);box-shadow:0 3px 12px rgba(0,118,213,0.4)}
+.fw-dc{background:linear-gradient(135deg,#6cc04a,#2d6b1e);box-shadow:0 3px 12px rgba(108,192,74,0.4)}
+
+.dev-proxy{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.5em;text-align:center;line-height:1.2;color:#fff;background:linear-gradient(135deg,#fd7e14,#cc5500);box-shadow:0 3px 12px rgba(253,126,20,0.4)}
+
+.dev-switch{width:60px;height:28px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,118,213,0.3);position:relative}
+.dev-switch::after{content:'';position:absolute;left:6px;width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:8px 0 0 #6cc04a,16px 0 0 #6cc04a,24px 0 0 #fd7e14,32px 0 0 #6cc04a}
+
+.dev-pra{width:55px;height:50px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.55em;font-weight:700;color:#fff;box-shadow:0 3px 12px rgba(232,93,4,0.4)}
+.dev-wsus{width:50px;height:50px;background:linear-gradient(135deg,#0078d4,#004578);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,120,212,0.4);position:relative}
+.dev-wsus .sync{width:20px;height:20px;border:3px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* Trellix */
-.icon-trellix{width:55px;height:55px;background:linear-gradient(135deg,#1a1a2e,#333);border:2px solid #00bceb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5em;font-weight:900;color:#00bceb;box-shadow:0 4px 12px rgba(0,188,235,0.3)}
-/* ACI */
-.icon-aci{width:60px;height:60px;border:3px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.08);box-shadow:0 4px 12px rgba(108,192,74,0.3)}
-.icon-aci-inner{font-size:0.55em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2}
-/* Jump Point */
-.icon-jumppoint{width:60px;height:65px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.5em;font-weight:700;line-height:1.3;box-shadow:0 4px 15px rgba(232,93,4,0.4)}
-/* DC Firewall */
-.icon-dc-fw{width:70px;height:50px;background:linear-gradient(90deg,#dc3545,#a71d2a);border-radius:5px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(220,53,69,0.4)}
-.icon-dc-fw::after{content:'';width:50px;height:3px;background:#fff;box-shadow:0 8px 0 #fff,0 -8px 0 #fff}
-/* Server rack */
-.icon-server{width:45px;height:60px;background:linear-gradient(180deg,#2a2a4a,#1a1a2e);border:1px solid #444;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 3px 10px rgba(0,0,0,0.4)}
-.icon-server .srv-led{width:25px;height:3px;background:#6cc04a;border-radius:2px;opacity:0.8}
-/* Note box */
-.note-box{position:absolute;background:rgba(255,255,200,0.9);border:1px solid #cca;border-radius:6px;padding:8px 10px;font-size:0.6em;color:#333;font-weight:600;max-width:140px;line-height:1.3;z-index:20}
-/* DMZ box */
-.dmz-box{position:absolute;border:2px dashed #00bceb;border-radius:10px;padding:8px;z-index:5}
-.dmz-label{position:absolute;top:-10px;left:10px;background:#1a1a2e;padding:0 8px;color:#00bceb;font-size:0.7em;font-weight:700}
+
+.dev-trellix{width:50px;height:50px;background:#1a1a2e;border:2px solid #00bceb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4em;font-weight:900;color:#00bceb;box-shadow:0 3px 10px rgba(0,188,235,0.3)}
+
+.dev-aci{width:55px;height:55px;border:3px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.05);box-shadow:0 3px 10px rgba(108,192,74,0.3);font-size:0.5em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2}
+
+.dev-jumppoint{width:55px;height:58px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.45em;font-weight:700;line-height:1.3;box-shadow:0 3px 12px rgba(232,93,4,0.4)}
+
+.dev-server{width:40px;height:55px;background:linear-gradient(180deg,#2a2a4a,#16162e);border:1px solid #444;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+.dev-server .led{width:22px;height:2.5px;background:#6cc04a;border-radius:2px}
+
+.dev-cloud{width:100px;height:55px;background:rgba(0,188,235,0.06);border:2px solid #00bceb;border-radius:28px;display:flex;align-items:center;justify-content:center;color:#00bceb;font-weight:700;font-size:0.8em}
+
+.dev-network-bar{width:280px;height:40px;background:rgba(255,255,255,0.02);border:2px solid #555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#aaa;font-size:0.8em}
+
+/* Zones */
+.zone-box{position:absolute;border:2px dashed;border-radius:12px;z-index:3}
+.zone-box .zone-label{position:absolute;top:-10px;left:12px;background:#12141d;padding:0 8px;font-size:0.7em;font-weight:700}
+.zone-dmz{border-color:rgba(0,188,235,0.5)}
+.zone-dmz .zone-label{color:#00bceb}
+.zone-dc{border-color:rgba(108,192,74,0.5)}
+.zone-dc .zone-label{color:#6cc04a}
+.zone-jumppoint{border-color:rgba(232,93,4,0.4)}
+.zone-jumppoint .zone-label{color:#e85d04}
+
+/* Connections (SVG) */
+#connections-svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
+.conn-path{fill:none;stroke-width:2;stroke-dasharray:6,4;cursor:pointer;pointer-events:stroke}
+.conn-path:hover{stroke-width:3.5;filter:drop-shadow(0 0 4px currentColor)}
+
+/* Connection mode */
+.conn-mode .device{cursor:crosshair !important}
+.conn-mode .device:hover .device-icon>*{outline:3px solid #ffc107;outline-offset:3px;border-radius:4px}
+
+/* Note */
+.note-box{position:absolute;background:rgba(255,255,210,0.92);border:1px solid #cca;border-radius:6px;padding:7px 10px;font-size:0.6em;color:#333;font-weight:600;max-width:130px;line-height:1.3;z-index:15}
+
+/* Particles */
+#bgp{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.bp{position:absolute;border-radius:50%;animation:pf 18s ease-in-out infinite}
+@keyframes pf{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-18px)}66%{transform:translate(-12px,15px)}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#12141d}
+::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
 </style>
 </head>
 <body>
-<div class="diagram-title"><h1>Secure Pull Architecture</h1></div>
-<div class="diagram-container">
 
-<!-- Internet Cloud -->
-<div class="net-cloud">&#x2601; NET</div>
-
-<!-- Main Network bar -->
-<div class="main-network">Main NETWORK</div>
-
-<!-- SVG Cables & Animated Traffic -->
-<svg width="1200" height="2200" style="position:absolute;top:0;left:0;z-index:2;pointer-events:none;overflow:visible">
-<defs>
-<marker id="arrowCyan" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#00bceb"/></marker>
-<marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#fd7e14"/></marker>
-<marker id="arrowGreen" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#6cc04a"/></marker>
-</defs>
-
-<!-- Cable: NET cloud to Main Network -->
-<path d="M600,100 L600,120" stroke="#666" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#00bceb" opacity="0.8"><animateMotion path="M600,100 L600,120" dur="1s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: Main Network down to INT FW (Layer 5) -->
-<path d="M500,170 L500,260" stroke="#fd7e14" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#fd7e14"><animateMotion path="M500,170 L500,260" dur="1.5s" repeatCount="indefinite"/></circle>
-<circle r="3" fill="#dc3545"><animateMotion path="M500,170 L500,260" dur="1.5s" begin="0.5s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: Main Network to WSA (Layer 5) -->
-<path d="M620,170 L620,280" stroke="#00bceb" stroke-width="2" stroke-dasharray="5,5" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#00bceb"><animateMotion path="M620,170 L620,280" dur="1.8s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: INT FW to Proxy (Layer 4) -->
-<path d="M500,420 L500,530" stroke="#fd7e14" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#fd7e14"><animateMotion path="M500,420 L500,530" dur="1.5s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: WSA to Proxy (Layer 4) -->
-<path d="M620,380 C620,450 560,500 550,530" stroke="#00bceb" stroke-width="1.5" stroke-dasharray="4,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1.2s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#00bceb"><animateMotion path="M620,380 C620,450 560,500 550,530" dur="2s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: Proxy to DMZ FW (Layer 3) -->
-<path d="M530,650 L530,770" stroke="#00bceb" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#00bceb"><animateMotion path="M530,650 L530,770" dur="1.5s" repeatCount="indefinite"/></circle>
-<circle r="3" fill="#6cc04a"><animateMotion path="M530,650 L530,770" dur="1.5s" begin="0.6s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: DMZ FW to ACI Switch (Layer 3) -->
-<path d="M580,800 L650,800" stroke="#00bceb" stroke-width="2" fill="none" marker-end="url(#arrowCyan)"><animate attributeName="stroke-dashoffset" values="0;-20" dur="0.8s" repeatCount="indefinite"/></path>
-
-<!-- Cable: DMZ FW to DC FW (Layer 2) -->
-<path d="M530,930 L530,1050" stroke="#6cc04a" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#6cc04a"><animateMotion path="M530,930 L530,1050" dur="1.5s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: DC FW to ACI (Layer 1) -->
-<path d="M530,1180 L530,1300" stroke="#198754" stroke-width="2" stroke-dasharray="6,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></path>
-<circle r="4" fill="#198754"><animateMotion path="M530,1180 L530,1300" dur="1.8s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: ACI to Jump Point -->
-<path d="M530,1470 L530,1600" stroke="#198754" stroke-width="2" stroke-dasharray="5,5" fill="none"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#198754"><animateMotion path="M530,1470 L530,1600" dur="2s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: BeyondTrust PRA curved to Jump Point -->
-<path d="M180,750 C180,1200 350,1400 470,1600" stroke="#e85d04" stroke-width="2" stroke-dasharray="6,4" fill="none" opacity="0.7"><animate attributeName="stroke-dashoffset" values="0;-20" dur="2s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#e85d04" opacity="0.8"><animateMotion path="M180,750 C180,1200 350,1400 470,1600" dur="4s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: WSUS to DMZ area -->
-<path d="M180,850 L350,830" stroke="#0078d4" stroke-width="1.5" stroke-dasharray="4,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#0078d4"><animateMotion path="M180,850 L350,830" dur="1.5s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: Trellix to DC FW -->
-<path d="M180,1050 L400,1080" stroke="#00bceb" stroke-width="1.5" stroke-dasharray="4,4" fill="none"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1s" repeatCount="indefinite"/></path>
-<circle r="3" fill="#00bceb"><animateMotion path="M180,1050 L400,1080" dur="1.8s" repeatCount="indefinite"/></circle>
-
-<!-- Cable: Jump Point to servers below -->
-<path d="M460,1680 L460,1740" stroke="#e85d04" stroke-width="1.5" stroke-dasharray="4,3" fill="none"><animate attributeName="stroke-dashoffset" values="0;-14" dur="0.8s" repeatCount="indefinite"/></path>
-<path d="M500,1680 L500,1740" stroke="#e85d04" stroke-width="1.5" stroke-dasharray="4,3" fill="none"><animate attributeName="stroke-dashoffset" values="0;-14" dur="0.8s" repeatCount="indefinite"/></path>
-<path d="M540,1680 L540,1740" stroke="#e85d04" stroke-width="1.5" stroke-dasharray="4,3" fill="none"><animate attributeName="stroke-dashoffset" values="0;-14" dur="0.8s" repeatCount="indefinite"/></path>
-<path d="M580,1680 L580,1740" stroke="#e85d04" stroke-width="1.5" stroke-dasharray="4,3" fill="none"><animate attributeName="stroke-dashoffset" values="0;-14" dur="0.8s" repeatCount="indefinite"/></path>
-<path d="M620,1680 L620,1740" stroke="#e85d04" stroke-width="1.5" stroke-dasharray="4,3" fill="none"><animate attributeName="stroke-dashoffset" values="0;-14" dur="0.8s" repeatCount="indefinite"/></path>
-
-<!-- PRA public certificate dashed line to Layer 5 -->
-<path d="M180,680 C120,500 200,350 430,300" stroke="#cca" stroke-width="1.5" stroke-dasharray="8,4" fill="none" opacity="0.5"><animate attributeName="stroke-dashoffset" values="0;-24" dur="2s" repeatCount="indefinite"/></path>
-
-</svg>
-
-<!-- ===================== -->
-<!-- LAYER 5: Internet FW -->
-<!-- ===================== -->
-<div class="layer layer-5">
-<div class="layer-label">Layer 5</div>
+<!-- TOOLBAR -->
+<div class="toolbar" id="toolbar">
+<div class="toolbar-section">
+<label>MODE:</label>
+<span class="mode-indicator" id="modeLabel">Select</span>
+</div>
+<div class="toolbar-section">
+<label>Add Device:</label>
+<select id="addDeviceSelect">
+<option value="">-- Select --</option>
+<option value="firewall">Firewall</option>
+<option value="switch">Switch</option>
+<option value="router">Router</option>
+<option value="server">Server</option>
+<option value="proxy">Proxy</option>
+<option value="vm">Virtual Machine</option>
+<option value="cloud">Cloud</option>
+<option value="loadbalancer">Load Balancer</option>
+<option value="waf">WAF</option>
+<option value="ids">IDS/IPS</option>
+<option value="wireless">Wireless AP</option>
+<option value="storage">Storage</option>
+</select>
+<button onclick="addDevice()">+ Add</button>
+</div>
+<div class="toolbar-section">
+<label>Connection:</label>
+<button id="connBtn" onclick="toggleConnMode()">Draw Connection</button>
+<input type="color" id="connColor" value="#00bceb" title="Connection Color">
+<select id="connAnim">
+<option value="flow">Flowing</option>
+<option value="pulse">Pulse</option>
+<option value="dash">Dashed</option>
+<option value="solid">Solid</option>
+</select>
+</div>
+<div class="toolbar-section">
+<button class="danger" onclick="deleteSelected()">Delete Selected</button>
+</div>
 </div>
 
-<!-- Internet Firewall (Palo Alto) -->
-<div class="device" style="top:270px;left:460px">
-<div class="icon-firewall fw-red"><div class="fw-body"><span class="flame">&#x1F525;</span></div></div>
+<!-- CANVAS -->
+<div id="canvas-area">
+<div class="diagram-title"><h1>Secure Pull Architecture</h1></div>
+
+<!-- SVG for connections -->
+<svg id="connections-svg"></svg>
+
+<!-- Internet Cloud -->
+<div class="device" id="dev-cloud" style="top:80px;left:560px" data-id="cloud">
+<div class="device-icon"><div class="dev-cloud">&#x2601; NET</div></div>
+<div class="device-name">Internet</div>
+</div>
+
+<!-- Main Network -->
+<div class="device" id="dev-mainnet" style="top:160px;left:470px" data-id="mainnet">
+<div class="device-icon"><div class="dev-network-bar">Main NETWORK</div></div>
+</div>
+
+<!-- ======= LAYER 5: Internet Firewall ======= -->
+<div class="layer-box l5" style="top:240px;height:170px">
+<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">5</span></div></div>
+<div class="layer-center"></div>
+<div class="layer-right">
+<div class="lr-title">Internet Firewall (Palo Alto)</div>
+<li>Source IP Whitelisting - Only from Web Proxy</li>
+<li>Destination Server IP & URL Whitelisting</li>
+<li>IPS, Web Filtering & Anti-malware Security</li>
+<li>Zoning & Multi-tenancy</li>
+<li>Unidirectional Flow</li>
+</div>
+</div>
+<!-- Palo Alto FW -->
+<div class="device" id="dev-intfw" style="top:280px;left:520px" data-id="intfw">
+<div class="device-icon"><div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div></div>
 <div class="device-name">INT FW</div>
 <div class="device-sub">Palo Alto</div>
 </div>
 
-<!-- WSA (Web Security Appliance) -->
-<div class="device" style="top:270px;left:590px">
-<div class="icon-proxy proxy-blue">WSA</div>
-<div class="device-name">WSA</div>
-<div class="device-sub">Web Security</div>
+<!-- ======= LAYER 4: Web Proxy ======= -->
+<div class="layer-box l4" style="top:430px;height:170px">
+<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">4</span></div></div>
+<div class="layer-center"></div>
+<div class="layer-right">
+<div class="lr-title">Web Proxy</div>
+<li>Source IP Whitelisting - Only from DMZ Servers</li>
+<li>Destination Server IP & URL Whitelisting</li>
+<li>Web Reputation & Web Usage Control</li>
+<li>Anti-malware Analysis & HTTPS Inspection</li>
+<li>URL Categorization & Content Filtering</li>
 </div>
-
-<!-- Layer 5 details -->
-<div style="position:absolute;top:380px;left:680px;font-size:0.7em;color:rgba(255,255,255,0.6);line-height:1.6;max-width:280px">
-<div style="color:#dc3545;font-weight:700;margin-bottom:4px">Internet Firewall Security:</div>
-- Source IP Whitelisting (Only from Proxy)<br>
-- Destination Server IP & URL Whitelisting<br>
-- IPS, Web Filtering & Anti-malware<br>
-- Zoning & Multi-tenancy<br>
-- Unidirectional Flow
 </div>
-
-<!-- ===================== -->
-<!-- LAYER 4: Web Proxy -->
-<!-- ===================== -->
-<div class="layer layer-4">
-<div class="layer-label">Layer 4</div>
-</div>
-
 <!-- Web Proxy -->
-<div class="device" style="top:530px;left:490px">
-<div class="icon-proxy proxy-orange">Web<br>Proxy</div>
+<div class="device" id="dev-proxy" style="top:470px;left:530px" data-id="proxy">
+<div class="device-icon"><div class="dev-proxy">Web<br>Proxy</div></div>
 <div class="device-name">Web Proxy</div>
 <div class="device-sub">Forward Proxy</div>
 </div>
 
-<!-- ACI Switch in Layer 4 -->
-<div class="device" style="top:540px;left:620px">
-<div class="icon-switch"><span class="arrows">&#x21C4;</span></div>
-<div class="device-name">ACI</div>
+<!-- ======= LAYER 3: DMZ Firewall ======= -->
+<div class="layer-box l3" style="top:620px;height:200px">
+<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">3</span></div></div>
+<div class="layer-center"></div>
+<div class="layer-right">
+<div class="lr-title">DMZ Firewall</div>
+<li>Only specific DMZ servers reach Proxy</li>
+<li>Destination Server IP & URL Whitelisting</li>
+<li>IPS, Web Filtering & Anti-malware Security</li>
+<li>Zoning & Unidirectional Flow</li>
+<li>DMZ VM Isolation & Protection</li>
 </div>
-
-<!-- Note: Public Certificate -->
-<div class="note-box" style="top:380px;left:80px;background:rgba(255,255,220,0.95)">
-Public Certificate,<br>Public IP & DNS is<br>required for PRA
 </div>
-
-<!-- Layer 4 details -->
-<div style="position:absolute;top:600px;left:680px;font-size:0.7em;color:rgba(255,255,255,0.6);line-height:1.6;max-width:280px">
-<div style="color:#fd7e14;font-weight:700;margin-bottom:4px">Web Proxy Security:</div>
-- Source IP Whitelisting (DMZ Servers only)<br>
-- Destination Server IP & URL Whitelisting<br>
-- Web Reputation & Usage Control<br>
-- Anti-malware & HTTPS Inspection
-</div>
-
-<!-- ===================== -->
-<!-- LAYER 3: DMZ Firewall -->
-<!-- ===================== -->
-<div class="layer layer-3">
-<div class="layer-label">Layer 3</div>
-</div>
-
-<!-- DMZ Box with products -->
-<div class="dmz-box" style="top:720px;left:100px;width:160px;height:220px">
-<div class="dmz-label">DMZ</div>
-</div>
-
-<!-- BeyondTrust PRA -->
-<div class="device" style="top:730px;left:130px">
-<div class="icon-pra">&#x1F510;<br>PRA</div>
-<div class="device-name">BeyondTrust</div>
-<div class="device-sub">PRA</div>
-</div>
-
-<!-- WSUS Server -->
-<div class="device" style="top:820px;left:130px">
-<div class="icon-wsus"></div>
-<div class="device-name">WSUS</div>
-<div class="device-sub">Patch Server</div>
-</div>
-
 <!-- DMZ Firewall -->
-<div class="device" style="top:770px;left:400px">
-<div class="icon-firewall fw-blue"><div class="fw-body"><span class="flame">&#x1F525;</span></div></div>
+<div class="device" id="dev-dmzfw" style="top:680px;left:500px" data-id="dmzfw">
+<div class="device-icon"><div class="dev-firewall fw-dmz"><span class="flame">&#x1F525;</span></div></div>
 <div class="device-name">DMZ FW</div>
 <div class="device-sub">DMZ Firewall</div>
 </div>
 
-<!-- ACI Switch (Layer 3) -->
-<div class="device" style="top:790px;left:580px">
-<div class="icon-switch"><span class="arrows">&#x21C4;</span></div>
-<div class="device-name">ACI Switch</div>
+<!-- DMZ Zone (PRA, WSUS, Trellix) -->
+<div class="zone-box zone-dmz" style="top:655px;left:150px;width:200px;height:155px">
+<div class="zone-label">DMZ</div>
 </div>
-
-<!-- DMZ VMs -->
-<div class="device" style="top:780px;left:700px">
-<div style="width:50px;height:50px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.7em;font-weight:700;box-shadow:0 3px 12px rgba(0,188,235,0.3)">VMs</div>
-<div class="device-name">DMZ VMs</div>
+<!-- BeyondTrust PRA in DMZ -->
+<div class="device" id="dev-pra" style="top:670px;left:175px" data-id="pra">
+<div class="device-icon"><div class="dev-pra">&#x1F510; PRA</div></div>
+<div class="device-name">BeyondTrust</div>
+<div class="device-sub">PRA</div>
 </div>
-
-<!-- Layer 3 details -->
-<div style="position:absolute;top:860px;left:680px;font-size:0.7em;color:rgba(255,255,255,0.6);line-height:1.6;max-width:280px">
-<div style="color:#00bceb;font-weight:700;margin-bottom:4px">DMZ Firewall Security:</div>
-- Only specific DMZ servers reach Proxy<br>
-- Destination Server IP & URL Whitelisting<br>
-- IPS, Web Filtering & Anti-malware<br>
-- Zoning & Unidirectional Flow<br>
-- DMZ VM isolation
+<!-- WSUS in DMZ -->
+<div class="device" id="dev-wsus" style="top:670px;left:265px" data-id="wsus">
+<div class="device-icon"><div class="dev-wsus"><div class="sync"></div></div></div>
+<div class="device-name">WSUS</div>
+<div class="device-sub">Patch Server</div>
 </div>
-
-<!-- ===================== -->
-<!-- LAYER 2: DC Firewall -->
-<!-- ===================== -->
-<div class="layer layer-2">
-<div class="layer-label">Layer 2</div>
-</div>
-
-<!-- Trellix TIE -->
-<div class="device" style="top:1030px;left:130px">
-<div class="icon-trellix">X</div>
+<!-- Trellix TIE in DMZ -->
+<div class="device" id="dev-trellix" style="top:750px;left:215px" data-id="trellix">
+<div class="device-icon"><div class="dev-trellix">X</div></div>
 <div class="device-name">Trellix TIE</div>
 <div class="device-sub">Threat Intel</div>
 </div>
 
+<!-- Note -->
+<div class="note-box" style="top:440px;left:100px">Public Certificate,<br>Public IP & DNS<br>required for PRA</div>
+
+<!-- ======= LAYER 2: DC Firewall ======= -->
+<div class="layer-box l2" style="top:850px;height:170px">
+<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">2</span></div></div>
+<div class="layer-center"></div>
+<div class="layer-right">
+<div class="lr-title">DC Firewall</div>
+<li>Source & Destination Server IP Whitelisting</li>
+<li>Only Specific Server to Specific DMZ Server</li>
+<li>IPS, Zoning & Multi-Instance</li>
+<li>Unidirectional Flow from DC to DMZ</li>
+</div>
+</div>
 <!-- DC Firewall -->
-<div class="device" style="top:1040px;left:440px">
-<div class="icon-firewall fw-blue"><div class="fw-body"><span class="flame">&#x1F525;</span></div></div>
+<div class="device" id="dev-dcfw" style="top:900px;left:520px" data-id="dcfw">
+<div class="device-icon"><div class="dev-firewall fw-dc"><span class="flame">&#x1F525;</span></div></div>
 <div class="device-name">DC FW</div>
-<div class="device-sub">Datacenter Firewall</div>
+<div class="device-sub">DC Firewall</div>
 </div>
 
-<!-- DC Switch -->
-<div class="device" style="top:1060px;left:600px">
-<div class="icon-switch"><span class="arrows">&#x21C4;</span></div>
-<div class="device-name">DC Switch</div>
+<!-- ======= LAYER 1: ACI ======= -->
+<div class="layer-box l1" style="top:1050px;height:180px">
+<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">1</span></div></div>
+<div class="layer-center"></div>
+<div class="layer-right">
+<div class="lr-title">ACI Fabric</div>
+<li>Source Whitelisting - Only specific EPG to DMZ</li>
+<li>Service Graphs, PBR, VRFs</li>
+<li>EPGs, ESGs & Multi-tenancy</li>
+<li>Unidirectional Flow from EPG to DMZ</li>
+</div>
+</div>
+<!-- ACI APIC -->
+<div class="device" id="dev-aci" style="top:1090px;left:470px" data-id="aci">
+<div class="device-icon"><div class="dev-aci">ACI<br>APIC</div></div>
+<div class="device-name">ACI APIC</div>
+<div class="device-sub">Controller</div>
+</div>
+<!-- Leaf/Spine -->
+<div class="device" id="dev-leafspine" style="top:1100px;left:590px" data-id="leafspine">
+<div class="device-icon"><div class="dev-switch"></div></div>
+<div class="device-name">Leaf / Spine</div>
+<div class="device-sub">ACI Fabric</div>
 </div>
 
-<!-- Layer 2 details -->
-<div style="position:absolute;top:1120px;left:680px;font-size:0.7em;color:rgba(255,255,255,0.6);line-height:1.6;max-width:280px">
-<div style="color:#6cc04a;font-weight:700;margin-bottom:4px">DC Firewall Security:</div>
-- Source & Dest Server IP Whitelisting<br>
-- Specific Server to Specific DMZ only<br>
-- IPS, Zoning & Multi-Instance<br>
-- Unidirectional Flow DC to DMZ
+<!-- ======= JUMP POINT ZONE ======= -->
+<div class="zone-box zone-jumppoint" style="top:1280px;left:300px;width:380px;height:250px">
+<div class="zone-label">Jump Point Zone</div>
 </div>
-
-<!-- ===================== -->
-<!-- LAYER 1: ACI -->
-<!-- ===================== -->
-<div class="layer layer-1">
-<div class="layer-label">Layer 1</div>
-</div>
-
-<!-- ACI / APIC -->
-<div class="device" style="top:1300px;left:490px">
-<div class="icon-aci"><div class="icon-aci-inner">ACI<br>APIC</div></div>
-<div class="device-name">ACI Fabric</div>
-<div class="device-sub">APIC Controller</div>
-</div>
-
-<!-- ACI Switch -->
-<div class="device" style="top:1330px;left:620px">
-<div class="icon-switch"><span class="arrows">&#x21C4;</span></div>
-<div class="device-name">Leaf/Spine</div>
-</div>
-
-<!-- Layer 1 details -->
-<div style="position:absolute;top:1380px;left:680px;font-size:0.7em;color:rgba(255,255,255,0.6);line-height:1.6;max-width:280px">
-<div style="color:#198754;font-weight:700;margin-bottom:4px">ACI Fabric Security:</div>
-- Source Whitelisting (EPG to DMZ)<br>
-- Service Graphs, PBR, VRFs<br>
-- EPGs, ESGs & Multi-tenancy<br>
-- Unidirectional Flow EPG to DMZ
-</div>
-
-<!-- ===================== -->
-<!-- DC ZONE -->
-<!-- ===================== -->
-<div class="dc-zone">
-<div class="dc-label">DC</div>
-</div>
-
 <!-- Jump Point -->
-<div class="device" style="top:1580px;left:490px">
-<div class="icon-jumppoint">Jump<br>Point</div>
+<div class="device" id="dev-jumppoint" style="top:1300px;left:450px" data-id="jumppoint">
+<div class="device-icon"><div class="dev-jumppoint">Jump<br>Point</div></div>
 <div class="device-name">Jump Point</div>
 <div class="device-sub">BeyondTrust</div>
 </div>
-
-<!-- Server access labels -->
-<div style="position:absolute;top:1720px;left:400px;display:flex;gap:25px;z-index:10">
-<div style="display:flex;flex-direction:column;align-items:center">
-<div class="icon-server"><div class="srv-led"></div><div class="srv-led"></div><div class="srv-led"></div></div>
-<div style="font-size:0.6em;color:#e85d04;margin-top:4px;font-weight:600">RDP</div>
-</div>
-<div style="display:flex;flex-direction:column;align-items:center">
-<div class="icon-server"><div class="srv-led"></div><div class="srv-led"></div><div class="srv-led"></div></div>
-<div style="font-size:0.6em;color:#e85d04;margin-top:4px;font-weight:600">Access<br>Extender</div>
-</div>
-<div style="display:flex;flex-direction:column;align-items:center">
-<div class="icon-server"><div class="srv-led"></div><div class="srv-led"></div><div class="srv-led"></div></div>
-<div style="font-size:0.6em;color:#e85d04;margin-top:4px;font-weight:600">Web<br>Jump</div>
-</div>
-<div style="display:flex;flex-direction:column;align-items:center">
-<div class="icon-server"><div class="srv-led"></div><div class="srv-led"></div><div class="srv-led"></div></div>
-<div style="font-size:0.6em;color:#e85d04;margin-top:4px;font-weight:600">SSH/<br>Telnet</div>
-</div>
-<div style="display:flex;flex-direction:column;align-items:center">
-<div class="icon-server"><div class="srv-led"></div><div class="srv-led"></div><div class="srv-led"></div></div>
-<div style="font-size:0.6em;color:#e85d04;margin-top:4px;font-weight:600">SSH/<br>Telnet</div>
-</div>
+<!-- Access Servers -->
+<div style="position:absolute;top:1410px;left:320px;display:flex;gap:20px;z-index:10">
+<div class="device" style="position:relative" data-id="srv-rdp"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">RDP</div></div>
+<div class="device" style="position:relative" data-id="srv-ae"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Access<br>Extender</div></div>
+<div class="device" style="position:relative" data-id="srv-wj"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Web<br>Jump</div></div>
+<div class="device" style="position:relative" data-id="srv-ssh1"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">SSH/<br>Telnet</div></div>
+<div class="device" style="position:relative" data-id="srv-ssh2"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">SSH/<br>Telnet</div></div>
 </div>
 
-<!-- DC Firewall (in DC zone) -->
-<div class="device" style="top:1600px;left:800px">
-<div class="icon-dc-fw"></div>
+<!-- ======= DC ZONE ======= -->
+<div class="zone-box zone-dc" style="top:1280px;left:750px;width:200px;height:250px">
+<div class="zone-label">DC</div>
+</div>
+<!-- DC Firewall in DC Zone -->
+<div class="device" id="dev-dcfw2" style="top:1370px;left:800px" data-id="dcfw2">
+<div class="device-icon"><div class="dev-firewall fw-dc" style="width:55px;height:45px"><span class="flame" style="font-size:1.3em">&#x1F525;</span></div></div>
 <div class="device-name">DC Firewall</div>
 </div>
 
-</div><!-- end diagram-container -->
+</div><!-- end canvas-area -->
 
 <!-- Background particles -->
-<div id="bgparticles"></div>
+<div id="bgp"></div>
+
 <script>
-(function(){
-var c=document.getElementById('bgparticles');
-c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
-var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#198754'];
-for(var i=0;i<20;i++){
-var p=document.createElement('div');
-var s=Math.random()*3+1;
-p.style.cssText='position:absolute;width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';border-radius:50%;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.15+0.03)+';animation:pfloat '+(Math.random()*18+12)+'s ease-in-out infinite;animation-delay:'+Math.random()*6+'s;';
-c.appendChild(p);
+// ===== CONFIGURATION =====
+let connections = [
+    {from:'cloud', to:'mainnet', color:'#666', anim:'dash'},
+    {from:'mainnet', to:'intfw', color:'#fd7e14', anim:'flow'},
+    {from:'intfw', to:'proxy', color:'#fd7e14', anim:'flow'},
+    {from:'proxy', to:'dmzfw', color:'#00bceb', anim:'flow'},
+    {from:'dmzfw', to:'dcfw', color:'#6cc04a', anim:'flow'},
+    {from:'dcfw', to:'aci', color:'#198754', anim:'flow'},
+    {from:'aci', to:'leafspine', color:'#6cc04a', anim:'dash'},
+    {from:'aci', to:'jumppoint', color:'#198754', anim:'flow'},
+    {from:'pra', to:'jumppoint', color:'#e85d04', anim:'flow'},
+    {from:'wsus', to:'dmzfw', color:'#0078d4', anim:'flow'},
+    {from:'trellix', to:'dmzfw', color:'#00bceb', anim:'flow'},
+];
+
+let connMode = false;
+let connSource = null;
+let selectedConn = null;
+let dragTarget = null;
+let dragOffset = {x:0, y:0};
+let deviceCounter = 100;
+
+// ===== RENDER CONNECTIONS =====
+function renderConnections() {
+    const svg = document.getElementById('connections-svg');
+    svg.innerHTML = '';
+    svg.setAttribute('width', '1300');
+    svg.setAttribute('height', '2000');
+    
+    // Defs for markers and animations
+    let defs = '<defs>';
+    const usedColors = [...new Set(connections.map(c=>c.color))];
+    usedColors.forEach(col => {
+        const id = 'arrow-' + col.replace('#','');
+        defs += `<marker id="${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${col}"/></marker>`;
+    });
+    defs += '</defs>';
+    svg.innerHTML = defs;
+    
+    connections.forEach((conn, idx) => {
+        const fromEl = document.querySelector(`[data-id="${conn.from}"]`);
+        const toEl = document.querySelector(`[data-id="${conn.to}"]`);
+        if (!fromEl || !toEl) return;
+        
+        const canvas = document.getElementById('canvas-area');
+        const canvasRect = canvas.getBoundingClientRect();
+        
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+        
+        const x1 = fromRect.left - canvasRect.left + fromRect.width/2;
+        const y1 = fromRect.top - canvasRect.top + fromRect.height/2;
+        const x2 = toRect.left - canvasRect.left + toRect.width/2;
+        const y2 = toRect.top - canvasRect.top + toRect.height/2;
+        
+        const markerId = 'arrow-' + conn.color.replace('#','');
+        let dasharray = '6,4';
+        let pathEl = '';
+        
+        if (conn.anim === 'solid') dasharray = 'none';
+        else if (conn.anim === 'pulse') dasharray = '2,6';
+        else if (conn.anim === 'dash') dasharray = '8,4';
+        
+        // Calculate curve
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        let path;
+        if (Math.abs(dx) < 30) {
+            path = `M${x1},${y1} L${x2},${y2}`;
+        } else {
+            const cx = (x1+x2)/2 + (dy > 100 ? -30 : 0);
+            const cy = (y1+y2)/2;
+            path = `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
+        }
+        
+        // Connection line
+        pathEl += `<path class="conn-path" d="${path}" stroke="${conn.color}" stroke-dasharray="${dasharray}" marker-end="url(#${markerId})" data-idx="${idx}" style="pointer-events:stroke;cursor:pointer" onclick="selectConn(event,${idx})">`;
+        if (conn.anim === 'flow' || conn.anim === 'dash') {
+            pathEl += `<animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/>`;
+        } else if (conn.anim === 'pulse') {
+            pathEl += `<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
+        }
+        pathEl += `</path>`;
+        
+        // Flowing particle
+        if (conn.anim === 'flow') {
+            pathEl += `<circle r="4" fill="${conn.color}" opacity="0.9"><animateMotion path="${path}" dur="${1.5 + dist/500}s" repeatCount="indefinite"/></circle>`;
+            pathEl += `<circle r="3" fill="${conn.color}" opacity="0.5"><animateMotion path="${path}" dur="${1.5 + dist/500}s" begin="0.5s" repeatCount="indefinite"/></circle>`;
+        }
+        
+        svg.innerHTML += pathEl;
+    });
 }
-var st=document.createElement('style');
-st.textContent='@keyframes pfloat{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-20px)}66%{transform:translate(-12px,18px)}}'
-document.head.appendChild(st);
+
+// ===== SELECT CONNECTION =====
+function selectConn(e, idx) {
+    e.stopPropagation();
+    selectedConn = idx;
+    document.getElementById('connColor').value = connections[idx].color;
+    document.getElementById('connAnim').value = connections[idx].anim;
+    renderConnections();
+    // Highlight selected
+    const paths = document.querySelectorAll('.conn-path');
+    paths.forEach((p,i) => {
+        if (i === idx) p.setAttribute('stroke-width', '4');
+    });
+}
+
+// ===== CONNECTION MODE =====
+function toggleConnMode() {
+    connMode = !connMode;
+    const btn = document.getElementById('connBtn');
+    const area = document.getElementById('canvas-area');
+    if (connMode) {
+        btn.style.background = 'linear-gradient(135deg,#ffc107,#e0a800)';
+        btn.textContent = 'Cancel';
+        area.classList.add('conn-mode');
+        document.getElementById('modeLabel').textContent = 'Connect';
+        document.getElementById('modeLabel').style.background = 'rgba(255,193,7,0.15)';
+        document.getElementById('modeLabel').style.color = '#ffc107';
+        document.getElementById('modeLabel').style.borderColor = 'rgba(255,193,7,0.3)';
+    } else {
+        btn.style.background = '';
+        btn.textContent = 'Draw Connection';
+        area.classList.remove('conn-mode');
+        connSource = null;
+        document.getElementById('modeLabel').textContent = 'Select';
+        document.getElementById('modeLabel').style.background = '';
+        document.getElementById('modeLabel').style.color = '';
+        document.getElementById('modeLabel').style.borderColor = '';
+    }
+}
+
+// ===== ADD DEVICE =====
+function addDevice() {
+    const type = document.getElementById('addDeviceSelect').value;
+    if (!type) return;
+    deviceCounter++;
+    const id = type + '-' + deviceCounter;
+    const device = document.createElement('div');
+    device.className = 'device';
+    device.style.top = '500px';
+    device.style.left = '650px';
+    device.dataset.id = id;
+    
+    let iconHtml = '';
+    let name = type.charAt(0).toUpperCase() + type.slice(1);
+    switch(type) {
+        case 'firewall': iconHtml = '<div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div>'; break;
+        case 'switch': iconHtml = '<div class="dev-switch"></div>'; break;
+        case 'router': iconHtml = '<div class="dev-switch" style="background:linear-gradient(90deg,#6cc04a,#198754)"></div>'; name='Router'; break;
+        case 'server': iconHtml = '<div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div>'; break;
+        case 'proxy': iconHtml = '<div class="dev-proxy">Proxy</div>'; break;
+        case 'vm': iconHtml = '<div style="width:45px;height:45px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:700">VM</div>'; break;
+        case 'cloud': iconHtml = '<div class="dev-cloud">Cloud</div>'; break;
+        case 'loadbalancer': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#6f42c1,#5a2d9e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">LB</div>'; name='Load Balancer'; break;
+        case 'waf': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#fd7e14,#dc3545);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">WAF</div>'; break;
+        case 'ids': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#dc3545,#6f0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">IDS</div>'; break;
+        case 'wireless': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9em">&#x1F4F6;</div>'; name='AP'; break;
+        case 'storage': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#555,#222);border:2px solid #888;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#aaa">SAN</div>'; name='Storage'; break;
+    }
+    
+    device.innerHTML = `<div class="device-icon">${iconHtml}</div><div class="device-name">${name}</div>`;
+    document.getElementById('canvas-area').appendChild(device);
+    initDrag(device);
+}
+
+// ===== DELETE SELECTED =====
+function deleteSelected() {
+    if (selectedConn !== null) {
+        connections.splice(selectedConn, 1);
+        selectedConn = null;
+        renderConnections();
+    }
+}
+
+// ===== DRAG & DROP =====
+function initDrag(el) {
+    el.addEventListener('mousedown', function(e) {
+        if (connMode) {
+            // Connection mode: set source/target
+            const id = el.dataset.id;
+            if (!connSource) {
+                connSource = id;
+                el.style.outline = '3px solid #ffc107';
+            } else {
+                if (connSource !== id) {
+                    connections.push({
+                        from: connSource,
+                        to: id,
+                        color: document.getElementById('connColor').value,
+                        anim: document.getElementById('connAnim').value
+                    });
+                    renderConnections();
+                }
+                document.querySelectorAll('.device').forEach(d => d.style.outline = '');
+                connSource = null;
+            }
+            return;
+        }
+        e.preventDefault();
+        dragTarget = el;
+        el.classList.add('dragging');
+        const rect = el.getBoundingClientRect();
+        const canvasRect = document.getElementById('canvas-area').getBoundingClientRect();
+        dragOffset.x = e.clientX - rect.left;
+        dragOffset.y = e.clientY - rect.top;
+    });
+}
+
+document.addEventListener('mousemove', function(e) {
+    if (!dragTarget) return;
+    const canvasRect = document.getElementById('canvas-area').getBoundingClientRect();
+    const x = e.clientX - canvasRect.left - dragOffset.x;
+    const y = e.clientY - canvasRect.top - dragOffset.y;
+    dragTarget.style.left = x + 'px';
+    dragTarget.style.top = y + 'px';
+    renderConnections();
+});
+
+document.addEventListener('mouseup', function() {
+    if (dragTarget) {
+        dragTarget.classList.remove('dragging');
+        dragTarget = null;
+    }
+});
+
+// Update connection properties on change
+document.getElementById('connColor').addEventListener('input', function() {
+    if (selectedConn !== null) {
+        connections[selectedConn].color = this.value;
+        renderConnections();
+    }
+});
+document.getElementById('connAnim').addEventListener('change', function() {
+    if (selectedConn !== null) {
+        connections[selectedConn].anim = this.value;
+        renderConnections();
+    }
+});
+
+// Click canvas to deselect
+document.getElementById('canvas-area').addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('layer-box')) {
+        selectedConn = null;
+        renderConnections();
+    }
+});
+
+// Init all devices
+document.querySelectorAll('.device').forEach(initDrag);
+
+// Background particles
+(function(){
+    var c=document.getElementById('bgp');
+    var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#198754'];
+    for(var i=0;i<20;i++){
+        var p=document.createElement('div');
+        p.className='bp';
+        var s=Math.random()*3+1;
+        p.style.cssText='width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.15+0.03)+';animation-delay:'+Math.random()*6+'s;animation-duration:'+(Math.random()*15+12)+'s;';
+        c.appendChild(p);
+    }
 })();
+
+// Initial render
+setTimeout(renderConnections, 100);
+window.addEventListener('resize', renderConnections);
 </script>
 </body>
 </html>
