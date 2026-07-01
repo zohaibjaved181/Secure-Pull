@@ -161,6 +161,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .cp.sel{stroke-width:4;filter:drop-shadow(0 0 5px #ffc107)}
 .conn-mode .el{cursor:crosshair !important}
 .conn-mode .el:hover{outline:3px solid #ffc107;outline-offset:2px;border-radius:6px}
+#trailCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
 </style>
 </head>
 <body>
@@ -208,6 +209,20 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="tb">
 <label>BG:</label>
 <select id="bgSel" onchange="changeBg(this.value)"><option value="bg-cyber">Cyber Dark</option><option value="bg-neural">Neural Network</option><option value="bg-pulse">Pulse</option><option value="bg-wave">Wave</option><option value="bg-aurora">Aurora</option><option value="bg-light-grid">Light Grid</option><option value="bg-light-clean">Light Clean</option><option value="bg-light-dots">Light Dots</option></select>
+</div>
+<div class="tb">
+<label>&#x2728; Mouse Trail:</label>
+<button id="trailBtn" onclick="toggleTrail()">Enable</button>
+<select id="trailColor" onchange="setTrailColor(this.value)">
+<option value="cyan">Cyan</option>
+<option value="green">Green</option>
+<option value="orange">Orange</option>
+<option value="purple">Purple</option>
+<option value="red">Red</option>
+<option value="gold">Gold</option>
+<option value="white">White</option>
+<option value="rainbow">Rainbow</option>
+</select>
 </div>
 </div>
 
@@ -472,6 +487,69 @@ document.querySelectorAll('.box').forEach(initBox);
 document.querySelectorAll('.shape').forEach(initShape);
 setTimeout(render,150);
 window.addEventListener('resize',render);
+
+// ===== MOUSE TRAIL =====
+let trailEnabled=false;
+let trailColorName='cyan';
+let trailHue=0;
+const trailColors={cyan:'0,188,235',green:'108,192,74',orange:'253,126,20',purple:'111,66,193',red:'220,53,69',gold:'255,193,7',white:'255,255,255',rainbow:null};
+const trailCanvas=document.createElement('canvas');
+trailCanvas.id='trailCanvas';
+document.body.appendChild(trailCanvas);
+const tCtx=trailCanvas.getContext('2d');
+let trailPoints=[];
+function resizeTrail(){trailCanvas.width=window.innerWidth;trailCanvas.height=window.innerHeight;}
+resizeTrail();
+window.addEventListener('resize',resizeTrail);
+
+document.addEventListener('mousemove',function(e){
+if(!trailEnabled)return;
+trailPoints.push({x:e.clientX,y:e.clientY,t:Date.now()});
+if(trailPoints.length>80)trailPoints.shift();
+});
+
+function drawTrail(){
+tCtx.clearRect(0,0,trailCanvas.width,trailCanvas.height);
+if(!trailEnabled||trailPoints.length<2){requestAnimationFrame(drawTrail);return;}
+const now=Date.now();
+trailPoints=trailPoints.filter(p=>now-p.t<800);
+for(let i=1;i<trailPoints.length;i++){
+const p0=trailPoints[i-1],p1=trailPoints[i];
+const age=(now-p1.t)/800;
+const alpha=Math.max(0,(1-age)*0.7);
+const width=Math.max(0.5,(1-age)*4);
+let rgb;
+if(trailColorName==='rainbow'){
+trailHue=(trailHue+2)%360;
+const h=trailHue,s=100,l=60;
+rgb=hslToRgb(h,s,l);
+}else{rgb=trailColors[trailColorName]||'0,188,235';}
+tCtx.beginPath();
+tCtx.moveTo(p0.x,p0.y);
+tCtx.lineTo(p1.x,p1.y);
+tCtx.strokeStyle=`rgba(${rgb},${alpha})`;
+tCtx.lineWidth=width;
+tCtx.lineCap='round';
+tCtx.stroke();
+// Glow
+tCtx.shadowColor=`rgba(${rgb},${alpha*0.5})`;
+tCtx.shadowBlur=width*3;
+tCtx.stroke();
+tCtx.shadowBlur=0;
+}
+requestAnimationFrame(drawTrail);
+}
+requestAnimationFrame(drawTrail);
+
+function hslToRgb(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12;const a=s*Math.min(l,1-l);const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return Math.round(f(0)*255)+','+Math.round(f(8)*255)+','+Math.round(f(4)*255);}
+
+function toggleTrail(){
+trailEnabled=!trailEnabled;
+const btn=document.getElementById('trailBtn');
+if(trailEnabled){btn.textContent='Disable';btn.style.background='linear-gradient(135deg,#ffc107,#e0a800)';}
+else{btn.textContent='Enable';btn.style.background='';trailPoints=[];tCtx.clearRect(0,0,trailCanvas.width,trailCanvas.height);}
+}
+function setTrailColor(c){trailColorName=c;}
 </script>
 </body>
 </html>
