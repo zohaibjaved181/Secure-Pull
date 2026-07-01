@@ -224,6 +224,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <option value="rainbow">Rainbow</option>
 </select>
 </div>
+<div class="tb">
+<label>&#x1F4E4; Export/Import:</label>
+<button class="btn-purple" onclick="exportGif()">Export GIF</button>
+<button class="btn-primary" onclick="document.getElementById('svgFileInput').click()">Import SVG</button>
+<input type="file" id="svgFileInput" accept=".svg" style="display:none" onchange="importSvg(event)">
+</div>
 </div>
 
 <!-- CONTEXT MENU -->
@@ -411,10 +417,10 @@ else if(selEl){const id=selEl.dataset.id;conns=conns.filter(c=>c.from!==id&&c.to
 function showCtx(e,el){e.preventDefault();ctxTarget=el;const m=document.getElementById('ctxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
 document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');});
 function ctxConnect(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(!id)return;connSrc=id;ctxTarget.style.outline='3px solid #ffc107';connMode=true;document.getElementById('connBtn').style.background='#ffc107';document.getElementById('connBtn').textContent='Cancel';document.getElementById('canvas').classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}
-function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el').forEach(e=>e.style.outline='');toggleConn();render();}
-function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';document.getElementById('canvas').appendChild(cl);initEl(cl);}
-function ctxEdit(){if(!ctxTarget)return;const lbl=ctxTarget.querySelector('.el-label');if(lbl){lbl.focus();}}
-function ctxDelete(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(id)conns=conns.filter(c=>c.from!==id&&c.to!==id);ctxTarget.remove();ctxTarget=null;render();}
+function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
+function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';cl.classList.remove('selected');document.getElementById('canvas').appendChild(cl);if(cl.classList.contains('shape'))initShape(cl);else initEl(cl);}
+function ctxEdit(){if(!ctxTarget)return;const lbl=ctxTarget.querySelector('.el-label,.shape-note,.shape-text,.shape-pill,[contenteditable]');if(lbl){lbl.focus();}}
+function ctxDelete(){if(!ctxTarget)return;snapshot();const id=ctxTarget.dataset.id;if(id)conns=conns.filter(c=>c.from!==id&&c.to!==id);ctxTarget.remove();ctxTarget=null;render();}
 
 // Save / Load
 function saveState(){
@@ -459,10 +465,13 @@ if(e.target.classList.contains('resize-handle')){e.preventDefault();resizing=b;r
 e.preventDefault();boxDrag=b;clearSel();b.classList.add('selected');selBox=b;selConn=null;selEl=null;const r=b.getBoundingClientRect();bOff.x=e.clientX-r.left;bOff.y=e.clientY-r.top;});
 }
 function initShape(s){
+if(!s.dataset.id)s.dataset.id='shape-'+Date.now()+Math.random().toString(36).substr(2,4);
 s.addEventListener('mousedown',function(e){
 if(e.target.getAttribute('contenteditable'))return;
 if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s;rStart={x:e.clientX,y:e.clientY,w:s.offsetWidth||60,h:s.offsetHeight||60};return;}
+if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;s.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;}return;}
 e.preventDefault();drag=s;s.classList.add('dragging');clearSel();s.classList.add('selected');selShape=s;selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
+s.addEventListener('contextmenu',function(e){showCtx(e,s);});
 }
 
 document.addEventListener('mousemove',function(e){
@@ -487,6 +496,145 @@ document.querySelectorAll('.box').forEach(initBox);
 document.querySelectorAll('.shape').forEach(initShape);
 setTimeout(render,150);
 window.addEventListener('resize',render);
+
+// ===== EXPORT GIF =====
+function exportGif(){
+const cv=document.getElementById('canvas');
+const rect=cv.getBoundingClientRect();
+const w=Math.min(rect.width,1400);
+const h=Math.min(rect.height,900);
+
+// Use html2canvas-style capture with gif.js
+// Load gif.js from CDN
+if(!window.GIF){
+const s1=document.createElement('script');
+s1.src='https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js';
+s1.onload=function(){startGifCapture(cv,w,h);};
+document.head.appendChild(s1);
+}else{startGifCapture(cv,w,h);}
+}
+
+function startGifCapture(cv,w,h){
+const statusEl=document.createElement('div');
+statusEl.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);color:#00bceb;padding:30px 50px;border-radius:12px;z-index:10000;font-size:1.2em;font-weight:700;border:2px solid #00bceb';
+statusEl.textContent='Capturing frames... 0/30';
+document.body.appendChild(statusEl);
+
+const gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'});
+const canvas=document.createElement('canvas');
+canvas.width=w;canvas.height=h;
+const ctx=canvas.getContext('2d');
+let frame=0;const totalFrames=30;
+
+function captureFrame(){
+if(frame>=totalFrames){
+statusEl.textContent='Encoding GIF...';
+gif.on('finished',function(blob){
+document.body.removeChild(statusEl);
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='secure_pull_diagram.gif';a.click();
+URL.revokeObjectURL(url);
+});
+gif.render();
+return;
+}
+html2canvasFallback(cv,canvas,ctx,w,h);
+gif.addFrame(ctx,{copy:true,delay:100});
+frame++;
+statusEl.textContent='Capturing frames... '+frame+'/'+totalFrames;
+setTimeout(captureFrame,100);
+}
+
+captureFrame();
+}
+
+function html2canvasFallback(source,canvas,ctx,w,h){
+// Simple DOM-to-canvas capture using foreignObject
+const data=new XMLSerializer().serializeToString(source);
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${source.outerHTML}</div></foreignObject></svg>`;
+// For cross-origin safety, draw colored rectangles representing layout
+ctx.fillStyle='#0d1117';
+ctx.fillRect(0,0,w,h);
+// Draw layer boxes
+const boxes=source.querySelectorAll('.box');
+const srcRect=source.getBoundingClientRect();
+boxes.forEach(b=>{
+const r=b.getBoundingClientRect();
+ctx.strokeStyle=b.style.color||'#00bceb';
+ctx.lineWidth=2;
+ctx.setLineDash([6,4]);
+ctx.strokeRect(r.left-srcRect.left,r.top-srcRect.top,r.width,r.height);
+});
+// Draw devices
+const els=source.querySelectorAll('.el');
+els.forEach(el=>{
+const r=el.getBoundingClientRect();
+const x=r.left-srcRect.left+r.width/2;
+const y=r.top-srcRect.top+r.height/2;
+ctx.fillStyle='rgba(0,188,235,0.6)';
+ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();
+// Animated pulse per frame
+const pulse=Math.sin(Date.now()/200+x)*3;
+ctx.strokeStyle='rgba(0,188,235,0.3)';
+ctx.lineWidth=1;
+ctx.beginPath();ctx.arc(x,y,15+pulse,0,Math.PI*2);ctx.stroke();
+});
+// Draw connections
+conns.forEach(c=>{
+const fromEl=source.querySelector(`[data-id="${c.from}"]`);
+const toEl=source.querySelector(`[data-id="${c.to}"]`);
+if(!fromEl||!toEl)return;
+const fr=fromEl.getBoundingClientRect();
+const tr=toEl.getBoundingClientRect();
+const x1=fr.left-srcRect.left+fr.width/2;
+const y1=fr.top-srcRect.top+fr.height/2;
+const x2=tr.left-srcRect.left+tr.width/2;
+const y2=tr.top-srcRect.top+tr.height/2;
+ctx.strokeStyle=c.color;
+ctx.lineWidth=2;
+ctx.setLineDash([6,4]);
+ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+// Animated particle
+const t=(Date.now()%2000)/2000;
+const px=x1+(x2-x1)*t;
+const py=y1+(y2-y1)*t;
+ctx.fillStyle=c.color;
+ctx.beginPath();ctx.arc(px,py,4,0,Math.PI*2);ctx.fill();
+});
+ctx.setLineDash([]);
+}
+
+// ===== IMPORT SVG =====
+function importSvg(event){
+const file=event.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=function(e){
+const svgContent=e.target.result;
+snapshot();
+idC++;
+const id='svg-'+idC;
+const d=document.createElement('div');
+d.className='el';
+d.style.cssText='top:400px;left:600px';
+d.dataset.id=id;
+// Clean SVG and set size
+let svgClean=svgContent.replace(/<\?xml[^?]*\?>/g,'').replace(/<!DOCTYPE[^>]*>/g,'').trim();
+// Ensure SVG has width/height
+if(!svgClean.includes('width=')){
+svgClean=svgClean.replace('<svg','<svg width="60" height="60"');
+}else{
+// Force resize to 60x60
+svgClean=svgClean.replace(/width="[^"]*"/,'width="60"').replace(/height="[^"]*"/,'height="60"');
+}
+d.innerHTML=`<div class="el-icon" style="width:60px;height:60px;overflow:hidden">${svgClean}</div><div class="el-label" contenteditable="true">${file.name.replace('.svg','')}</div>`;
+document.getElementById('canvas').appendChild(d);
+initEl(d);
+};
+reader.readAsText(file);
+event.target.value='';
+}
 
 // ===== MOUSE TRAIL =====
 let trailEnabled=false;
