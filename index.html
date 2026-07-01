@@ -7,335 +7,217 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:#12141d;min-height:100vh;overflow:auto;color:#fff}
-#canvas-area{position:relative;width:1300px;min-height:2000px;margin:0 auto;padding:30px 0}
+#canvas-area{position:relative;width:1300px;min-height:2100px;margin:0 auto;padding:80px 0 30px}
 .diagram-title{text-align:center;margin-bottom:25px}
 .diagram-title h1{display:inline-block;background:linear-gradient(90deg,#00bceb,#0076d5);border-radius:40px;padding:12px 50px;font-size:1.7em;box-shadow:0 4px 25px rgba(0,188,235,0.4);animation:tGlow 3s ease-in-out infinite}
 @keyframes tGlow{0%,100%{box-shadow:0 4px 25px rgba(0,188,235,0.3)}50%{box-shadow:0 4px 50px rgba(0,188,235,0.7)}}
 
-/* Toolbar */
-.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(18,20,29,0.95);border-bottom:1px solid #333;padding:8px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;backdrop-filter:blur(10px)}
-.toolbar-section{display:flex;align-items:center;gap:8px;padding:0 12px;border-right:1px solid #333}
-.toolbar-section:last-child{border-right:none}
-.toolbar label{font-size:0.75em;color:#888;font-weight:600}
-.toolbar select,.toolbar input[type=color]{background:#1e2030;border:1px solid #444;color:#fff;border-radius:4px;padding:4px 8px;font-size:0.75em;cursor:pointer}
-.toolbar input[type=color]{width:30px;height:26px;padding:2px}
-.toolbar button{background:linear-gradient(135deg,#0076d5,#00bceb);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer;transition:all 0.2s}
-.toolbar button:hover{transform:scale(1.05);box-shadow:0 2px 10px rgba(0,188,235,0.4)}
+/* TOOLBAR */
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(18,20,29,0.97);border-bottom:1px solid #333;padding:6px 15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;backdrop-filter:blur(12px)}
+.tb-section{display:flex;align-items:center;gap:6px;padding:0 10px;border-right:1px solid #333}
+.tb-section:last-child{border-right:none}
+.toolbar label{font-size:0.68em;color:#888;font-weight:600;white-space:nowrap}
+.toolbar select,.toolbar input[type=color],.toolbar input[type=number],.toolbar input[type=text]{background:#1e2030;border:1px solid #444;color:#fff;border-radius:4px;padding:3px 6px;font-size:0.7em;cursor:pointer}
+.toolbar input[type=color]{width:28px;height:24px;padding:1px}
+.toolbar input[type=number]{width:45px}
+.toolbar input[type=text]{width:80px}
+.toolbar button{background:linear-gradient(135deg,#0076d5,#00bceb);border:none;color:#fff;padding:5px 11px;border-radius:5px;font-size:0.7em;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.toolbar button:hover{transform:scale(1.05);box-shadow:0 2px 8px rgba(0,188,235,0.4)}
 .toolbar button.danger{background:linear-gradient(135deg,#dc3545,#a71d2a)}
-.toolbar .mode-indicator{font-size:0.7em;padding:4px 10px;border-radius:12px;background:rgba(108,192,74,0.15);color:#6cc04a;border:1px solid rgba(108,192,74,0.3)}
+.toolbar button.warn{background:linear-gradient(135deg,#fd7e14,#e8590c)}
+.toolbar button.success{background:linear-gradient(135deg,#198754,#0f5132)}
+.tb-mode{font-size:0.65em;padding:3px 8px;border-radius:10px;background:rgba(108,192,74,0.12);color:#6cc04a;border:1px solid rgba(108,192,74,0.3);font-weight:600}
 
-/* Layers */
+/* LAYERS */
 .layer-box{position:absolute;left:40px;right:40px;border-radius:14px;border:2px solid;display:flex;align-items:stretch}
-.layer-left{display:flex;align-items:center;padding:0 15px;min-width:90px}
-.layer-badge{width:60px;height:60px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;box-shadow:0 3px 12px rgba(0,0,0,0.3)}
-.layer-badge .lbl{font-size:0.45em;opacity:0.85}
-.layer-badge .num{font-size:1.2em;line-height:1}
-.layer-center{flex:1;display:flex;align-items:center;justify-content:center;padding:15px 10px;position:relative;min-height:160px}
-.layer-right{min-width:250px;padding:15px;display:flex;flex-direction:column;justify-content:center;font-size:0.72em;line-height:1.7;color:rgba(255,255,255,0.7);border-left:1px solid rgba(255,255,255,0.05)}
-.layer-right .lr-title{font-weight:700;margin-bottom:4px}
-.layer-right li{list-style:none;padding-left:12px;position:relative}
+.layer-left{display:flex;align-items:center;padding:0 12px;min-width:80px}
+.layer-badge{width:55px;height:55px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.layer-badge .lbl{font-size:0.42em;opacity:0.8}
+.layer-badge .num{font-size:1.1em;line-height:1}
+.layer-center{flex:1;min-height:150px}
+.layer-right{min-width:240px;padding:12px;display:flex;flex-direction:column;justify-content:center;font-size:0.7em;line-height:1.7;color:rgba(255,255,255,0.7);border-left:1px solid rgba(255,255,255,0.05)}
+.layer-right .lr-title{font-weight:700;margin-bottom:3px}
+.layer-right li{list-style:none;padding-left:11px;position:relative}
 .layer-right li::before{content:"\25B8";position:absolute;left:0;font-size:0.8em}
-
 .l5{background:rgba(220,53,69,0.04);border-color:rgba(220,53,69,0.35)}
 .l5 .layer-badge{background:linear-gradient(135deg,#dc3545,#a71d2a)}
-.l5 .lr-title{color:#dc3545}
-.l5 .layer-right li::before{color:#dc3545}
-
+.l5 .lr-title{color:#dc3545}.l5 li::before{color:#dc3545}
 .l4{background:rgba(253,126,20,0.04);border-color:rgba(253,126,20,0.35)}
 .l4 .layer-badge{background:linear-gradient(135deg,#fd7e14,#e8590c)}
-.l4 .lr-title{color:#fd7e14}
-.l4 .layer-right li::before{color:#fd7e14}
-
+.l4 .lr-title{color:#fd7e14}.l4 li::before{color:#fd7e14}
 .l3{background:rgba(0,188,235,0.04);border-color:rgba(0,188,235,0.35)}
 .l3 .layer-badge{background:linear-gradient(135deg,#00bceb,#0076d5)}
-.l3 .lr-title{color:#00bceb}
-.l3 .layer-right li::before{color:#00bceb}
-
+.l3 .lr-title{color:#00bceb}.l3 li::before{color:#00bceb}
 .l2{background:rgba(108,192,74,0.04);border-color:rgba(108,192,74,0.35)}
 .l2 .layer-badge{background:linear-gradient(135deg,#6cc04a,#3d8b37)}
-.l2 .lr-title{color:#6cc04a}
-.l2 .layer-right li::before{color:#6cc04a}
-
+.l2 .lr-title{color:#6cc04a}.l2 li::before{color:#6cc04a}
 .l1{background:rgba(25,135,84,0.04);border-color:rgba(25,135,84,0.35)}
 .l1 .layer-badge{background:linear-gradient(135deg,#198754,#0f5132)}
-.l1 .lr-title{color:#198754}
-.l1 .layer-right li::before{color:#198754}
+.l1 .lr-title{color:#198754}.l1 li::before{color:#198754}
 
-/* Device icons */
+/* ZONE BOXES */
+.zone-box{position:absolute;border-radius:12px;z-index:3;cursor:pointer;transition:box-shadow 0.2s}
+.zone-box:hover{box-shadow:0 0 15px rgba(255,255,255,0.1)}
+.zone-box.selected{box-shadow:0 0 0 3px #ffc107 !important}
+.zone-box .zone-label{position:absolute;top:-10px;left:12px;background:#12141d;padding:0 8px;font-size:0.68em;font-weight:700}
+.zone-box.anim-dash{animation:boxDash 2s linear infinite}
+.zone-box.anim-pulse{animation:boxPulse 2s ease-in-out infinite}
+.zone-box.anim-glow{animation:boxGlow 2s ease-in-out infinite}
+@keyframes boxDash{to{stroke-dashoffset:-20px}}
+@keyframes boxPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.01)}}
+@keyframes boxGlow{0%,100%{box-shadow:0 0 5px currentColor}50%{box-shadow:0 0 25px currentColor,0 0 50px currentColor}}
+
+/* DEVICES */
 .device{position:absolute;cursor:grab;z-index:20;display:flex;flex-direction:column;align-items:center;transition:filter 0.2s}
 .device:hover{filter:brightness(1.2)}
 .device.dragging{cursor:grabbing;z-index:100;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.5))}
 .device-icon{display:flex;align-items:center;justify-content:center}
-.device-name{font-size:0.65em;color:rgba(255,255,255,0.85);margin-top:3px;font-weight:600;white-space:nowrap;text-align:center}
-.device-sub{font-size:0.55em;color:rgba(255,255,255,0.5);text-align:center}
-
-/* Specific device icons */
-.dev-firewall{width:60px;height:56px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.dev-firewall::after{content:'';position:absolute;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 7px,rgba(255,255,255,0.1) 7px,rgba(255,255,255,0.1) 8px)}
-.dev-firewall .flame{font-size:1.6em}
-.fw-paloalto{background:linear-gradient(135deg,#dc3545,#8b0000);box-shadow:0 3px 12px rgba(220,53,69,0.4)}
-.fw-dmz{background:linear-gradient(135deg,#0076d5,#003d73);box-shadow:0 3px 12px rgba(0,118,213,0.4)}
-.fw-dc{background:linear-gradient(135deg,#6cc04a,#2d6b1e);box-shadow:0 3px 12px rgba(108,192,74,0.4)}
-
-.dev-proxy{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.5em;text-align:center;line-height:1.2;color:#fff;background:linear-gradient(135deg,#fd7e14,#cc5500);box-shadow:0 3px 12px rgba(253,126,20,0.4)}
-
-.dev-switch{width:60px;height:28px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,118,213,0.3);position:relative}
-.dev-switch::after{content:'';position:absolute;left:6px;width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:8px 0 0 #6cc04a,16px 0 0 #6cc04a,24px 0 0 #fd7e14,32px 0 0 #6cc04a}
-
-.dev-pra{width:55px;height:50px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.55em;font-weight:700;color:#fff;box-shadow:0 3px 12px rgba(232,93,4,0.4)}
-.dev-wsus{width:50px;height:50px;background:linear-gradient(135deg,#0078d4,#004578);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,120,212,0.4);position:relative}
-.dev-wsus .sync{width:20px;height:20px;border:3px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 2s linear infinite}
+.device-name{font-size:0.63em;color:rgba(255,255,255,0.85);margin-top:3px;font-weight:600;white-space:nowrap;text-align:center}
+.device-sub{font-size:0.52em;color:rgba(255,255,255,0.5);text-align:center}
+.dev-firewall{width:58px;height:54px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.dev-firewall::after{content:'';position:absolute;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 7px,rgba(255,255,255,0.08) 7px,rgba(255,255,255,0.08) 8px)}
+.dev-firewall .flame{font-size:1.5em}
+.fw-paloalto{background:linear-gradient(135deg,#dc3545,#8b0000);box-shadow:0 3px 10px rgba(220,53,69,0.4)}
+.fw-dmz{background:linear-gradient(135deg,#0076d5,#003d73);box-shadow:0 3px 10px rgba(0,118,213,0.4)}
+.fw-dc{background:linear-gradient(135deg,#6cc04a,#2d6b1e);box-shadow:0 3px 10px rgba(108,192,74,0.4)}
+.dev-proxy{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.48em;text-align:center;line-height:1.2;color:#fff;background:linear-gradient(135deg,#fd7e14,#cc5500);box-shadow:0 3px 10px rgba(253,126,20,0.4)}
+.dev-switch{width:58px;height:26px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:4px;position:relative;box-shadow:0 2px 8px rgba(0,118,213,0.3)}
+.dev-switch::after{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:8px 0 0 #6cc04a,16px 0 0 #6cc04a,24px 0 0 #fd7e14,32px 0 0 #6cc04a}
+.dev-pra{width:52px;height:48px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(232,93,4,0.4)}
+.dev-wsus{width:48px;height:48px;background:linear-gradient(135deg,#0078d4,#004578);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,120,212,0.4)}
+.dev-wsus .sync{width:18px;height:18px;border:3px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.dev-trellix{width:48px;height:48px;background:#1a1a2e;border:2px solid #00bceb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3em;font-weight:900;color:#00bceb;box-shadow:0 3px 8px rgba(0,188,235,0.3)}
+.dev-aci{width:52px;height:52px;border:3px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.05);box-shadow:0 3px 8px rgba(108,192,74,0.3);font-size:0.48em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2}
+.dev-jumppoint{width:52px;height:56px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.42em;font-weight:700;line-height:1.3;box-shadow:0 3px 10px rgba(232,93,4,0.4)}
+.dev-server{width:38px;height:52px;background:linear-gradient(180deg,#2a2a4a,#16162e);border:1px solid #444;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4)}
+.dev-server .led{width:20px;height:2px;background:#6cc04a;border-radius:2px}
+.dev-cloud{width:95px;height:52px;background:rgba(0,188,235,0.06);border:2px solid #00bceb;border-radius:26px;display:flex;align-items:center;justify-content:center;color:#00bceb;font-weight:700;font-size:0.75em}
+.dev-netbar{width:260px;height:38px;background:rgba(255,255,255,0.02);border:2px solid #555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#aaa;font-size:0.75em}
+.note-box{position:absolute;background:rgba(255,255,210,0.92);border:1px solid #cca;border-radius:6px;padding:6px 9px;font-size:0.58em;color:#333;font-weight:600;max-width:125px;line-height:1.3;z-index:15}
 
-.dev-trellix{width:50px;height:50px;background:#1a1a2e;border:2px solid #00bceb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4em;font-weight:900;color:#00bceb;box-shadow:0 3px 10px rgba(0,188,235,0.3)}
-
-.dev-aci{width:55px;height:55px;border:3px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.05);box-shadow:0 3px 10px rgba(108,192,74,0.3);font-size:0.5em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2}
-
-.dev-jumppoint{width:55px;height:58px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.45em;font-weight:700;line-height:1.3;box-shadow:0 3px 12px rgba(232,93,4,0.4)}
-
-.dev-server{width:40px;height:55px;background:linear-gradient(180deg,#2a2a4a,#16162e);border:1px solid #444;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
-.dev-server .led{width:22px;height:2.5px;background:#6cc04a;border-radius:2px}
-
-.dev-cloud{width:100px;height:55px;background:rgba(0,188,235,0.06);border:2px solid #00bceb;border-radius:28px;display:flex;align-items:center;justify-content:center;color:#00bceb;font-weight:700;font-size:0.8em}
-
-.dev-network-bar{width:280px;height:40px;background:rgba(255,255,255,0.02);border:2px solid #555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#aaa;font-size:0.8em}
-
-/* Zones */
-.zone-box{position:absolute;border:2px dashed;border-radius:12px;z-index:3}
-.zone-box .zone-label{position:absolute;top:-10px;left:12px;background:#12141d;padding:0 8px;font-size:0.7em;font-weight:700}
-.zone-dmz{border-color:rgba(0,188,235,0.5)}
-.zone-dmz .zone-label{color:#00bceb}
-.zone-dc{border-color:rgba(108,192,74,0.5)}
-.zone-dc .zone-label{color:#6cc04a}
-.zone-jumppoint{border-color:rgba(232,93,4,0.4)}
-.zone-jumppoint .zone-label{color:#e85d04}
-
-/* Connections (SVG) */
-#connections-svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
-.conn-path{fill:none;stroke-width:2;stroke-dasharray:6,4;cursor:pointer;pointer-events:stroke}
+/* Connections SVG */
+#conn-svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
+.conn-path{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
 .conn-path:hover{stroke-width:3.5;filter:drop-shadow(0 0 4px currentColor)}
+.conn-path.selected{stroke-width:4;filter:drop-shadow(0 0 6px #ffc107)}
 
 /* Connection mode */
 .conn-mode .device{cursor:crosshair !important}
-.conn-mode .device:hover .device-icon>*{outline:3px solid #ffc107;outline-offset:3px;border-radius:4px}
-
-/* Note */
-.note-box{position:absolute;background:rgba(255,255,210,0.92);border:1px solid #cca;border-radius:6px;padding:7px 10px;font-size:0.6em;color:#333;font-weight:600;max-width:130px;line-height:1.3;z-index:15}
+.conn-mode .device:hover .device-icon>*{outline:3px solid #ffc107;outline-offset:3px;border-radius:6px}
 
 /* Particles */
 #bgp{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .bp{position:absolute;border-radius:50%;animation:pf 18s ease-in-out infinite}
 @keyframes pf{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-18px)}66%{transform:translate(-12px,15px)}}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-track{background:#12141d}
-::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#12141d}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
 </style>
 </head>
 <body>
 
 <!-- TOOLBAR -->
-<div class="toolbar" id="toolbar">
-<div class="toolbar-section">
-<label>MODE:</label>
-<span class="mode-indicator" id="modeLabel">Select</span>
+<div class="toolbar">
+<div class="tb-section">
+<label>Mode:</label>
+<span class="tb-mode" id="modeLabel">Select</span>
 </div>
-<div class="toolbar-section">
-<label>Add Device:</label>
-<select id="addDeviceSelect">
-<option value="">-- Select --</option>
-<option value="firewall">Firewall</option>
-<option value="switch">Switch</option>
-<option value="router">Router</option>
-<option value="server">Server</option>
-<option value="proxy">Proxy</option>
-<option value="vm">Virtual Machine</option>
-<option value="cloud">Cloud</option>
-<option value="loadbalancer">Load Balancer</option>
-<option value="waf">WAF</option>
-<option value="ids">IDS/IPS</option>
-<option value="wireless">Wireless AP</option>
-<option value="storage">Storage</option>
-</select>
-<button onclick="addDevice()">+ Add</button>
+<div class="tb-section">
+<label>Device:</label>
+<select id="addDeviceSelect"><option value="">--Add--</option><option value="firewall">Firewall</option><option value="switch">Switch</option><option value="router">Router</option><option value="server">Server</option><option value="proxy">Proxy</option><option value="vm">VM</option><option value="cloud">Cloud</option><option value="loadbalancer">Load Balancer</option><option value="waf">WAF</option><option value="ids">IDS/IPS</option><option value="wireless">Wireless</option><option value="storage">Storage</option></select>
+<button onclick="addDevice()">+Add</button>
 </div>
-<div class="toolbar-section">
+<div class="tb-section">
+<label>Zone/Box:</label>
+<input type="text" id="boxLabel" placeholder="Label" value="New Zone">
+<input type="color" id="boxColor" value="#00bceb">
+<select id="boxStyle"><option value="dashed">Dashed</option><option value="solid">Solid</option><option value="dotted">Dotted</option></select>
+<select id="boxAnim"><option value="none">No Anim</option><option value="anim-pulse">Pulse</option><option value="anim-glow">Glow</option></select>
+<button class="success" onclick="addZoneBox()">+Box</button>
+<button class="danger" onclick="deleteSelectedBox()">-Box</button>
+</div>
+<div class="tb-section">
 <label>Connection:</label>
-<button id="connBtn" onclick="toggleConnMode()">Draw Connection</button>
-<input type="color" id="connColor" value="#00bceb" title="Connection Color">
-<select id="connAnim">
-<option value="flow">Flowing</option>
-<option value="pulse">Pulse</option>
-<option value="dash">Dashed</option>
-<option value="solid">Solid</option>
-</select>
+<button id="connBtn" onclick="toggleConnMode()">Draw</button>
+<input type="color" id="connColor" value="#00bceb" title="Color">
+<select id="connAnim"><option value="flow">Flow</option><option value="pulse">Pulse</option><option value="dash">Dash</option><option value="solid">Solid</option></select>
+<label>Speed:</label>
+<input type="number" id="connSpeed" value="1.5" min="0.3" max="8" step="0.1" style="width:50px">
 </div>
-<div class="toolbar-section">
-<button class="danger" onclick="deleteSelected()">Delete Selected</button>
+<div class="tb-section">
+<label>Multi-Flow:</label>
+<button class="warn" onclick="addFlowToConn()">+Flow</button>
+<input type="color" id="flowColor2" value="#6cc04a" title="2nd Flow Color">
+<input type="number" id="flowSpeed2" value="2.5" min="0.3" max="8" step="0.1" style="width:50px" title="Speed">
+</div>
+<div class="tb-section">
+<button class="danger" onclick="deleteSelected()">Delete</button>
 </div>
 </div>
 
 <!-- CANVAS -->
 <div id="canvas-area">
 <div class="diagram-title"><h1>Secure Pull Architecture</h1></div>
+<svg id="conn-svg"></svg>
 
-<!-- SVG for connections -->
-<svg id="connections-svg"></svg>
+<!-- Cloud + Network -->
+<div class="device" style="top:80px;left:560px" data-id="cloud"><div class="device-icon"><div class="dev-cloud">&#x2601; NET</div></div><div class="device-name">Internet</div></div>
+<div class="device" style="top:155px;left:480px" data-id="mainnet"><div class="device-icon"><div class="dev-netbar">Main NETWORK</div></div></div>
 
-<!-- Internet Cloud -->
-<div class="device" id="dev-cloud" style="top:80px;left:560px" data-id="cloud">
-<div class="device-icon"><div class="dev-cloud">&#x2601; NET</div></div>
-<div class="device-name">Internet</div>
-</div>
-
-<!-- Main Network -->
-<div class="device" id="dev-mainnet" style="top:160px;left:470px" data-id="mainnet">
-<div class="device-icon"><div class="dev-network-bar">Main NETWORK</div></div>
-</div>
-
-<!-- ======= LAYER 5: Internet Firewall ======= -->
-<div class="layer-box l5" style="top:240px;height:170px">
+<!-- LAYER 5 -->
+<div class="layer-box l5" style="top:220px;height:160px">
 <div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">5</span></div></div>
 <div class="layer-center"></div>
-<div class="layer-right">
-<div class="lr-title">Internet Firewall (Palo Alto)</div>
-<li>Source IP Whitelisting - Only from Web Proxy</li>
-<li>Destination Server IP & URL Whitelisting</li>
-<li>IPS, Web Filtering & Anti-malware Security</li>
-<li>Zoning & Multi-tenancy</li>
-<li>Unidirectional Flow</li>
+<div class="layer-right"><div class="lr-title">Internet Firewall (Palo Alto)</div><li>Source IP Whitelisting - Only from Web Proxy</li><li>Destination Server IP & URL Whitelisting</li><li>IPS, Web Filtering & Anti-malware Security</li><li>Zoning & Multi-tenancy</li><li>Unidirectional Flow</li></div>
 </div>
-</div>
-<!-- Palo Alto FW -->
-<div class="device" id="dev-intfw" style="top:280px;left:520px" data-id="intfw">
-<div class="device-icon"><div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div></div>
-<div class="device-name">INT FW</div>
-<div class="device-sub">Palo Alto</div>
-</div>
+<div class="device" style="top:265px;left:530px" data-id="intfw"><div class="device-icon"><div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div></div><div class="device-name">INT FW</div><div class="device-sub">Palo Alto</div></div>
 
-<!-- ======= LAYER 4: Web Proxy ======= -->
-<div class="layer-box l4" style="top:430px;height:170px">
+<!-- LAYER 4 -->
+<div class="layer-box l4" style="top:400px;height:160px">
 <div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">4</span></div></div>
 <div class="layer-center"></div>
-<div class="layer-right">
-<div class="lr-title">Web Proxy</div>
-<li>Source IP Whitelisting - Only from DMZ Servers</li>
-<li>Destination Server IP & URL Whitelisting</li>
-<li>Web Reputation & Web Usage Control</li>
-<li>Anti-malware Analysis & HTTPS Inspection</li>
-<li>URL Categorization & Content Filtering</li>
+<div class="layer-right"><div class="lr-title">Web Proxy</div><li>Source IP Whitelisting - Only from DMZ Servers</li><li>Destination Server IP & URL Whitelisting</li><li>Web Reputation & Web Usage Control</li><li>Anti-malware Analysis & HTTPS Inspection</li><li>URL Categorization & Content Filtering</li></div>
 </div>
-</div>
-<!-- Web Proxy -->
-<div class="device" id="dev-proxy" style="top:470px;left:530px" data-id="proxy">
-<div class="device-icon"><div class="dev-proxy">Web<br>Proxy</div></div>
-<div class="device-name">Web Proxy</div>
-<div class="device-sub">Forward Proxy</div>
-</div>
+<div class="device" style="top:440px;left:530px" data-id="proxy"><div class="device-icon"><div class="dev-proxy">Web<br>Proxy</div></div><div class="device-name">Web Proxy</div><div class="device-sub">Forward Proxy</div></div>
 
-<!-- ======= LAYER 3: DMZ Firewall ======= -->
-<div class="layer-box l3" style="top:620px;height:200px">
+<!-- LAYER 3 -->
+<div class="layer-box l3" style="top:580px;height:190px">
 <div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">3</span></div></div>
 <div class="layer-center"></div>
-<div class="layer-right">
-<div class="lr-title">DMZ Firewall</div>
-<li>Only specific DMZ servers reach Proxy</li>
-<li>Destination Server IP & URL Whitelisting</li>
-<li>IPS, Web Filtering & Anti-malware Security</li>
-<li>Zoning & Unidirectional Flow</li>
-<li>DMZ VM Isolation & Protection</li>
+<div class="layer-right"><div class="lr-title">DMZ Firewall</div><li>Only specific DMZ servers reach Proxy</li><li>Destination Server IP & URL Whitelisting</li><li>IPS, Web Filtering & Anti-malware Security</li><li>Zoning & Unidirectional Flow</li><li>DMZ VM Isolation & Protection</li></div>
 </div>
-</div>
-<!-- DMZ Firewall -->
-<div class="device" id="dev-dmzfw" style="top:680px;left:500px" data-id="dmzfw">
-<div class="device-icon"><div class="dev-firewall fw-dmz"><span class="flame">&#x1F525;</span></div></div>
-<div class="device-name">DMZ FW</div>
-<div class="device-sub">DMZ Firewall</div>
-</div>
+<div class="device" style="top:630px;left:500px" data-id="dmzfw"><div class="device-icon"><div class="dev-firewall fw-dmz"><span class="flame">&#x1F525;</span></div></div><div class="device-name">DMZ FW</div><div class="device-sub">DMZ Firewall</div></div>
 
-<!-- DMZ Zone (PRA, WSUS, Trellix) -->
-<div class="zone-box zone-dmz" style="top:655px;left:150px;width:200px;height:155px">
-<div class="zone-label">DMZ</div>
-</div>
-<!-- BeyondTrust PRA in DMZ -->
-<div class="device" id="dev-pra" style="top:670px;left:175px" data-id="pra">
-<div class="device-icon"><div class="dev-pra">&#x1F510; PRA</div></div>
-<div class="device-name">BeyondTrust</div>
-<div class="device-sub">PRA</div>
-</div>
-<!-- WSUS in DMZ -->
-<div class="device" id="dev-wsus" style="top:670px;left:265px" data-id="wsus">
-<div class="device-icon"><div class="dev-wsus"><div class="sync"></div></div></div>
-<div class="device-name">WSUS</div>
-<div class="device-sub">Patch Server</div>
-</div>
-<!-- Trellix TIE in DMZ -->
-<div class="device" id="dev-trellix" style="top:750px;left:215px" data-id="trellix">
-<div class="device-icon"><div class="dev-trellix">X</div></div>
-<div class="device-name">Trellix TIE</div>
-<div class="device-sub">Threat Intel</div>
-</div>
+<!-- DMZ Zone -->
+<div class="zone-box" style="top:610px;left:130px;width:220px;height:150px;border:2px dashed rgba(0,188,235,0.5);color:#00bceb" data-zone="dmz" id="zone-dmz"><div class="zone-label">DMZ</div></div>
+<div class="device" style="top:625px;left:155px" data-id="pra"><div class="device-icon"><div class="dev-pra">&#x1F510; PRA</div></div><div class="device-name">BeyondTrust</div><div class="device-sub">PRA</div></div>
+<div class="device" style="top:625px;left:255px" data-id="wsus"><div class="device-icon"><div class="dev-wsus"><div class="sync"></div></div></div><div class="device-name">WSUS</div><div class="device-sub">Patch Server</div></div>
+<div class="device" style="top:700px;left:200px" data-id="trellix"><div class="device-icon"><div class="dev-trellix">X</div></div><div class="device-name">Trellix TIE</div><div class="device-sub">Threat Intel</div></div>
 
 <!-- Note -->
-<div class="note-box" style="top:440px;left:100px">Public Certificate,<br>Public IP & DNS<br>required for PRA</div>
+<div class="note-box" style="top:400px;left:100px">Public Certificate,<br>Public IP & DNS<br>required for PRA</div>
 
-<!-- ======= LAYER 2: DC Firewall ======= -->
-<div class="layer-box l2" style="top:850px;height:170px">
+<!-- LAYER 2 -->
+<div class="layer-box l2" style="top:800px;height:160px">
 <div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">2</span></div></div>
 <div class="layer-center"></div>
-<div class="layer-right">
-<div class="lr-title">DC Firewall</div>
-<li>Source & Destination Server IP Whitelisting</li>
-<li>Only Specific Server to Specific DMZ Server</li>
-<li>IPS, Zoning & Multi-Instance</li>
-<li>Unidirectional Flow from DC to DMZ</li>
+<div class="layer-right"><div class="lr-title">DC Firewall</div><li>Source & Destination Server IP Whitelisting</li><li>Only Specific Server to Specific DMZ Server</li><li>IPS, Zoning & Multi-Instance</li><li>Unidirectional Flow from DC to DMZ</li></div>
 </div>
-</div>
-<!-- DC Firewall -->
-<div class="device" id="dev-dcfw" style="top:900px;left:520px" data-id="dcfw">
-<div class="device-icon"><div class="dev-firewall fw-dc"><span class="flame">&#x1F525;</span></div></div>
-<div class="device-name">DC FW</div>
-<div class="device-sub">DC Firewall</div>
-</div>
+<div class="device" style="top:845px;left:530px" data-id="dcfw"><div class="device-icon"><div class="dev-firewall fw-dc"><span class="flame">&#x1F525;</span></div></div><div class="device-name">DC FW</div><div class="device-sub">DC Firewall</div></div>
 
-<!-- ======= LAYER 1: ACI ======= -->
-<div class="layer-box l1" style="top:1050px;height:180px">
+<!-- LAYER 1 -->
+<div class="layer-box l1" style="top:990px;height:170px">
 <div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">1</span></div></div>
 <div class="layer-center"></div>
-<div class="layer-right">
-<div class="lr-title">ACI Fabric</div>
-<li>Source Whitelisting - Only specific EPG to DMZ</li>
-<li>Service Graphs, PBR, VRFs</li>
-<li>EPGs, ESGs & Multi-tenancy</li>
-<li>Unidirectional Flow from EPG to DMZ</li>
+<div class="layer-right"><div class="lr-title">ACI Fabric</div><li>Source Whitelisting - Only specific EPG to DMZ</li><li>Service Graphs, PBR, VRFs</li><li>EPGs, ESGs & Multi-tenancy</li><li>Unidirectional Flow from EPG to DMZ</li></div>
 </div>
-</div>
-<!-- ACI APIC -->
-<div class="device" id="dev-aci" style="top:1090px;left:470px" data-id="aci">
-<div class="device-icon"><div class="dev-aci">ACI<br>APIC</div></div>
-<div class="device-name">ACI APIC</div>
-<div class="device-sub">Controller</div>
-</div>
-<!-- Leaf/Spine -->
-<div class="device" id="dev-leafspine" style="top:1100px;left:590px" data-id="leafspine">
-<div class="device-icon"><div class="dev-switch"></div></div>
-<div class="device-name">Leaf / Spine</div>
-<div class="device-sub">ACI Fabric</div>
-</div>
+<div class="device" style="top:1040px;left:470px" data-id="aci"><div class="device-icon"><div class="dev-aci">ACI<br>APIC</div></div><div class="device-name">ACI APIC</div><div class="device-sub">Controller</div></div>
+<div class="device" style="top:1050px;left:590px" data-id="leafspine"><div class="device-icon"><div class="dev-switch"></div></div><div class="device-name">Leaf / Spine</div><div class="device-sub">ACI Fabric</div></div>
 
-<!-- ======= JUMP POINT ZONE ======= -->
-<div class="zone-box zone-jumppoint" style="top:1280px;left:300px;width:380px;height:250px">
-<div class="zone-label">Jump Point Zone</div>
-</div>
-<!-- Jump Point -->
-<div class="device" id="dev-jumppoint" style="top:1300px;left:450px" data-id="jumppoint">
-<div class="device-icon"><div class="dev-jumppoint">Jump<br>Point</div></div>
-<div class="device-name">Jump Point</div>
-<div class="device-sub">BeyondTrust</div>
-</div>
-<!-- Access Servers -->
-<div style="position:absolute;top:1410px;left:320px;display:flex;gap:20px;z-index:10">
+<!-- Jump Point Zone -->
+<div class="zone-box" style="top:1210px;left:280px;width:380px;height:250px;border:2px dashed rgba(232,93,4,0.5);color:#e85d04" data-zone="jumppoint" id="zone-jp"><div class="zone-label">Jump Point Zone</div></div>
+<div class="device" style="top:1230px;left:430px" data-id="jumppoint"><div class="device-icon"><div class="dev-jumppoint">Jump<br>Point</div></div><div class="device-name">Jump Point</div><div class="device-sub">BeyondTrust</div></div>
+<div style="position:absolute;top:1340px;left:300px;display:flex;gap:18px;z-index:10">
 <div class="device" style="position:relative" data-id="srv-rdp"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">RDP</div></div>
 <div class="device" style="position:relative" data-id="srv-ae"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Access<br>Extender</div></div>
 <div class="device" style="position:relative" data-id="srv-wj"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Web<br>Jump</div></div>
@@ -343,15 +225,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#12141d;min-height:100v
 <div class="device" style="position:relative" data-id="srv-ssh2"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">SSH/<br>Telnet</div></div>
 </div>
 
-<!-- ======= DC ZONE ======= -->
-<div class="zone-box zone-dc" style="top:1280px;left:750px;width:200px;height:250px">
-<div class="zone-label">DC</div>
-</div>
-<!-- DC Firewall in DC Zone -->
-<div class="device" id="dev-dcfw2" style="top:1370px;left:800px" data-id="dcfw2">
-<div class="device-icon"><div class="dev-firewall fw-dc" style="width:55px;height:45px"><span class="flame" style="font-size:1.3em">&#x1F525;</span></div></div>
-<div class="device-name">DC Firewall</div>
-</div>
+<!-- DC Zone -->
+<div class="zone-box" style="top:1210px;left:730px;width:190px;height:250px;border:2px solid rgba(108,192,74,0.5);color:#6cc04a" data-zone="dc" id="zone-dc"><div class="zone-label">DC</div></div>
+<div class="device" style="top:1310px;left:780px" data-id="dcfw2"><div class="device-icon"><div class="dev-firewall fw-dc" style="width:52px;height:42px"><span class="flame" style="font-size:1.2em">&#x1F525;</span></div></div><div class="device-name">DC Firewall</div></div>
 
 </div><!-- end canvas-area -->
 
@@ -359,275 +235,235 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#12141d;min-height:100v
 <div id="bgp"></div>
 
 <script>
-// ===== CONFIGURATION =====
+// ===== STATE =====
 let connections = [
-    {from:'cloud', to:'mainnet', color:'#666', anim:'dash'},
-    {from:'mainnet', to:'intfw', color:'#fd7e14', anim:'flow'},
-    {from:'intfw', to:'proxy', color:'#fd7e14', anim:'flow'},
-    {from:'proxy', to:'dmzfw', color:'#00bceb', anim:'flow'},
-    {from:'dmzfw', to:'dcfw', color:'#6cc04a', anim:'flow'},
-    {from:'dcfw', to:'aci', color:'#198754', anim:'flow'},
-    {from:'aci', to:'leafspine', color:'#6cc04a', anim:'dash'},
-    {from:'aci', to:'jumppoint', color:'#198754', anim:'flow'},
-    {from:'pra', to:'jumppoint', color:'#e85d04', anim:'flow'},
-    {from:'wsus', to:'dmzfw', color:'#0078d4', anim:'flow'},
-    {from:'trellix', to:'dmzfw', color:'#00bceb', anim:'flow'},
+    {from:'cloud',to:'mainnet',color:'#666',anim:'dash',speed:1.5,flows:[{color:'#00bceb',speed:1.2}]},
+    {from:'mainnet',to:'intfw',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5},{color:'#dc3545',speed:2.2}]},
+    {from:'intfw',to:'proxy',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5}]},
+    {from:'proxy',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.5,flows:[{color:'#00bceb',speed:1.5},{color:'#6cc04a',speed:2.3}]},
+    {from:'dmzfw',to:'dcfw',color:'#6cc04a',anim:'flow',speed:1.8,flows:[{color:'#6cc04a',speed:1.8}]},
+    {from:'dcfw',to:'aci',color:'#198754',anim:'flow',speed:1.8,flows:[{color:'#198754',speed:1.8}]},
+    {from:'aci',to:'leafspine',color:'#6cc04a',anim:'dash',speed:1,flows:[{color:'#6cc04a',speed:1}]},
+    {from:'aci',to:'jumppoint',color:'#198754',anim:'flow',speed:2,flows:[{color:'#198754',speed:2}]},
+    {from:'pra',to:'jumppoint',color:'#e85d04',anim:'flow',speed:3,flows:[{color:'#e85d04',speed:3},{color:'#ffc107',speed:4.5}]},
+    {from:'wsus',to:'dmzfw',color:'#0078d4',anim:'flow',speed:1.5,flows:[{color:'#0078d4',speed:1.5}]},
+    {from:'trellix',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.8,flows:[{color:'#00bceb',speed:1.8}]},
 ];
-
-let connMode = false;
-let connSource = null;
-let selectedConn = null;
-let dragTarget = null;
-let dragOffset = {x:0, y:0};
-let deviceCounter = 100;
+let connMode=false, connSource=null, selectedConn=null, selectedZone=null;
+let dragTarget=null, dragOffset={x:0,y:0}, deviceCounter=100, zoneCounter=10;
 
 // ===== RENDER CONNECTIONS =====
-function renderConnections() {
-    const svg = document.getElementById('connections-svg');
-    svg.innerHTML = '';
-    svg.setAttribute('width', '1300');
-    svg.setAttribute('height', '2000');
+function renderConnections(){
+    const svg=document.getElementById('conn-svg');
+    const canvas=document.getElementById('canvas-area');
+    const cr=canvas.getBoundingClientRect();
+    let html='<defs>';
+    const colors=[...new Set(connections.flatMap(c=>[c.color,...c.flows.map(f=>f.color)]))];
+    colors.forEach(col=>{html+=`<marker id="a${col.replace('#','')}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${col}"/></marker>`;});
+    html+='</defs>';
     
-    // Defs for markers and animations
-    let defs = '<defs>';
-    const usedColors = [...new Set(connections.map(c=>c.color))];
-    usedColors.forEach(col => {
-        const id = 'arrow-' + col.replace('#','');
-        defs += `<marker id="${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${col}"/></marker>`;
-    });
-    defs += '</defs>';
-    svg.innerHTML = defs;
-    
-    connections.forEach((conn, idx) => {
-        const fromEl = document.querySelector(`[data-id="${conn.from}"]`);
-        const toEl = document.querySelector(`[data-id="${conn.to}"]`);
-        if (!fromEl || !toEl) return;
-        
-        const canvas = document.getElementById('canvas-area');
-        const canvasRect = canvas.getBoundingClientRect();
-        
-        const fromRect = fromEl.getBoundingClientRect();
-        const toRect = toEl.getBoundingClientRect();
-        
-        const x1 = fromRect.left - canvasRect.left + fromRect.width/2;
-        const y1 = fromRect.top - canvasRect.top + fromRect.height/2;
-        const x2 = toRect.left - canvasRect.left + toRect.width/2;
-        const y2 = toRect.top - canvasRect.top + toRect.height/2;
-        
-        const markerId = 'arrow-' + conn.color.replace('#','');
-        let dasharray = '6,4';
-        let pathEl = '';
-        
-        if (conn.anim === 'solid') dasharray = 'none';
-        else if (conn.anim === 'pulse') dasharray = '2,6';
-        else if (conn.anim === 'dash') dasharray = '8,4';
-        
-        // Calculate curve
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const dist = Math.sqrt(dx*dx + dy*dy);
+    connections.forEach((conn,idx)=>{
+        const fromEl=document.querySelector(`[data-id="${conn.from}"]`);
+        const toEl=document.querySelector(`[data-id="${conn.to}"]`);
+        if(!fromEl||!toEl) return;
+        const fr=fromEl.getBoundingClientRect();
+        const tr=toEl.getBoundingClientRect();
+        const x1=fr.left-cr.left+fr.width/2, y1=fr.top-cr.top+fr.height/2;
+        const x2=tr.left-cr.left+tr.width/2, y2=tr.top-cr.top+tr.height/2;
+        const dx=x2-x1, dy=y2-y1;
         let path;
-        if (Math.abs(dx) < 30) {
-            path = `M${x1},${y1} L${x2},${y2}`;
-        } else {
-            const cx = (x1+x2)/2 + (dy > 100 ? -30 : 0);
-            const cy = (y1+y2)/2;
-            path = `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
-        }
+        if(Math.abs(dx)<40) path=`M${x1},${y1} L${x2},${y2}`;
+        else{const cx=(x1+x2)/2+(dy>80?-20:20);path=`M${x1},${y1} Q${cx},${(y1+y2)/2} ${x2},${y2}`;}
         
-        // Connection line
-        pathEl += `<path class="conn-path" d="${path}" stroke="${conn.color}" stroke-dasharray="${dasharray}" marker-end="url(#${markerId})" data-idx="${idx}" style="pointer-events:stroke;cursor:pointer" onclick="selectConn(event,${idx})">`;
-        if (conn.anim === 'flow' || conn.anim === 'dash') {
-            pathEl += `<animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/>`;
-        } else if (conn.anim === 'pulse') {
-            pathEl += `<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
-        }
-        pathEl += `</path>`;
+        let da='6,4';
+        if(conn.anim==='solid')da='none';
+        else if(conn.anim==='pulse')da='3,8';
+        const sel=selectedConn===idx?' selected':'';
+        html+=`<path class="conn-path${sel}" d="${path}" stroke="${conn.color}" stroke-dasharray="${da}" marker-end="url(#a${conn.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selectConn(event,${idx})">`;
+        if(conn.anim==='flow'||conn.anim==='dash')html+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${conn.speed*0.6}s" repeatCount="indefinite"/>`;
+        else if(conn.anim==='pulse')html+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
+        html+=`</path>`;
         
-        // Flowing particle
-        if (conn.anim === 'flow') {
-            pathEl += `<circle r="4" fill="${conn.color}" opacity="0.9"><animateMotion path="${path}" dur="${1.5 + dist/500}s" repeatCount="indefinite"/></circle>`;
-            pathEl += `<circle r="3" fill="${conn.color}" opacity="0.5"><animateMotion path="${path}" dur="${1.5 + dist/500}s" begin="0.5s" repeatCount="indefinite"/></circle>`;
-        }
-        
-        svg.innerHTML += pathEl;
+        // Multi-flow particles
+        conn.flows.forEach((fl,fi)=>{
+            const r=Math.max(2,4-fi);
+            const delay=fi*0.4;
+            html+=`<circle r="${r}" fill="${fl.color}" opacity="${0.9-fi*0.15}"><animateMotion path="${path}" dur="${fl.speed}s" begin="${delay}s" repeatCount="indefinite"/></circle>`;
+        });
     });
+    svg.innerHTML=html;
 }
 
 // ===== SELECT CONNECTION =====
-function selectConn(e, idx) {
-    e.stopPropagation();
-    selectedConn = idx;
-    document.getElementById('connColor').value = connections[idx].color;
-    document.getElementById('connAnim').value = connections[idx].anim;
+function selectConn(e,idx){e.stopPropagation();selectedConn=idx;selectedZone=null;document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));document.getElementById('connColor').value=connections[idx].color;document.getElementById('connAnim').value=connections[idx].anim;document.getElementById('connSpeed').value=connections[idx].speed;renderConnections();}
+
+// ===== ADD FLOW TO CONNECTION =====
+function addFlowToConn(){
+    if(selectedConn===null){alert('Select a connection first');return;}
+    const color=document.getElementById('flowColor2').value;
+    const speed=parseFloat(document.getElementById('flowSpeed2').value)||2;
+    connections[selectedConn].flows.push({color:color,speed:speed});
     renderConnections();
-    // Highlight selected
-    const paths = document.querySelectorAll('.conn-path');
-    paths.forEach((p,i) => {
-        if (i === idx) p.setAttribute('stroke-width', '4');
-    });
 }
 
-// ===== CONNECTION MODE =====
-function toggleConnMode() {
-    connMode = !connMode;
-    const btn = document.getElementById('connBtn');
-    const area = document.getElementById('canvas-area');
-    if (connMode) {
-        btn.style.background = 'linear-gradient(135deg,#ffc107,#e0a800)';
-        btn.textContent = 'Cancel';
-        area.classList.add('conn-mode');
-        document.getElementById('modeLabel').textContent = 'Connect';
-        document.getElementById('modeLabel').style.background = 'rgba(255,193,7,0.15)';
-        document.getElementById('modeLabel').style.color = '#ffc107';
-        document.getElementById('modeLabel').style.borderColor = 'rgba(255,193,7,0.3)';
-    } else {
-        btn.style.background = '';
-        btn.textContent = 'Draw Connection';
-        area.classList.remove('conn-mode');
-        connSource = null;
-        document.getElementById('modeLabel').textContent = 'Select';
-        document.getElementById('modeLabel').style.background = '';
-        document.getElementById('modeLabel').style.color = '';
-        document.getElementById('modeLabel').style.borderColor = '';
+// ===== TOGGLE CONNECTION MODE =====
+function toggleConnMode(){
+    connMode=!connMode;
+    const btn=document.getElementById('connBtn');
+    const area=document.getElementById('canvas-area');
+    if(connMode){btn.style.background='linear-gradient(135deg,#ffc107,#e0a800)';btn.textContent='Cancel';area.classList.add('conn-mode');document.getElementById('modeLabel').textContent='Connect';document.getElementById('modeLabel').style.cssText='background:rgba(255,193,7,0.15);color:#ffc107;border-color:rgba(255,193,7,0.3)';}
+    else{btn.style.background='';btn.textContent='Draw';area.classList.remove('conn-mode');connSource=null;document.getElementById('modeLabel').textContent='Select';document.getElementById('modeLabel').style.cssText='';}
+}
+
+// ===== ADD ZONE BOX =====
+function addZoneBox(){
+    zoneCounter++;
+    const label=document.getElementById('boxLabel').value||'Zone';
+    const color=document.getElementById('boxColor').value;
+    const style=document.getElementById('boxStyle').value;
+    const anim=document.getElementById('boxAnim').value;
+    const box=document.createElement('div');
+    box.className='zone-box '+(anim!=='none'?anim:'');
+    box.dataset.zone='custom-'+zoneCounter;
+    box.id='zone-custom-'+zoneCounter;
+    box.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${style} ${color};color:${color};cursor:move`;
+    box.innerHTML=`<div class="zone-label">${label}</div>`;
+    box.addEventListener('click',function(e){selectZone(e,this);});
+    box.addEventListener('mousedown',function(e){startBoxDrag(e,this);});
+    document.getElementById('canvas-area').appendChild(box);
+}
+
+// ===== SELECT ZONE =====
+function selectZone(e,el){
+    e.stopPropagation();
+    selectedConn=null;
+    document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedZone=el;
+}
+
+// ===== DELETE SELECTED =====
+function deleteSelected(){
+    if(selectedConn!==null){connections.splice(selectedConn,1);selectedConn=null;renderConnections();}
+    else if(selectedZone){selectedZone.remove();selectedZone=null;}
+}
+function deleteSelectedBox(){
+    if(selectedZone){selectedZone.remove();selectedZone=null;}
+}
+
+// ===== BOX DRAG/RESIZE =====
+let boxDragTarget=null,boxDragOffset={x:0,y:0};
+function startBoxDrag(e,el){
+    if(e.target.classList.contains('zone-label')||e.target===el){
+        e.preventDefault();
+        boxDragTarget=el;
+        const r=el.getBoundingClientRect();
+        const cr=document.getElementById('canvas-area').getBoundingClientRect();
+        boxDragOffset.x=e.clientX-r.left;
+        boxDragOffset.y=e.clientY-r.top;
     }
 }
 
 // ===== ADD DEVICE =====
-function addDevice() {
-    const type = document.getElementById('addDeviceSelect').value;
-    if (!type) return;
+function addDevice(){
+    const type=document.getElementById('addDeviceSelect').value;
+    if(!type)return;
     deviceCounter++;
-    const id = type + '-' + deviceCounter;
-    const device = document.createElement('div');
-    device.className = 'device';
-    device.style.top = '500px';
-    device.style.left = '650px';
-    device.dataset.id = id;
-    
-    let iconHtml = '';
-    let name = type.charAt(0).toUpperCase() + type.slice(1);
-    switch(type) {
-        case 'firewall': iconHtml = '<div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div>'; break;
-        case 'switch': iconHtml = '<div class="dev-switch"></div>'; break;
-        case 'router': iconHtml = '<div class="dev-switch" style="background:linear-gradient(90deg,#6cc04a,#198754)"></div>'; name='Router'; break;
-        case 'server': iconHtml = '<div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div>'; break;
-        case 'proxy': iconHtml = '<div class="dev-proxy">Proxy</div>'; break;
-        case 'vm': iconHtml = '<div style="width:45px;height:45px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:700">VM</div>'; break;
-        case 'cloud': iconHtml = '<div class="dev-cloud">Cloud</div>'; break;
-        case 'loadbalancer': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#6f42c1,#5a2d9e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">LB</div>'; name='Load Balancer'; break;
-        case 'waf': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#fd7e14,#dc3545);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">WAF</div>'; break;
-        case 'ids': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#dc3545,#6f0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">IDS</div>'; break;
-        case 'wireless': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9em">&#x1F4F6;</div>'; name='AP'; break;
-        case 'storage': iconHtml = '<div style="width:50px;height:50px;background:linear-gradient(135deg,#555,#222);border:2px solid #888;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#aaa">SAN</div>'; name='Storage'; break;
+    const id=type+'-'+deviceCounter;
+    const div=document.createElement('div');
+    div.className='device';
+    div.style.cssText='top:500px;left:650px';
+    div.dataset.id=id;
+    let icon='',name=type.charAt(0).toUpperCase()+type.slice(1);
+    switch(type){
+        case'firewall':icon='<div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div>';break;
+        case'switch':icon='<div class="dev-switch"></div>';break;
+        case'router':icon='<div class="dev-switch" style="background:linear-gradient(90deg,#6cc04a,#198754)"></div>';name='Router';break;
+        case'server':icon='<div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div>';break;
+        case'proxy':icon='<div class="dev-proxy">Proxy</div>';break;
+        case'vm':icon='<div style="width:42px;height:42px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.55em;font-weight:700">VM</div>';break;
+        case'cloud':icon='<div class="dev-cloud">Cloud</div>';break;
+        case'loadbalancer':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#6f42c1,#5a2d9e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">LB</div>';break;
+        case'waf':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#fd7e14,#dc3545);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">WAF</div>';break;
+        case'ids':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#dc3545,#6f0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">IDS</div>';break;
+        case'wireless':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85em">&#x1F4F6;</div>';name='AP';break;
+        case'storage':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#555,#222);border:2px solid #888;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#aaa">SAN</div>';name='Storage';break;
     }
-    
-    device.innerHTML = `<div class="device-icon">${iconHtml}</div><div class="device-name">${name}</div>`;
-    document.getElementById('canvas-area').appendChild(device);
-    initDrag(device);
+    div.innerHTML=`<div class="device-icon">${icon}</div><div class="device-name">${name}</div>`;
+    document.getElementById('canvas-area').appendChild(div);
+    initDrag(div);
 }
 
-// ===== DELETE SELECTED =====
-function deleteSelected() {
-    if (selectedConn !== null) {
-        connections.splice(selectedConn, 1);
-        selectedConn = null;
-        renderConnections();
-    }
-}
-
-// ===== DRAG & DROP =====
-function initDrag(el) {
-    el.addEventListener('mousedown', function(e) {
-        if (connMode) {
-            // Connection mode: set source/target
-            const id = el.dataset.id;
-            if (!connSource) {
-                connSource = id;
-                el.style.outline = '3px solid #ffc107';
-            } else {
-                if (connSource !== id) {
-                    connections.push({
-                        from: connSource,
-                        to: id,
-                        color: document.getElementById('connColor').value,
-                        anim: document.getElementById('connAnim').value
-                    });
+// ===== DRAG DEVICES =====
+function initDrag(el){
+    el.addEventListener('mousedown',function(e){
+        if(connMode){
+            const id=el.dataset.id;
+            if(!id)return;
+            if(!connSource){connSource=id;el.style.outline='3px solid #ffc107';}
+            else{
+                if(connSource!==id){
+                    const color=document.getElementById('connColor').value;
+                    const anim=document.getElementById('connAnim').value;
+                    const speed=parseFloat(document.getElementById('connSpeed').value)||1.5;
+                    connections.push({from:connSource,to:id,color:color,anim:anim,speed:speed,flows:[{color:color,speed:speed}]});
                     renderConnections();
                 }
-                document.querySelectorAll('.device').forEach(d => d.style.outline = '');
-                connSource = null;
+                document.querySelectorAll('.device').forEach(d=>d.style.outline='');
+                connSource=null;
             }
             return;
         }
         e.preventDefault();
-        dragTarget = el;
+        dragTarget=el;
         el.classList.add('dragging');
-        const rect = el.getBoundingClientRect();
-        const canvasRect = document.getElementById('canvas-area').getBoundingClientRect();
-        dragOffset.x = e.clientX - rect.left;
-        dragOffset.y = e.clientY - rect.top;
+        const r=el.getBoundingClientRect();
+        dragOffset.x=e.clientX-r.left;
+        dragOffset.y=e.clientY-r.top;
     });
 }
 
-document.addEventListener('mousemove', function(e) {
-    if (!dragTarget) return;
-    const canvasRect = document.getElementById('canvas-area').getBoundingClientRect();
-    const x = e.clientX - canvasRect.left - dragOffset.x;
-    const y = e.clientY - canvasRect.top - dragOffset.y;
-    dragTarget.style.left = x + 'px';
-    dragTarget.style.top = y + 'px';
-    renderConnections();
-});
-
-document.addEventListener('mouseup', function() {
-    if (dragTarget) {
-        dragTarget.classList.remove('dragging');
-        dragTarget = null;
-    }
-});
-
-// Update connection properties on change
-document.getElementById('connColor').addEventListener('input', function() {
-    if (selectedConn !== null) {
-        connections[selectedConn].color = this.value;
+document.addEventListener('mousemove',function(e){
+    if(dragTarget){
+        const cr=document.getElementById('canvas-area').getBoundingClientRect();
+        dragTarget.style.left=(e.clientX-cr.left-dragOffset.x)+'px';
+        dragTarget.style.top=(e.clientY-cr.top-dragOffset.y)+'px';
         renderConnections();
     }
-});
-document.getElementById('connAnim').addEventListener('change', function() {
-    if (selectedConn !== null) {
-        connections[selectedConn].anim = this.value;
-        renderConnections();
+    if(boxDragTarget){
+        const cr=document.getElementById('canvas-area').getBoundingClientRect();
+        boxDragTarget.style.left=(e.clientX-cr.left-boxDragOffset.x)+'px';
+        boxDragTarget.style.top=(e.clientY-cr.top-boxDragOffset.y)+'px';
     }
 });
-
-// Click canvas to deselect
-document.getElementById('canvas-area').addEventListener('click', function(e) {
-    if (e.target === this || e.target.classList.contains('layer-box')) {
-        selectedConn = null;
-        renderConnections();
-    }
+document.addEventListener('mouseup',function(){
+    if(dragTarget){dragTarget.classList.remove('dragging');dragTarget=null;}
+    boxDragTarget=null;
 });
 
-// Init all devices
+// Update connection properties
+document.getElementById('connColor').addEventListener('input',function(){if(selectedConn!==null){connections[selectedConn].color=this.value;renderConnections();}});
+document.getElementById('connAnim').addEventListener('change',function(){if(selectedConn!==null){connections[selectedConn].anim=this.value;renderConnections();}});
+document.getElementById('connSpeed').addEventListener('input',function(){if(selectedConn!==null){connections[selectedConn].speed=parseFloat(this.value)||1.5;renderConnections();}});
+
+// Click to deselect
+document.getElementById('canvas-area').addEventListener('click',function(e){
+    if(e.target===this||e.target.classList.contains('layer-box')){selectedConn=null;selectedZone=null;document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));renderConnections();}
+});
+
+// Init existing elements
 document.querySelectorAll('.device').forEach(initDrag);
+document.querySelectorAll('.zone-box').forEach(z=>{
+    z.addEventListener('click',function(e){selectZone(e,this);});
+    z.addEventListener('mousedown',function(e){startBoxDrag(e,this);});
+});
 
 // Background particles
-(function(){
-    var c=document.getElementById('bgp');
-    var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#198754'];
-    for(var i=0;i<20;i++){
-        var p=document.createElement('div');
-        p.className='bp';
-        var s=Math.random()*3+1;
-        p.style.cssText='width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.15+0.03)+';animation-delay:'+Math.random()*6+'s;animation-duration:'+(Math.random()*15+12)+'s;';
-        c.appendChild(p);
-    }
-})();
+(function(){var c=document.getElementById('bgp');var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#198754'];for(var i=0;i<18;i++){var p=document.createElement('div');p.className='bp';var s=Math.random()*3+1;p.style.cssText='width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.12+0.03)+';animation-delay:'+Math.random()*6+'s;animation-duration:'+(Math.random()*15+12)+'s;';c.appendChild(p);}})();
 
 // Initial render
-setTimeout(renderConnections, 100);
-window.addEventListener('resize', renderConnections);
+setTimeout(renderConnections,150);
+window.addEventListener('resize',renderConnections);
 </script>
 </body>
 </html>
