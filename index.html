@@ -3,467 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Pull Architecture - Interactive Network Diagram</title>
+<title>Secure Pull Architecture - Diagram Editor</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#12141d;min-height:100vh;overflow:auto;color:#fff}
-#canvas-area{position:relative;width:1300px;min-height:2100px;margin:0 auto;padding:80px 0 30px}
-.diagram-title{text-align:center;margin-bottom:25px}
-.diagram-title h1{display:inline-block;background:linear-gradient(90deg,#00bceb,#0076d5);border-radius:40px;padding:12px 50px;font-size:1.7em;box-shadow:0 4px 25px rgba(0,188,235,0.4);animation:tGlow 3s ease-in-out infinite}
-@keyframes tGlow{0%,100%{box-shadow:0 4px 25px rgba(0,188,235,0.3)}50%{box-shadow:0 4px 50px rgba(0,188,235,0.7)}}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100vh;overflow:auto;color:#fff;user-select:none}
+#canvas{position:relative;width:1400px;min-height:2200px;margin:0 auto;padding:60px 0 40px;background:#1e1e2e}
 
 /* TOOLBAR */
-.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(18,20,29,0.97);border-bottom:1px solid #333;padding:6px 15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;backdrop-filter:blur(12px)}
-.tb-section{display:flex;align-items:center;gap:6px;padding:0 10px;border-right:1px solid #333}
-.tb-section:last-child{border-right:none}
-.toolbar label{font-size:0.68em;color:#888;font-weight:600;white-space:nowrap}
-.toolbar select,.toolbar input[type=color],.toolbar input[type=number],.toolbar input[type=text]{background:#1e2030;border:1px solid #444;color:#fff;border-radius:4px;padding:3px 6px;font-size:0.7em;cursor:pointer}
-.toolbar input[type=color]{width:28px;height:24px;padding:1px}
-.toolbar input[type=number]{width:45px}
-.toolbar input[type=text]{width:80px}
-.toolbar button{background:linear-gradient(135deg,#0076d5,#00bceb);border:none;color:#fff;padding:5px 11px;border-radius:5px;font-size:0.7em;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
-.toolbar button:hover{transform:scale(1.05);box-shadow:0 2px 8px rgba(0,188,235,0.4)}
-.toolbar button.danger{background:linear-gradient(135deg,#dc3545,#a71d2a)}
-.toolbar button.warn{background:linear-gradient(135deg,#fd7e14,#e8590c)}
-.toolbar button.success{background:linear-gradient(135deg,#198754,#0f5132)}
-.tb-mode{font-size:0.65em;padding:3px 8px;border-radius:10px;background:rgba(108,192,74,0.12);color:#6cc04a;border:1px solid rgba(108,192,74,0.3);font-weight:600}
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:2000;background:rgba(30,30,46,0.98);border-bottom:1px solid #333;padding:5px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;backdrop-filter:blur(12px)}
+.tb{display:flex;align-items:center;gap:5px;padding:0 8px;border-right:1px solid #333}
+.tb:last-child{border:none}
+.toolbar label{font-size:0.62em;color:#777;font-weight:600;white-space:nowrap}
+.toolbar select,.toolbar input[type=color],.toolbar input[type=number],.toolbar input[type=text]{background:#2a2a3e;border:1px solid #444;color:#fff;border-radius:4px;padding:2px 5px;font-size:0.65em}
+.toolbar input[type=color]{width:24px;height:22px;padding:1px;cursor:pointer}
+.toolbar input[type=number]{width:40px}
+.toolbar input[type=text]{width:70px}
+.toolbar button{border:none;color:#fff;padding:4px 10px;border-radius:4px;font-size:0.65em;font-weight:600;cursor:pointer;transition:all 0.15s}
+.toolbar button:hover{transform:scale(1.05)}
+.btn-primary{background:linear-gradient(135deg,#0076d5,#00bceb)}
+.btn-danger{background:linear-gradient(135deg,#dc3545,#a71d2a)}
+.btn-success{background:linear-gradient(135deg,#198754,#0f5132)}
+.btn-warn{background:linear-gradient(135deg,#fd7e14,#e8590c)}
+.btn-purple{background:linear-gradient(135deg,#6f42c1,#5a2d9e)}
+.tb-mode{font-size:0.6em;padding:2px 7px;border-radius:8px;background:rgba(108,192,74,0.12);color:#6cc04a;border:1px solid rgba(108,192,74,0.3);font-weight:600}
 
-/* LAYERS */
-.layer-box{position:absolute;left:40px;right:40px;border-radius:14px;border:2px solid;display:flex;align-items:stretch}
-.layer-left{display:flex;align-items:center;padding:0 12px;min-width:80px}
-.layer-badge{width:55px;height:55px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,0.3)}
-.layer-badge .lbl{font-size:0.42em;opacity:0.8}
-.layer-badge .num{font-size:1.1em;line-height:1}
-.layer-center{flex:1;min-height:150px}
-.layer-right{min-width:240px;padding:12px;display:flex;flex-direction:column;justify-content:center;font-size:0.7em;line-height:1.7;color:rgba(255,255,255,0.7);border-left:1px solid rgba(255,255,255,0.05)}
-.layer-right .lr-title{font-weight:700;margin-bottom:3px}
-.layer-right li{list-style:none;padding-left:11px;position:relative}
-.layer-right li::before{content:"\25B8";position:absolute;left:0;font-size:0.8em}
-.l5{background:rgba(220,53,69,0.04);border-color:rgba(220,53,69,0.35)}
-.l5 .layer-badge{background:linear-gradient(135deg,#dc3545,#a71d2a)}
-.l5 .lr-title{color:#dc3545}.l5 li::before{color:#dc3545}
-.l4{background:rgba(253,126,20,0.04);border-color:rgba(253,126,20,0.35)}
-.l4 .layer-badge{background:linear-gradient(135deg,#fd7e14,#e8590c)}
-.l4 .lr-title{color:#fd7e14}.l4 li::before{color:#fd7e14}
-.l3{background:rgba(0,188,235,0.04);border-color:rgba(0,188,235,0.35)}
-.l3 .layer-badge{background:linear-gradient(135deg,#00bceb,#0076d5)}
-.l3 .lr-title{color:#00bceb}.l3 li::before{color:#00bceb}
-.l2{background:rgba(108,192,74,0.04);border-color:rgba(108,192,74,0.35)}
-.l2 .layer-badge{background:linear-gradient(135deg,#6cc04a,#3d8b37)}
-.l2 .lr-title{color:#6cc04a}.l2 li::before{color:#6cc04a}
-.l1{background:rgba(25,135,84,0.04);border-color:rgba(25,135,84,0.35)}
-.l1 .layer-badge{background:linear-gradient(135deg,#198754,#0f5132)}
-.l1 .lr-title{color:#198754}.l1 li::before{color:#198754}
+/* CONTEXT MENU */
+.ctx-menu{position:fixed;z-index:3000;background:#2a2a3e;border:1px solid #444;border-radius:8px;padding:5px 0;min-width:160px;box-shadow:0 8px 30px rgba(0,0,0,0.5);display:none}
+.ctx-menu.show{display:block}
+.ctx-item{padding:7px 15px;font-size:0.75em;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.15s}
+.ctx-item:hover{background:rgba(0,188,235,0.1)}
+.ctx-item.danger:hover{background:rgba(220,53,69,0.15)}
+.ctx-sep{height:1px;background:#444;margin:4px 0}
 
-/* ZONE BOXES */
-.zone-box{position:absolute;border-radius:12px;z-index:3;cursor:pointer;transition:box-shadow 0.2s}
-.zone-box:hover{box-shadow:0 0 15px rgba(255,255,255,0.1)}
-.zone-box.selected{box-shadow:0 0 0 3px #ffc107 !important}
-.zone-box .zone-label{position:absolute;top:-10px;left:12px;background:#12141d;padding:0 8px;font-size:0.68em;font-weight:700}
-.zone-box.anim-dash{animation:boxDash 2s linear infinite}
-.zone-box.anim-pulse{animation:boxPulse 2s ease-in-out infinite}
-.zone-box.anim-glow{animation:boxGlow 2s ease-in-out infinite}
-@keyframes boxDash{to{stroke-dashoffset:-20px}}
-@keyframes boxPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.01)}}
-@keyframes boxGlow{0%,100%{box-shadow:0 0 5px currentColor}50%{box-shadow:0 0 25px currentColor,0 0 50px currentColor}}
+/* ELEMENTS */
+.el{position:absolute;cursor:grab;z-index:20}
+.el:hover{filter:brightness(1.15)}
+.el.dragging{cursor:grabbing;z-index:100;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.4))}
+.el.selected{outline:2px solid #ffc107;outline-offset:2px;border-radius:4px}
+.el-icon{display:flex;align-items:center;justify-content:center}
+.el-label{font-size:0.6em;color:rgba(255,255,255,0.85);margin-top:2px;font-weight:600;text-align:center;white-space:nowrap;outline:none}
+.el-sub{font-size:0.5em;color:rgba(255,255,255,0.5);text-align:center;outline:none}
+.el-label[contenteditable=true]:focus,.el-sub[contenteditable=true]:focus{outline:1px dashed #00bceb;border-radius:2px;white-space:normal}
 
-/* DEVICES */
-.device{position:absolute;cursor:grab;z-index:20;display:flex;flex-direction:column;align-items:center;transition:filter 0.2s}
-.device:hover{filter:brightness(1.2)}
-.device.dragging{cursor:grabbing;z-index:100;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.5))}
-.device-icon{display:flex;align-items:center;justify-content:center}
-.device-name{font-size:0.63em;color:rgba(255,255,255,0.85);margin-top:3px;font-weight:600;white-space:nowrap;text-align:center}
-.device-sub{font-size:0.52em;color:rgba(255,255,255,0.5);text-align:center}
-.dev-firewall{width:58px;height:54px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.dev-firewall::after{content:'';position:absolute;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 7px,rgba(255,255,255,0.08) 7px,rgba(255,255,255,0.08) 8px)}
-.dev-firewall .flame{font-size:1.5em}
-.fw-paloalto{background:linear-gradient(135deg,#dc3545,#8b0000);box-shadow:0 3px 10px rgba(220,53,69,0.4)}
-.fw-dmz{background:linear-gradient(135deg,#0076d5,#003d73);box-shadow:0 3px 10px rgba(0,118,213,0.4)}
-.fw-dc{background:linear-gradient(135deg,#6cc04a,#2d6b1e);box-shadow:0 3px 10px rgba(108,192,74,0.4)}
-.dev-proxy{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.48em;text-align:center;line-height:1.2;color:#fff;background:linear-gradient(135deg,#fd7e14,#cc5500);box-shadow:0 3px 10px rgba(253,126,20,0.4)}
-.dev-switch{width:58px;height:26px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:4px;position:relative;box-shadow:0 2px 8px rgba(0,118,213,0.3)}
-.dev-switch::after{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:8px 0 0 #6cc04a,16px 0 0 #6cc04a,24px 0 0 #fd7e14,32px 0 0 #6cc04a}
-.dev-pra{width:52px;height:48px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(232,93,4,0.4)}
-.dev-wsus{width:48px;height:48px;background:linear-gradient(135deg,#0078d4,#004578);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,120,212,0.4)}
-.dev-wsus .sync{width:18px;height:18px;border:3px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 2s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.dev-trellix{width:48px;height:48px;background:#1a1a2e;border:2px solid #00bceb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3em;font-weight:900;color:#00bceb;box-shadow:0 3px 8px rgba(0,188,235,0.3)}
-.dev-aci{width:52px;height:52px;border:3px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.05);box-shadow:0 3px 8px rgba(108,192,74,0.3);font-size:0.48em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2}
-.dev-jumppoint{width:52px;height:56px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.42em;font-weight:700;line-height:1.3;box-shadow:0 3px 10px rgba(232,93,4,0.4)}
-.dev-server{width:38px;height:52px;background:linear-gradient(180deg,#2a2a4a,#16162e);border:1px solid #444;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4)}
-.dev-server .led{width:20px;height:2px;background:#6cc04a;border-radius:2px}
-.dev-cloud{width:95px;height:52px;background:rgba(0,188,235,0.06);border:2px solid #00bceb;border-radius:26px;display:flex;align-items:center;justify-content:center;color:#00bceb;font-weight:700;font-size:0.75em}
-.dev-netbar{width:260px;height:38px;background:rgba(255,255,255,0.02);border:2px solid #555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#aaa;font-size:0.75em}
-.note-box{position:absolute;background:rgba(255,255,210,0.92);border:1px solid #cca;border-radius:6px;padding:6px 9px;font-size:0.58em;color:#333;font-weight:600;max-width:125px;line-height:1.3;z-index:15}
+/* BOXES */
+.box{position:absolute;border-radius:12px;z-index:5;cursor:move}
+.box.selected{outline:3px solid #ffc107;outline-offset:-1px}
+.box .box-label{position:absolute;top:-9px;left:12px;background:#1e1e2e;padding:0 6px;font-size:0.62em;font-weight:700;outline:none}
+.box .box-label[contenteditable=true]:focus{outline:1px dashed #ffc107}
+.box .resize-handle{position:absolute;bottom:-4px;right:-4px;width:12px;height:12px;background:#ffc107;border-radius:2px;cursor:nwse-resize;opacity:0;transition:opacity 0.2s}
+.box.selected .resize-handle{opacity:1}
+.box.anim-pulse{animation:bPulse 2s ease-in-out infinite}
+.box.anim-glow{animation:bGlow 2.5s ease-in-out infinite}
+@keyframes bPulse{0%,100%{opacity:0.7}50%{opacity:1}}
+@keyframes bGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px currentColor,0 0 40px currentColor}}
 
-/* Connections SVG */
-#conn-svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible}
-.conn-path{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
-.conn-path:hover{stroke-width:3.5;filter:drop-shadow(0 0 4px currentColor)}
-.conn-path.selected{stroke-width:4;filter:drop-shadow(0 0 6px #ffc107)}
+/* SHAPES */
+.shape{position:absolute;z-index:15;cursor:grab}
+.shape.selected{outline:2px solid #ffc107;outline-offset:3px}
+.shape-arrow{width:0;height:0;border:15px solid transparent}
+.shape-arrow.right{border-left:25px solid #00bceb}
+.shape-arrow.down{border-top:25px solid #00bceb}
+.shape-arrow.left{border-right:25px solid #00bceb}
+.shape-arrow.up{border-bottom:25px solid #00bceb}
+.shape-note{background:rgba(255,255,200,0.92);border:1px solid #cca;border-radius:6px;padding:8px 10px;font-size:0.65em;color:#333;font-weight:500;min-width:80px;min-height:30px;outline:none}
+.shape-text{font-size:0.85em;color:#fff;font-weight:600;outline:none;min-width:40px}
 
-/* Connection mode */
-.conn-mode .device{cursor:crosshair !important}
-.conn-mode .device:hover .device-icon>*{outline:3px solid #ffc107;outline-offset:3px;border-radius:6px}
+/* DEVICE ICONS */
+.ico{display:flex;align-items:center;justify-content:center}
+.ico-fw{width:55px;height:50px;border-radius:5px;overflow:hidden;position:relative}
+.ico-fw::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 6px,rgba(255,255,255,0.08) 6px,rgba(255,255,255,0.08) 7px)}
+.ico-fw .fl{font-size:1.4em}
+.fw-red{background:linear-gradient(135deg,#dc3545,#8b0000);box-shadow:0 3px 10px rgba(220,53,69,0.35)}
+.fw-blue{background:linear-gradient(135deg,#0076d5,#003d73);box-shadow:0 3px 10px rgba(0,118,213,0.35)}
+.fw-green{background:linear-gradient(135deg,#6cc04a,#2d6b1e);box-shadow:0 3px 10px rgba(108,192,74,0.35)}
+.ico-sw{width:55px;height:24px;background:linear-gradient(90deg,#0076d5,#00bceb);border-radius:3px;position:relative;box-shadow:0 2px 6px rgba(0,118,213,0.3)}
+.ico-sw::after{content:'';position:absolute;left:5px;top:50%;transform:translateY(-50%);width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:7px 0 0 #6cc04a,14px 0 0 #6cc04a,21px 0 0 #fd7e14,28px 0 0 #6cc04a}
+.ico-proxy{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#fd7e14,#cc5500);display:flex;align-items:center;justify-content:center;font-size:0.45em;font-weight:700;color:#fff;text-align:center;line-height:1.2;box-shadow:0 3px 8px rgba(253,126,20,0.35)}
+.ico-pra{width:50px;height:45px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.48em;font-weight:700;color:#fff;box-shadow:0 3px 8px rgba(232,93,4,0.35)}
+.ico-wsus{width:45px;height:45px;background:linear-gradient(135deg,#0078d4,#004578);border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,120,212,0.35)}
+.ico-wsus .spin{width:16px;height:16px;border:2.5px solid #fff;border-radius:50%;border-top-color:transparent;animation:sp 2s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ico-trellix{width:45px;height:45px;background:#1a1a2e;border:2px solid #00bceb;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.2em;font-weight:900;color:#00bceb;box-shadow:0 3px 8px rgba(0,188,235,0.25)}
+.ico-aci{width:50px;height:50px;border:2.5px solid #6cc04a;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(108,192,74,0.05);font-size:0.45em;font-weight:700;color:#6cc04a;text-align:center;line-height:1.2;box-shadow:0 3px 8px rgba(108,192,74,0.25)}
+.ico-jp{width:50px;height:54px;background:linear-gradient(135deg,#e85d04,#9d0208);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:0.4em;font-weight:700;line-height:1.3;box-shadow:0 3px 10px rgba(232,93,4,0.35)}
+.ico-srv{width:36px;height:48px;background:linear-gradient(180deg,#2a2a4a,#16162e);border:1px solid #444;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ico-srv .ld{width:18px;height:2px;background:#6cc04a;border-radius:1px}
+.ico-cloud{width:90px;height:48px;background:rgba(0,188,235,0.06);border:2px solid #00bceb;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#00bceb;font-weight:700;font-size:0.7em}
+.ico-bar{width:240px;height:34px;background:rgba(255,255,255,0.02);border:1.5px solid #555;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#aaa;font-size:0.7em}
+.ico-pc{width:42px;height:38px;background:linear-gradient(180deg,#333,#1a1a2e);border:1.5px solid #666;border-radius:4px 4px 0 0;position:relative;display:flex;align-items:center;justify-content:center;font-size:0.8em}
+.ico-pc::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:30px;height:6px;background:#555;border-radius:0 0 3px 3px}
+.ico-laptop{width:48px;height:32px;background:linear-gradient(180deg,#333,#1a1a2e);border:1.5px solid #666;border-radius:4px 4px 0 0;position:relative;display:flex;align-items:center;justify-content:center;font-size:0.7em}
+.ico-laptop::after{content:'';position:absolute;bottom:-5px;left:-4px;width:56px;height:4px;background:#555;border-radius:0 0 6px 6px}
+.ico-phone{width:28px;height:48px;background:linear-gradient(180deg,#333,#1a1a2e);border:2px solid #555;border-radius:6px;position:relative;display:flex;align-items:center;justify-content:center;font-size:0.7em}
+.ico-phone::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:10px;height:10px;border:1.5px solid #666;border-radius:50%}
+.ico-mobile{width:24px;height:42px;background:linear-gradient(180deg,#222,#111);border:1.5px solid #555;border-radius:5px;position:relative;display:flex;align-items:center;justify-content:center;font-size:0.6em}
+.ico-mobile::before{content:'';position:absolute;top:3px;width:10px;height:2px;background:#444;border-radius:2px}
+.ico-user{width:40px;height:45px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ico-user::before{content:'';width:18px;height:18px;background:#6cc04a;border-radius:50%}
+.ico-user::after{content:'';width:30px;height:16px;background:#6cc04a;border-radius:10px 10px 0 0;margin-top:2px}
+.ico-admin{width:40px;height:45px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ico-admin::before{content:'';width:18px;height:18px;background:#dc3545;border-radius:50%}
+.ico-admin::after{content:'';width:30px;height:16px;background:#dc3545;border-radius:10px 10px 0 0;margin-top:2px}
+.ico-guest{width:40px;height:45px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.6}
+.ico-guest::before{content:'';width:18px;height:18px;background:#888;border-radius:50%}
+.ico-guest::after{content:'';width:30px;height:16px;background:#888;border-radius:10px 10px 0 0;margin-top:2px}
+.ico-remote{width:44px;height:44px;border:2px solid #fd7e14;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9em;background:rgba(253,126,20,0.08)}
 
-/* Particles */
-#bgp{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
-.bp{position:absolute;border-radius:50%;animation:pf 18s ease-in-out infinite}
-@keyframes pf{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-18px)}66%{transform:translate(-12px,15px)}}
-
-::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#12141d}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+/* SVG connections */
+#csvg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible}
+.cp{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
+.cp:hover{stroke-width:3.5}
+.cp.sel{stroke-width:4;filter:drop-shadow(0 0 5px #ffc107)}
+.conn-mode .el{cursor:crosshair !important}
+.conn-mode .el:hover{outline:3px solid #ffc107;outline-offset:2px;border-radius:6px}
 </style>
 </head>
 <body>
 
 <!-- TOOLBAR -->
 <div class="toolbar">
-<div class="tb-section">
-<label>Mode:</label>
-<span class="tb-mode" id="modeLabel">Select</span>
-</div>
-<div class="tb-section">
+<div class="tb"><span class="tb-mode" id="modeLbl">Select</span></div>
+<div class="tb">
 <label>Device:</label>
-<select id="addDeviceSelect"><option value="">--Add--</option><option value="firewall">Firewall</option><option value="switch">Switch</option><option value="router">Router</option><option value="server">Server</option><option value="proxy">Proxy</option><option value="vm">VM</option><option value="cloud">Cloud</option><option value="loadbalancer">Load Balancer</option><option value="waf">WAF</option><option value="ids">IDS/IPS</option><option value="wireless">Wireless</option><option value="storage">Storage</option></select>
-<button onclick="addDevice()">+Add</button>
+<select id="devSel"><option value="">--</option><option value="firewall">Firewall</option><option value="switch">Switch</option><option value="router">Router</option><option value="server">Server</option><option value="proxy">Proxy</option><option value="vm">VM</option><option value="cloud">Cloud</option><option value="loadbalancer">LB</option><option value="waf">WAF</option><option value="ids">IDS</option><option value="wireless">WiFi AP</option><option value="storage">Storage</option><option value="pc">PC</option><option value="laptop">Laptop</option><option value="phone">Phone</option><option value="mobile">Mobile</option><option value="user">User</option><option value="admin">Admin</option><option value="guest">Guest</option><option value="remote">Remote User</option></select>
+<button class="btn-primary" onclick="addDevice()">+</button>
 </div>
-<div class="tb-section">
-<label>Zone/Box:</label>
-<input type="text" id="boxLabel" placeholder="Label" value="New Zone">
-<input type="color" id="boxColor" value="#00bceb">
-<select id="boxStyle"><option value="dashed">Dashed</option><option value="solid">Solid</option><option value="dotted">Dotted</option></select>
-<select id="boxAnim"><option value="none">No Anim</option><option value="anim-pulse">Pulse</option><option value="anim-glow">Glow</option></select>
-<button class="success" onclick="addZoneBox()">+Box</button>
-<button class="danger" onclick="deleteSelectedBox()">-Box</button>
+<div class="tb">
+<label>Box:</label>
+<input type="text" id="boxLbl" value="Zone" style="width:55px">
+<input type="color" id="boxClr" value="#00bceb">
+<select id="boxBdr"><option value="dashed">Dash</option><option value="solid">Solid</option><option value="dotted">Dot</option></select>
+<select id="boxAnm"><option value="">None</option><option value="anim-pulse">Pulse</option><option value="anim-glow">Glow</option></select>
+<button class="btn-success" onclick="addBox()">+Box</button>
 </div>
-<div class="tb-section">
-<label>Connection:</label>
-<button id="connBtn" onclick="toggleConnMode()">Draw</button>
-<input type="color" id="connColor" value="#00bceb" title="Color">
-<select id="connAnim"><option value="flow">Flow</option><option value="pulse">Pulse</option><option value="dash">Dash</option><option value="solid">Solid</option></select>
-<label>Speed:</label>
-<input type="number" id="connSpeed" value="1.5" min="0.3" max="8" step="0.1" style="width:50px">
+<div class="tb">
+<label>Shape:</label>
+<select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option></select>
+<button class="btn-purple" onclick="addShape()">+Shape</button>
 </div>
-<div class="tb-section">
-<label>Multi-Flow:</label>
-<button class="warn" onclick="addFlowToConn()">+Flow</button>
-<input type="color" id="flowColor2" value="#6cc04a" title="2nd Flow Color">
-<input type="number" id="flowSpeed2" value="2.5" min="0.3" max="8" step="0.1" style="width:50px" title="Speed">
+<div class="tb">
+<label>Link:</label>
+<button id="connBtn" class="btn-primary" onclick="toggleConn()">Draw</button>
+<input type="color" id="cClr" value="#00bceb">
+<select id="cAnm"><option value="flow">Flow</option><option value="pulse">Pulse</option><option value="dash">Dash</option><option value="solid">Solid</option></select>
+<input type="number" id="cSpd" value="1.5" min="0.3" max="8" step="0.1" title="Speed">
 </div>
-<div class="tb-section">
-<button class="danger" onclick="deleteSelected()">Delete</button>
+<div class="tb">
+<label>+Flow:</label>
+<button class="btn-warn" onclick="addFlow()">+</button>
+<input type="color" id="fClr" value="#6cc04a">
+<input type="number" id="fSpd" value="2.5" min="0.3" max="8" step="0.1">
 </div>
+<div class="tb">
+<button class="btn-danger" onclick="delSelected()">Delete</button>
+<button class="btn-success" onclick="saveState()">Save</button>
+<button class="btn-warn" onclick="loadState()">Load</button>
+</div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctxMenu">
+<div class="ctx-item" onclick="ctxConnect()">&#x1F517; Connect From Here</div>
+<div class="ctx-item" onclick="ctxConnectTo()">&#x27A1; Connect To Here</div>
+<div class="ctx-sep"></div>
+<div class="ctx-item" onclick="ctxDuplicate()">&#x1F4CB; Duplicate</div>
+<div class="ctx-item" onclick="ctxEdit()">&#x270F; Edit Label</div>
+<div class="ctx-sep"></div>
+<div class="ctx-item danger" onclick="ctxDelete()">&#x1F5D1; Delete</div>
 </div>
 
 <!-- CANVAS -->
-<div id="canvas-area">
-<div class="diagram-title"><h1>Secure Pull Architecture</h1></div>
-<svg id="conn-svg"></svg>
+<div id="canvas">
+<svg id="csvg"></svg>
 
-<!-- Cloud + Network -->
-<div class="device" style="top:80px;left:560px" data-id="cloud"><div class="device-icon"><div class="dev-cloud">&#x2601; NET</div></div><div class="device-name">Internet</div></div>
-<div class="device" style="top:155px;left:480px" data-id="mainnet"><div class="device-icon"><div class="dev-netbar">Main NETWORK</div></div></div>
+<!-- DEFAULT ELEMENTS -->
+<div class="el" style="top:80px;left:580px" data-id="cloud"><div class="el-icon"><div class="ico-cloud">&#x2601; NET</div></div><div class="el-label" contenteditable="true">Internet</div></div>
+<div class="el" style="top:150px;left:500px" data-id="mainnet"><div class="el-icon"><div class="ico-bar">Main NETWORK</div></div></div>
 
-<!-- LAYER 5 -->
-<div class="layer-box l5" style="top:220px;height:160px">
-<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">5</span></div></div>
-<div class="layer-center"></div>
-<div class="layer-right"><div class="lr-title">Internet Firewall (Palo Alto)</div><li>Source IP Whitelisting - Only from Web Proxy</li><li>Destination Server IP & URL Whitelisting</li><li>IPS, Web Filtering & Anti-malware Security</li><li>Zoning & Multi-tenancy</li><li>Unidirectional Flow</li></div>
-</div>
-<div class="device" style="top:265px;left:530px" data-id="intfw"><div class="device-icon"><div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div></div><div class="device-name">INT FW</div><div class="device-sub">Palo Alto</div></div>
+<!-- L5 box -->
+<div class="box" style="top:210px;left:50px;width:1200px;height:150px;border:2px solid rgba(220,53,69,0.4);color:#dc3545" data-bid="l5"><div class="box-label" contenteditable="true">Layer 5 - Internet Firewall | Source IP Whitelisting | IPS & Anti-malware | Unidirectional Flow</div><div class="resize-handle"></div></div>
+<div class="el" style="top:260px;left:540px" data-id="intfw"><div class="el-icon"><div class="ico-fw fw-red"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">INT FW</div><div class="el-sub" contenteditable="true">Palo Alto</div></div>
 
-<!-- LAYER 4 -->
-<div class="layer-box l4" style="top:400px;height:160px">
-<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">4</span></div></div>
-<div class="layer-center"></div>
-<div class="layer-right"><div class="lr-title">Web Proxy</div><li>Source IP Whitelisting - Only from DMZ Servers</li><li>Destination Server IP & URL Whitelisting</li><li>Web Reputation & Web Usage Control</li><li>Anti-malware Analysis & HTTPS Inspection</li><li>URL Categorization & Content Filtering</li></div>
-</div>
-<div class="device" style="top:440px;left:530px" data-id="proxy"><div class="device-icon"><div class="dev-proxy">Web<br>Proxy</div></div><div class="device-name">Web Proxy</div><div class="device-sub">Forward Proxy</div></div>
+<!-- L4 box -->
+<div class="box" style="top:380px;left:50px;width:1200px;height:150px;border:2px solid rgba(253,126,20,0.4);color:#fd7e14" data-bid="l4"><div class="box-label" contenteditable="true">Layer 4 - Web Proxy | HTTPS Inspection | Anti-malware | Web Reputation | URL Filtering</div><div class="resize-handle"></div></div>
+<div class="el" style="top:420px;left:540px" data-id="proxy"><div class="el-icon"><div class="ico-proxy">Web<br>Proxy</div></div><div class="el-label" contenteditable="true">Web Proxy</div><div class="el-sub" contenteditable="true">Forward Proxy</div></div>
 
-<!-- LAYER 3 -->
-<div class="layer-box l3" style="top:580px;height:190px">
-<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">3</span></div></div>
-<div class="layer-center"></div>
-<div class="layer-right"><div class="lr-title">DMZ Firewall</div><li>Only specific DMZ servers reach Proxy</li><li>Destination Server IP & URL Whitelisting</li><li>IPS, Web Filtering & Anti-malware Security</li><li>Zoning & Unidirectional Flow</li><li>DMZ VM Isolation & Protection</li></div>
-</div>
-<div class="device" style="top:630px;left:500px" data-id="dmzfw"><div class="device-icon"><div class="dev-firewall fw-dmz"><span class="flame">&#x1F525;</span></div></div><div class="device-name">DMZ FW</div><div class="device-sub">DMZ Firewall</div></div>
+<!-- L3 box -->
+<div class="box" style="top:550px;left:50px;width:1200px;height:180px;border:2px solid rgba(0,188,235,0.4);color:#00bceb" data-bid="l3"><div class="box-label" contenteditable="true">Layer 3 - DMZ Firewall | Zoning | Unidirectional Flow | DMZ VM Isolation</div><div class="resize-handle"></div></div>
+<div class="el" style="top:600px;left:520px" data-id="dmzfw"><div class="el-icon"><div class="ico-fw fw-blue"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">DMZ FW</div><div class="el-sub" contenteditable="true">DMZ Firewall</div></div>
 
 <!-- DMZ Zone -->
-<div class="zone-box" style="top:610px;left:130px;width:220px;height:150px;border:2px dashed rgba(0,188,235,0.5);color:#00bceb" data-zone="dmz" id="zone-dmz"><div class="zone-label">DMZ</div></div>
-<div class="device" style="top:625px;left:155px" data-id="pra"><div class="device-icon"><div class="dev-pra">&#x1F510; PRA</div></div><div class="device-name">BeyondTrust</div><div class="device-sub">PRA</div></div>
-<div class="device" style="top:625px;left:255px" data-id="wsus"><div class="device-icon"><div class="dev-wsus"><div class="sync"></div></div></div><div class="device-name">WSUS</div><div class="device-sub">Patch Server</div></div>
-<div class="device" style="top:700px;left:200px" data-id="trellix"><div class="device-icon"><div class="dev-trellix">X</div></div><div class="device-name">Trellix TIE</div><div class="device-sub">Threat Intel</div></div>
+<div class="box" style="top:575px;left:130px;width:210px;height:145px;border:2px dashed rgba(0,188,235,0.5);color:#00bceb" data-bid="dmz"><div class="box-label" contenteditable="true">DMZ</div><div class="resize-handle"></div></div>
+<div class="el" style="top:590px;left:155px" data-id="pra"><div class="el-icon"><div class="ico-pra">&#x1F510; PRA</div></div><div class="el-label" contenteditable="true">BeyondTrust</div><div class="el-sub" contenteditable="true">PRA</div></div>
+<div class="el" style="top:590px;left:250px" data-id="wsus"><div class="el-icon"><div class="ico-wsus"><div class="spin"></div></div></div><div class="el-label" contenteditable="true">WSUS</div><div class="el-sub" contenteditable="true">Patch Server</div></div>
+<div class="el" style="top:665px;left:195px" data-id="trellix"><div class="el-icon"><div class="ico-trellix">X</div></div><div class="el-label" contenteditable="true">Trellix TIE</div><div class="el-sub" contenteditable="true">Threat Intel</div></div>
 
-<!-- Note -->
-<div class="note-box" style="top:400px;left:100px">Public Certificate,<br>Public IP & DNS<br>required for PRA</div>
+<!-- L2 box -->
+<div class="box" style="top:755px;left:50px;width:1200px;height:150px;border:2px solid rgba(108,192,74,0.4);color:#6cc04a" data-bid="l2"><div class="box-label" contenteditable="true">Layer 2 - DC Firewall | Source/Dest IP Whitelisting | IPS | Unidirectional DC to DMZ</div><div class="resize-handle"></div></div>
+<div class="el" style="top:800px;left:540px" data-id="dcfw"><div class="el-icon"><div class="ico-fw fw-green"><span class="fl">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">DC FW</div><div class="el-sub" contenteditable="true">DC Firewall</div></div>
 
-<!-- LAYER 2 -->
-<div class="layer-box l2" style="top:800px;height:160px">
-<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">2</span></div></div>
-<div class="layer-center"></div>
-<div class="layer-right"><div class="lr-title">DC Firewall</div><li>Source & Destination Server IP Whitelisting</li><li>Only Specific Server to Specific DMZ Server</li><li>IPS, Zoning & Multi-Instance</li><li>Unidirectional Flow from DC to DMZ</li></div>
-</div>
-<div class="device" style="top:845px;left:530px" data-id="dcfw"><div class="device-icon"><div class="dev-firewall fw-dc"><span class="flame">&#x1F525;</span></div></div><div class="device-name">DC FW</div><div class="device-sub">DC Firewall</div></div>
-
-<!-- LAYER 1 -->
-<div class="layer-box l1" style="top:990px;height:170px">
-<div class="layer-left"><div class="layer-badge"><span class="lbl">LAYER</span><span class="num">1</span></div></div>
-<div class="layer-center"></div>
-<div class="layer-right"><div class="lr-title">ACI Fabric</div><li>Source Whitelisting - Only specific EPG to DMZ</li><li>Service Graphs, PBR, VRFs</li><li>EPGs, ESGs & Multi-tenancy</li><li>Unidirectional Flow from EPG to DMZ</li></div>
-</div>
-<div class="device" style="top:1040px;left:470px" data-id="aci"><div class="device-icon"><div class="dev-aci">ACI<br>APIC</div></div><div class="device-name">ACI APIC</div><div class="device-sub">Controller</div></div>
-<div class="device" style="top:1050px;left:590px" data-id="leafspine"><div class="device-icon"><div class="dev-switch"></div></div><div class="device-name">Leaf / Spine</div><div class="device-sub">ACI Fabric</div></div>
+<!-- L1 box -->
+<div class="box" style="top:930px;left:50px;width:1200px;height:155px;border:2px solid rgba(25,135,84,0.4);color:#198754" data-bid="l1"><div class="box-label" contenteditable="true">Layer 1 - ACI Fabric | EPG Whitelisting | Service Graphs | PBR | VRFs | Multi-tenancy</div><div class="resize-handle"></div></div>
+<div class="el" style="top:975px;left:480px" data-id="aci"><div class="el-icon"><div class="ico-aci">ACI<br>APIC</div></div><div class="el-label" contenteditable="true">ACI APIC</div><div class="el-sub" contenteditable="true">Controller</div></div>
+<div class="el" style="top:985px;left:600px" data-id="leafspine"><div class="el-icon"><div class="ico-sw"></div></div><div class="el-label" contenteditable="true">Leaf / Spine</div><div class="el-sub" contenteditable="true">ACI Fabric</div></div>
 
 <!-- Jump Point Zone -->
-<div class="zone-box" style="top:1210px;left:280px;width:380px;height:250px;border:2px dashed rgba(232,93,4,0.5);color:#e85d04" data-zone="jumppoint" id="zone-jp"><div class="zone-label">Jump Point Zone</div></div>
-<div class="device" style="top:1230px;left:430px" data-id="jumppoint"><div class="device-icon"><div class="dev-jumppoint">Jump<br>Point</div></div><div class="device-name">Jump Point</div><div class="device-sub">BeyondTrust</div></div>
-<div style="position:absolute;top:1340px;left:300px;display:flex;gap:18px;z-index:10">
-<div class="device" style="position:relative" data-id="srv-rdp"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">RDP</div></div>
-<div class="device" style="position:relative" data-id="srv-ae"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Access<br>Extender</div></div>
-<div class="device" style="position:relative" data-id="srv-wj"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">Web<br>Jump</div></div>
-<div class="device" style="position:relative" data-id="srv-ssh1"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">SSH/<br>Telnet</div></div>
-<div class="device" style="position:relative" data-id="srv-ssh2"><div class="device-icon"><div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div></div><div class="device-name">SSH/<br>Telnet</div></div>
-</div>
+<div class="box" style="top:1120px;left:260px;width:380px;height:240px;border:2px dashed rgba(232,93,4,0.5);color:#e85d04" data-bid="jpz"><div class="box-label" contenteditable="true">Jump Point Zone</div><div class="resize-handle"></div></div>
+<div class="el" style="top:1140px;left:420px" data-id="jumppoint"><div class="el-icon"><div class="ico-jp">Jump<br>Point</div></div><div class="el-label" contenteditable="true">Jump Point</div><div class="el-sub" contenteditable="true">BeyondTrust</div></div>
+<div class="el" style="top:1245px;left:280px" data-id="srv-rdp"><div class="el-icon"><div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div><div class="el-label" contenteditable="true">RDP</div></div>
+<div class="el" style="top:1245px;left:340px" data-id="srv-ae"><div class="el-icon"><div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div><div class="el-label" contenteditable="true">Access Ext</div></div>
+<div class="el" style="top:1245px;left:410px" data-id="srv-wj"><div class="el-icon"><div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div><div class="el-label" contenteditable="true">Web Jump</div></div>
+<div class="el" style="top:1245px;left:480px" data-id="srv-ssh1"><div class="el-icon"><div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div><div class="el-label" contenteditable="true">SSH/Telnet</div></div>
+<div class="el" style="top:1245px;left:550px" data-id="srv-ssh2"><div class="el-icon"><div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div><div class="el-label" contenteditable="true">SSH/Telnet</div></div>
 
 <!-- DC Zone -->
-<div class="zone-box" style="top:1210px;left:730px;width:190px;height:250px;border:2px solid rgba(108,192,74,0.5);color:#6cc04a" data-zone="dc" id="zone-dc"><div class="zone-label">DC</div></div>
-<div class="device" style="top:1310px;left:780px" data-id="dcfw2"><div class="device-icon"><div class="dev-firewall fw-dc" style="width:52px;height:42px"><span class="flame" style="font-size:1.2em">&#x1F525;</span></div></div><div class="device-name">DC Firewall</div></div>
+<div class="box" style="top:1120px;left:730px;width:180px;height:240px;border:2px solid rgba(108,192,74,0.5);color:#6cc04a" data-bid="dczone"><div class="box-label" contenteditable="true">DC</div><div class="resize-handle"></div></div>
+<div class="el" style="top:1220px;left:775px" data-id="dcfw2"><div class="el-icon"><div class="ico-fw fw-green" style="width:50px;height:40px"><span class="fl" style="font-size:1.1em">&#x1F525;</span></div></div><div class="el-label" contenteditable="true">DC Firewall</div></div>
 
-</div><!-- end canvas-area -->
-
-<!-- Background particles -->
-<div id="bgp"></div>
+</div><!-- end canvas -->
 
 <script>
-// ===== STATE =====
-let connections = [
-    {from:'cloud',to:'mainnet',color:'#666',anim:'dash',speed:1.5,flows:[{color:'#00bceb',speed:1.2}]},
-    {from:'mainnet',to:'intfw',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5},{color:'#dc3545',speed:2.2}]},
-    {from:'intfw',to:'proxy',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5}]},
-    {from:'proxy',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.5,flows:[{color:'#00bceb',speed:1.5},{color:'#6cc04a',speed:2.3}]},
-    {from:'dmzfw',to:'dcfw',color:'#6cc04a',anim:'flow',speed:1.8,flows:[{color:'#6cc04a',speed:1.8}]},
-    {from:'dcfw',to:'aci',color:'#198754',anim:'flow',speed:1.8,flows:[{color:'#198754',speed:1.8}]},
-    {from:'aci',to:'leafspine',color:'#6cc04a',anim:'dash',speed:1,flows:[{color:'#6cc04a',speed:1}]},
-    {from:'aci',to:'jumppoint',color:'#198754',anim:'flow',speed:2,flows:[{color:'#198754',speed:2}]},
-    {from:'pra',to:'jumppoint',color:'#e85d04',anim:'flow',speed:3,flows:[{color:'#e85d04',speed:3},{color:'#ffc107',speed:4.5}]},
-    {from:'wsus',to:'dmzfw',color:'#0078d4',anim:'flow',speed:1.5,flows:[{color:'#0078d4',speed:1.5}]},
-    {from:'trellix',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.8,flows:[{color:'#00bceb',speed:1.8}]},
+let conns=[
+{from:'cloud',to:'mainnet',color:'#666',anim:'dash',speed:1.5,flows:[{color:'#00bceb',speed:1.2}]},
+{from:'mainnet',to:'intfw',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5},{color:'#dc3545',speed:2.2}]},
+{from:'intfw',to:'proxy',color:'#fd7e14',anim:'flow',speed:1.5,flows:[{color:'#fd7e14',speed:1.5}]},
+{from:'proxy',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.5,flows:[{color:'#00bceb',speed:1.5},{color:'#6cc04a',speed:2.3}]},
+{from:'dmzfw',to:'dcfw',color:'#6cc04a',anim:'flow',speed:1.8,flows:[{color:'#6cc04a',speed:1.8}]},
+{from:'dcfw',to:'aci',color:'#198754',anim:'flow',speed:1.8,flows:[{color:'#198754',speed:1.8}]},
+{from:'aci',to:'leafspine',color:'#6cc04a',anim:'dash',speed:1,flows:[{color:'#6cc04a',speed:1}]},
+{from:'aci',to:'jumppoint',color:'#198754',anim:'flow',speed:2,flows:[{color:'#198754',speed:2}]},
+{from:'pra',to:'jumppoint',color:'#e85d04',anim:'flow',speed:3,flows:[{color:'#e85d04',speed:3},{color:'#ffc107',speed:4.5}]},
+{from:'wsus',to:'dmzfw',color:'#0078d4',anim:'flow',speed:1.5,flows:[{color:'#0078d4',speed:1.5}]},
+{from:'trellix',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.8,flows:[{color:'#00bceb',speed:1.8}]}
 ];
-let connMode=false, connSource=null, selectedConn=null, selectedZone=null;
-let dragTarget=null, dragOffset={x:0,y:0}, deviceCounter=100, zoneCounter=10;
+let connMode=false,connSrc=null,selConn=null,selBox=null,selEl=null;
+let drag=null,dOff={x:0,y:0},boxDrag=null,bOff={x:0,y:0},resizing=null,rStart={};
+let idC=200,boxC=50,shapeC=50;
+let ctxTarget=null;
 
-// ===== RENDER CONNECTIONS =====
-function renderConnections(){
-    const svg=document.getElementById('conn-svg');
-    const canvas=document.getElementById('canvas-area');
-    const cr=canvas.getBoundingClientRect();
-    let html='<defs>';
-    const colors=[...new Set(connections.flatMap(c=>[c.color,...c.flows.map(f=>f.color)]))];
-    colors.forEach(col=>{html+=`<marker id="a${col.replace('#','')}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${col}"/></marker>`;});
-    html+='</defs>';
-    
-    connections.forEach((conn,idx)=>{
-        const fromEl=document.querySelector(`[data-id="${conn.from}"]`);
-        const toEl=document.querySelector(`[data-id="${conn.to}"]`);
-        if(!fromEl||!toEl) return;
-        const fr=fromEl.getBoundingClientRect();
-        const tr=toEl.getBoundingClientRect();
-        const x1=fr.left-cr.left+fr.width/2, y1=fr.top-cr.top+fr.height/2;
-        const x2=tr.left-cr.left+tr.width/2, y2=tr.top-cr.top+tr.height/2;
-        const dx=x2-x1, dy=y2-y1;
-        let path;
-        if(Math.abs(dx)<40) path=`M${x1},${y1} L${x2},${y2}`;
-        else{const cx=(x1+x2)/2+(dy>80?-20:20);path=`M${x1},${y1} Q${cx},${(y1+y2)/2} ${x2},${y2}`;}
-        
-        let da='6,4';
-        if(conn.anim==='solid')da='none';
-        else if(conn.anim==='pulse')da='3,8';
-        const sel=selectedConn===idx?' selected':'';
-        html+=`<path class="conn-path${sel}" d="${path}" stroke="${conn.color}" stroke-dasharray="${da}" marker-end="url(#a${conn.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selectConn(event,${idx})">`;
-        if(conn.anim==='flow'||conn.anim==='dash')html+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${conn.speed*0.6}s" repeatCount="indefinite"/>`;
-        else if(conn.anim==='pulse')html+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
-        html+=`</path>`;
-        
-        // Multi-flow particles
-        conn.flows.forEach((fl,fi)=>{
-            const r=Math.max(2,4-fi);
-            const delay=fi*0.4;
-            html+=`<circle r="${r}" fill="${fl.color}" opacity="${0.9-fi*0.15}"><animateMotion path="${path}" dur="${fl.speed}s" begin="${delay}s" repeatCount="indefinite"/></circle>`;
-        });
-    });
-    svg.innerHTML=html;
+function render(){
+const svg=document.getElementById('csvg');
+const cv=document.getElementById('canvas');
+const cr=cv.getBoundingClientRect();
+let h='<defs>';
+const cls=[...new Set(conns.flatMap(c=>[c.color,...c.flows.map(f=>f.color)]))];
+cls.forEach(c=>{h+=`<marker id="m${c.replace('#','')}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${c}"/></marker>`;});
+h+='</defs>';
+conns.forEach((c,i)=>{
+const fe=document.querySelector(`[data-id="${c.from}"]`);
+const te=document.querySelector(`[data-id="${c.to}"]`);
+if(!fe||!te)return;
+const fr=fe.getBoundingClientRect(),tr=te.getBoundingClientRect();
+const x1=fr.left-cr.left+fr.width/2,y1=fr.top-cr.top+fr.height/2;
+const x2=tr.left-cr.left+tr.width/2,y2=tr.top-cr.top+tr.height/2;
+const dx=x2-x1,dy=y2-y1;
+let p;
+if(Math.abs(dx)<40)p=`M${x1},${y1} L${x2},${y2}`;
+else p=`M${x1},${y1} Q${(x1+x2)/2+(dy>80?-20:20)},${(y1+y2)/2} ${x2},${y2}`;
+let da=c.anim==='solid'?'none':c.anim==='pulse'?'3,8':'6,4';
+const sel=selConn===i?' sel':'';
+h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}" marker-end="url(#m${c.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selC(event,${i})">`;
+if(c.anim==='flow'||c.anim==='dash')h+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${c.speed*0.6}s" repeatCount="indefinite"/>`;
+else if(c.anim==='pulse')h+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
+h+=`</path>`;
+c.flows.forEach((fl,fi)=>{h+=`<circle r="${Math.max(2,4-fi)}" fill="${fl.color}" opacity="${0.9-fi*0.12}"><animateMotion path="${p}" dur="${fl.speed}s" begin="${fi*0.35}s" repeatCount="indefinite"/></circle>`;});
+});
+svg.innerHTML=h;
 }
 
-// ===== SELECT CONNECTION =====
-function selectConn(e,idx){e.stopPropagation();selectedConn=idx;selectedZone=null;document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));document.getElementById('connColor').value=connections[idx].color;document.getElementById('connAnim').value=connections[idx].anim;document.getElementById('connSpeed').value=connections[idx].speed;renderConnections();}
+function selC(e,i){e.stopPropagation();selConn=i;selBox=null;selEl=null;clearSel();document.getElementById('cClr').value=conns[i].color;document.getElementById('cAnm').value=conns[i].anim;document.getElementById('cSpd').value=conns[i].speed;render();}
+function clearSel(){document.querySelectorAll('.box.selected,.el.selected,.shape.selected').forEach(e=>e.classList.remove('selected'));}
 
-// ===== ADD FLOW TO CONNECTION =====
-function addFlowToConn(){
-    if(selectedConn===null){alert('Select a connection first');return;}
-    const color=document.getElementById('flowColor2').value;
-    const speed=parseFloat(document.getElementById('flowSpeed2').value)||2;
-    connections[selectedConn].flows.push({color:color,speed:speed});
-    renderConnections();
+function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
+
+function addFlow(){if(selConn===null){alert('Select a connection first');return;}conns[selConn].flows.push({color:document.getElementById('fClr').value,speed:parseFloat(document.getElementById('fSpd').value)||2});render();}
+
+function addBox(){boxC++;const lb=document.getElementById('boxLbl').value||'Zone';const cl=document.getElementById('boxClr').value;const bd=document.getElementById('boxBdr').value;const an=document.getElementById('boxAnm').value;const b=document.createElement('div');b.className='box '+(an||'');b.dataset.bid='b'+boxC;b.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${bd} ${cl};color:${cl}`;b.innerHTML=`<div class="box-label" contenteditable="true">${lb}</div><div class="resize-handle"></div>`;document.getElementById('canvas').appendChild(b);initBox(b);}
+
+function addShape(){const t=document.getElementById('shapeSel').value;if(!t)return;shapeC++;const s=document.createElement('div');s.className='shape';s.dataset.sid='s'+shapeC;s.style.cssText='top:500px;left:700px';
+if(t==='arrow-right')s.innerHTML='<div class="shape-arrow right"></div>';
+else if(t==='arrow-down')s.innerHTML='<div class="shape-arrow down"></div>';
+else if(t==='arrow-left')s.innerHTML='<div class="shape-arrow left"></div>';
+else if(t==='arrow-up')s.innerHTML='<div class="shape-arrow up"></div>';
+else if(t==='note')s.innerHTML='<div class="shape-note" contenteditable="true">Note text here</div>';
+else if(t==='text')s.innerHTML='<div class="shape-text" contenteditable="true">Text</div>';
+document.getElementById('canvas').appendChild(s);initShape(s);}
+
+function addDevice(){const t=document.getElementById('devSel').value;if(!t)return;idC++;const id=t+'-'+idC;const d=document.createElement('div');d.className='el';d.style.cssText='top:500px;left:650px';d.dataset.id=id;let ico='',nm=t;
+switch(t){
+case'firewall':ico='<div class="ico-fw fw-red"><span class="fl">&#x1F525;</span></div>';nm='Firewall';break;
+case'switch':ico='<div class="ico-sw"></div>';nm='Switch';break;
+case'router':ico='<div class="ico-sw" style="background:linear-gradient(90deg,#6cc04a,#198754)"></div>';nm='Router';break;
+case'server':ico='<div class="ico-srv"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>';nm='Server';break;
+case'proxy':ico='<div class="ico-proxy">Proxy</div>';nm='Proxy';break;
+case'vm':ico='<div style="width:42px;height:42px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">VM</div>';nm='VM';break;
+case'cloud':ico='<div class="ico-cloud">Cloud</div>';nm='Cloud';break;
+case'loadbalancer':ico='<div style="width:44px;height:44px;background:linear-gradient(135deg,#6f42c1,#5a2d9e);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">LB</div>';nm='LB';break;
+case'waf':ico='<div style="width:44px;height:44px;background:linear-gradient(135deg,#fd7e14,#dc3545);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">WAF</div>';nm='WAF';break;
+case'ids':ico='<div style="width:44px;height:44px;background:linear-gradient(135deg,#dc3545,#6f0000);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">IDS</div>';nm='IDS';break;
+case'wireless':ico='<div style="width:44px;height:44px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8em">&#x1F4F6;</div>';nm='AP';break;
+case'storage':ico='<div style="width:44px;height:44px;background:linear-gradient(135deg,#555,#222);border:1.5px solid #888;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.45em;font-weight:700;color:#aaa">SAN</div>';nm='Storage';break;
+case'pc':ico='<div class="ico-pc">&#x1F5A5;</div>';nm='PC';break;
+case'laptop':ico='<div class="ico-laptop">&#x1F4BB;</div>';nm='Laptop';break;
+case'phone':ico='<div class="ico-phone"></div>';nm='Phone';break;
+case'mobile':ico='<div class="ico-mobile"></div>';nm='Mobile';break;
+case'user':ico='<div class="ico-user"></div>';nm='User';break;
+case'admin':ico='<div class="ico-admin"></div>';nm='Admin';break;
+case'guest':ico='<div class="ico-guest"></div>';nm='Guest';break;
+case'remote':ico='<div class="ico-remote">&#x1F464;</div>';nm='Remote';break;
+}
+d.innerHTML=`<div class="el-icon">${ico}</div><div class="el-label" contenteditable="true">${nm}</div>`;
+document.getElementById('canvas').appendChild(d);initEl(d);}
+
+function delSelected(){
+if(selConn!==null){conns.splice(selConn,1);selConn=null;render();}
+else if(selBox){selBox.remove();selBox=null;}
+else if(selEl){const id=selEl.dataset.id;conns=conns.filter(c=>c.from!==id&&c.to!==id);selEl.remove();selEl=null;render();}
 }
 
-// ===== TOGGLE CONNECTION MODE =====
-function toggleConnMode(){
-    connMode=!connMode;
-    const btn=document.getElementById('connBtn');
-    const area=document.getElementById('canvas-area');
-    if(connMode){btn.style.background='linear-gradient(135deg,#ffc107,#e0a800)';btn.textContent='Cancel';area.classList.add('conn-mode');document.getElementById('modeLabel').textContent='Connect';document.getElementById('modeLabel').style.cssText='background:rgba(255,193,7,0.15);color:#ffc107;border-color:rgba(255,193,7,0.3)';}
-    else{btn.style.background='';btn.textContent='Draw';area.classList.remove('conn-mode');connSource=null;document.getElementById('modeLabel').textContent='Select';document.getElementById('modeLabel').style.cssText='';}
+// Context menu
+function showCtx(e,el){e.preventDefault();ctxTarget=el;const m=document.getElementById('ctxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
+document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');});
+function ctxConnect(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(!id)return;connSrc=id;ctxTarget.style.outline='3px solid #ffc107';connMode=true;document.getElementById('connBtn').style.background='#ffc107';document.getElementById('connBtn').textContent='Cancel';document.getElementById('canvas').classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}
+function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el').forEach(e=>e.style.outline='');toggleConn();render();}
+function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';document.getElementById('canvas').appendChild(cl);initEl(cl);}
+function ctxEdit(){if(!ctxTarget)return;const lbl=ctxTarget.querySelector('.el-label');if(lbl){lbl.focus();}}
+function ctxDelete(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(id)conns=conns.filter(c=>c.from!==id&&c.to!==id);ctxTarget.remove();ctxTarget=null;render();}
+
+// Save / Load
+function saveState(){
+const cv=document.getElementById('canvas');
+const data={html:cv.innerHTML,conns:JSON.stringify(conns)};
+localStorage.setItem('securepull_diagram',JSON.stringify(data));
+alert('Diagram saved!');
+}
+function loadState(){
+const raw=localStorage.getItem('securepull_diagram');
+if(!raw){alert('No saved state');return;}
+const data=JSON.parse(raw);
+const cv=document.getElementById('canvas');
+cv.innerHTML=data.html;
+conns=JSON.parse(data.conns);
+// Re-init all
+document.querySelectorAll('.el').forEach(initEl);
+document.querySelectorAll('.box').forEach(initBox);
+document.querySelectorAll('.shape').forEach(initShape);
+setTimeout(render,100);
 }
 
-// ===== ADD ZONE BOX =====
-function addZoneBox(){
-    zoneCounter++;
-    const label=document.getElementById('boxLabel').value||'Zone';
-    const color=document.getElementById('boxColor').value;
-    const style=document.getElementById('boxStyle').value;
-    const anim=document.getElementById('boxAnim').value;
-    const box=document.createElement('div');
-    box.className='zone-box '+(anim!=='none'?anim:'');
-    box.dataset.zone='custom-'+zoneCounter;
-    box.id='zone-custom-'+zoneCounter;
-    box.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${style} ${color};color:${color};cursor:move`;
-    box.innerHTML=`<div class="zone-label">${label}</div>`;
-    box.addEventListener('click',function(e){selectZone(e,this);});
-    box.addEventListener('mousedown',function(e){startBoxDrag(e,this);});
-    document.getElementById('canvas-area').appendChild(box);
+// Auto-load on start
+window.addEventListener('DOMContentLoaded',function(){
+const raw=localStorage.getItem('securepull_diagram');
+if(raw){
+try{const d=JSON.parse(raw);const cv=document.getElementById('canvas');cv.innerHTML=d.html;conns=JSON.parse(d.conns);document.querySelectorAll('.el').forEach(initEl);document.querySelectorAll('.box').forEach(initBox);document.querySelectorAll('.shape').forEach(initShape);}catch(e){}
 }
+setTimeout(render,150);
+});
 
-// ===== SELECT ZONE =====
-function selectZone(e,el){
-    e.stopPropagation();
-    selectedConn=null;
-    document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedZone=el;
+// Init element
+function initEl(el){
+el.addEventListener('mousedown',function(e){
+if(e.target.getAttribute('contenteditable'))return;
+if(connMode){const id=el.dataset.id;if(!id)return;if(!connSrc){connSrc=id;el.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el').forEach(x=>x.style.outline='');connSrc=null;}return;}
+e.preventDefault();drag=el;el.classList.add('dragging');clearSel();el.classList.add('selected');selEl=el;selConn=null;selBox=null;const r=el.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
+el.addEventListener('contextmenu',function(e){showCtx(e,el);});
 }
-
-// ===== DELETE SELECTED =====
-function deleteSelected(){
-    if(selectedConn!==null){connections.splice(selectedConn,1);selectedConn=null;renderConnections();}
-    else if(selectedZone){selectedZone.remove();selectedZone=null;}
+function initBox(b){
+b.addEventListener('mousedown',function(e){
+if(e.target.getAttribute('contenteditable'))return;
+if(e.target.classList.contains('resize-handle')){e.preventDefault();resizing=b;rStart={x:e.clientX,y:e.clientY,w:b.offsetWidth,h:b.offsetHeight};return;}
+e.preventDefault();boxDrag=b;clearSel();b.classList.add('selected');selBox=b;selConn=null;selEl=null;const r=b.getBoundingClientRect();bOff.x=e.clientX-r.left;bOff.y=e.clientY-r.top;});
 }
-function deleteSelectedBox(){
-    if(selectedZone){selectedZone.remove();selectedZone=null;}
-}
-
-// ===== BOX DRAG/RESIZE =====
-let boxDragTarget=null,boxDragOffset={x:0,y:0};
-function startBoxDrag(e,el){
-    if(e.target.classList.contains('zone-label')||e.target===el){
-        e.preventDefault();
-        boxDragTarget=el;
-        const r=el.getBoundingClientRect();
-        const cr=document.getElementById('canvas-area').getBoundingClientRect();
-        boxDragOffset.x=e.clientX-r.left;
-        boxDragOffset.y=e.clientY-r.top;
-    }
-}
-
-// ===== ADD DEVICE =====
-function addDevice(){
-    const type=document.getElementById('addDeviceSelect').value;
-    if(!type)return;
-    deviceCounter++;
-    const id=type+'-'+deviceCounter;
-    const div=document.createElement('div');
-    div.className='device';
-    div.style.cssText='top:500px;left:650px';
-    div.dataset.id=id;
-    let icon='',name=type.charAt(0).toUpperCase()+type.slice(1);
-    switch(type){
-        case'firewall':icon='<div class="dev-firewall fw-paloalto"><span class="flame">&#x1F525;</span></div>';break;
-        case'switch':icon='<div class="dev-switch"></div>';break;
-        case'router':icon='<div class="dev-switch" style="background:linear-gradient(90deg,#6cc04a,#198754)"></div>';name='Router';break;
-        case'server':icon='<div class="dev-server"><div class="led"></div><div class="led"></div><div class="led"></div></div>';break;
-        case'proxy':icon='<div class="dev-proxy">Proxy</div>';break;
-        case'vm':icon='<div style="width:42px;height:42px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.55em;font-weight:700">VM</div>';break;
-        case'cloud':icon='<div class="dev-cloud">Cloud</div>';break;
-        case'loadbalancer':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#6f42c1,#5a2d9e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">LB</div>';break;
-        case'waf':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#fd7e14,#dc3545);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">WAF</div>';break;
-        case'ids':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#dc3545,#6f0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#fff">IDS</div>';break;
-        case'wireless':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#00bceb,#0076d5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85em">&#x1F4F6;</div>';name='AP';break;
-        case'storage':icon='<div style="width:48px;height:48px;background:linear-gradient(135deg,#555,#222);border:2px solid #888;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.5em;font-weight:700;color:#aaa">SAN</div>';name='Storage';break;
-    }
-    div.innerHTML=`<div class="device-icon">${icon}</div><div class="device-name">${name}</div>`;
-    document.getElementById('canvas-area').appendChild(div);
-    initDrag(div);
-}
-
-// ===== DRAG DEVICES =====
-function initDrag(el){
-    el.addEventListener('mousedown',function(e){
-        if(connMode){
-            const id=el.dataset.id;
-            if(!id)return;
-            if(!connSource){connSource=id;el.style.outline='3px solid #ffc107';}
-            else{
-                if(connSource!==id){
-                    const color=document.getElementById('connColor').value;
-                    const anim=document.getElementById('connAnim').value;
-                    const speed=parseFloat(document.getElementById('connSpeed').value)||1.5;
-                    connections.push({from:connSource,to:id,color:color,anim:anim,speed:speed,flows:[{color:color,speed:speed}]});
-                    renderConnections();
-                }
-                document.querySelectorAll('.device').forEach(d=>d.style.outline='');
-                connSource=null;
-            }
-            return;
-        }
-        e.preventDefault();
-        dragTarget=el;
-        el.classList.add('dragging');
-        const r=el.getBoundingClientRect();
-        dragOffset.x=e.clientX-r.left;
-        dragOffset.y=e.clientY-r.top;
-    });
+function initShape(s){
+s.addEventListener('mousedown',function(e){
+if(e.target.getAttribute('contenteditable'))return;
+e.preventDefault();drag=s;s.classList.add('dragging');clearSel();s.classList.add('selected');selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 }
 
 document.addEventListener('mousemove',function(e){
-    if(dragTarget){
-        const cr=document.getElementById('canvas-area').getBoundingClientRect();
-        dragTarget.style.left=(e.clientX-cr.left-dragOffset.x)+'px';
-        dragTarget.style.top=(e.clientY-cr.top-dragOffset.y)+'px';
-        renderConnections();
-    }
-    if(boxDragTarget){
-        const cr=document.getElementById('canvas-area').getBoundingClientRect();
-        boxDragTarget.style.left=(e.clientX-cr.left-boxDragOffset.x)+'px';
-        boxDragTarget.style.top=(e.clientY-cr.top-boxDragOffset.y)+'px';
-    }
+const cr=document.getElementById('canvas').getBoundingClientRect();
+if(drag){drag.style.left=(e.clientX-cr.left-dOff.x)+'px';drag.style.top=(e.clientY-cr.top-dOff.y)+'px';render();}
+if(boxDrag){boxDrag.style.left=(e.clientX-cr.left-bOff.x)+'px';boxDrag.style.top=(e.clientY-cr.top-bOff.y)+'px';}
+if(resizing){const dw=e.clientX-rStart.x;const dh=e.clientY-rStart.y;resizing.style.width=Math.max(80,rStart.w+dw)+'px';resizing.style.height=Math.max(40,rStart.h+dh)+'px';}
 });
-document.addEventListener('mouseup',function(){
-    if(dragTarget){dragTarget.classList.remove('dragging');dragTarget=null;}
-    boxDragTarget=null;
-});
+document.addEventListener('mouseup',function(){if(drag){drag.classList.remove('dragging');drag=null;}boxDrag=null;resizing=null;});
 
-// Update connection properties
-document.getElementById('connColor').addEventListener('input',function(){if(selectedConn!==null){connections[selectedConn].color=this.value;renderConnections();}});
-document.getElementById('connAnim').addEventListener('change',function(){if(selectedConn!==null){connections[selectedConn].anim=this.value;renderConnections();}});
-document.getElementById('connSpeed').addEventListener('input',function(){if(selectedConn!==null){connections[selectedConn].speed=parseFloat(this.value)||1.5;renderConnections();}});
+// Property updates
+document.getElementById('cClr').addEventListener('input',function(){if(selConn!==null){conns[selConn].color=this.value;render();}});
+document.getElementById('cAnm').addEventListener('change',function(){if(selConn!==null){conns[selConn].anim=this.value;render();}});
+document.getElementById('cSpd').addEventListener('input',function(){if(selConn!==null){conns[selConn].speed=parseFloat(this.value)||1.5;render();}});
 
-// Click to deselect
-document.getElementById('canvas-area').addEventListener('click',function(e){
-    if(e.target===this||e.target.classList.contains('layer-box')){selectedConn=null;selectedZone=null;document.querySelectorAll('.zone-box').forEach(z=>z.classList.remove('selected'));renderConnections();}
-});
+// Click canvas to deselect
+document.getElementById('canvas').addEventListener('click',function(e){if(e.target===this){selConn=null;selBox=null;selEl=null;clearSel();render();}});
 
-// Init existing elements
-document.querySelectorAll('.device').forEach(initDrag);
-document.querySelectorAll('.zone-box').forEach(z=>{
-    z.addEventListener('click',function(e){selectZone(e,this);});
-    z.addEventListener('mousedown',function(e){startBoxDrag(e,this);});
-});
-
-// Background particles
-(function(){var c=document.getElementById('bgp');var cols=['#00bceb','#6cc04a','#fd7e14','#dc3545','#198754'];for(var i=0;i<18;i++){var p=document.createElement('div');p.className='bp';var s=Math.random()*3+1;p.style.cssText='width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;opacity:'+(Math.random()*0.12+0.03)+';animation-delay:'+Math.random()*6+'s;animation-duration:'+(Math.random()*15+12)+'s;';c.appendChild(p);}})();
-
-// Initial render
-setTimeout(renderConnections,150);
-window.addEventListener('resize',renderConnections);
+// Init existing
+document.querySelectorAll('.el').forEach(initEl);
+document.querySelectorAll('.box').forEach(initBox);
+document.querySelectorAll('.shape').forEach(initShape);
+setTimeout(render,150);
+window.addEventListener('resize',render);
 </script>
 </body>
 </html>
