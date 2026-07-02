@@ -387,6 +387,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <select id="cAnm"><option value="flow">Flow</option><option value="pulse">Pulse</option><option value="dash">Dash</option><option value="solid">Solid</option></select>
 <input type="number" id="cSpd" value="1.5" min="0.3" max="8" step="0.1" title="Speed">
 <select id="cType" title="Line Type"><option value="auto">Auto</option><option value="straight">Straight</option><option value="curved">Curved</option><option value="ortho">Orthogonal</option><option value="iso">Isometric</option></select>
+<select id="cStart" title="Start Arrow"><option value="none">&#x2500; No Start</option><option value="arrow">&#x2190; Arrow</option><option value="filled">&#x25C0; Filled</option><option value="open">&#x25C1; Open</option><option value="diamond">&#x25C6; Diamond</option><option value="circle">&#x25CF; Circle</option></select>
+<select id="cEnd" title="End Arrow"><option value="arrow">&#x2192; Arrow</option><option value="filled">&#x25B6; Filled</option><option value="open">&#x25B7; Open</option><option value="none">&#x2500; No End</option><option value="diamond">&#x25C6; Diamond</option><option value="circle">&#x25CF; Circle</option></select>
 </div>
 <div class="tb">
 <label>+Flow:</label>
@@ -551,7 +553,18 @@ const cv=document.getElementById('canvas');
 const cr=cv.getBoundingClientRect();
 let h='<defs>';
 const cls=[...new Set(conns.flatMap(c=>[c.color,...c.flows.map(f=>f.color)]))];
-cls.forEach(c=>{h+=`<marker id="m${c.replace('#','')}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="${c}"/></marker>`;});
+cls.forEach(c=>{var id=c.replace('#','');
+h+=`<marker id="ma${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
+h+=`<marker id="mf${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mo${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
+h+=`<marker id="md${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M4,0 L8,4 L4,8 L0,4 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mc${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><circle cx="4" cy="4" r="3" fill="${c}"/></marker>`;
+h+=`<marker id="mas${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
+h+=`<marker id="mfs${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mos${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
+h+=`<marker id="mds${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><path d="M4,0 L8,4 L4,8 L0,4 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mcs${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><circle cx="4" cy="4" r="3" fill="${c}"/></marker>`;
+});
 h+='</defs>';
 conns.forEach((c,i)=>{
 const fe=document.querySelector(`[data-id="${c.from}"]`);
@@ -570,7 +583,20 @@ else if(lt==='iso'){var mx=x1+(x2-x1)*0.5;var my=y1;p=`M${x1},${y1} L${mx},${my}
 else{if(Math.abs(dx)<40)p=`M${x1},${y1} L${x2},${y2}`;else p=`M${x1},${y1} Q${(x1+x2)/2+(dy>80?-20:20)},${(y1+y2)/2} ${x2},${y2}`;}
 let da=c.anim==='solid'?'none':c.anim==='pulse'?'3,8':'6,4';
 const sel=selConn===i?' sel':'';
-h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}" marker-end="url(#m${c.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selC(event,${i})" oncontextmenu="showConnCtx(event,${i})">`;
+var endType=c.endArrow||'arrow';var startType=c.startArrow||'none';
+var cid=c.color.replace('#','');
+var meAttr='';var msAttr='';
+if(endType==='arrow')meAttr=` marker-end="url(#ma${cid})"`;
+else if(endType==='filled')meAttr=` marker-end="url(#mf${cid})"`;
+else if(endType==='open')meAttr=` marker-end="url(#mo${cid})"`;
+else if(endType==='diamond')meAttr=` marker-end="url(#md${cid})"`;
+else if(endType==='circle')meAttr=` marker-end="url(#mc${cid})"`;
+if(startType==='arrow')msAttr=` marker-start="url(#mas${cid})"`;
+else if(startType==='filled')msAttr=` marker-start="url(#mfs${cid})"`;
+else if(startType==='open')msAttr=` marker-start="url(#mos${cid})"`;
+else if(startType==='diamond')msAttr=` marker-start="url(#mds${cid})"`;
+else if(startType==='circle')msAttr=` marker-start="url(#mcs${cid})"`;
+h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}"${meAttr}${msAttr} style="pointer-events:stroke;cursor:pointer" onclick="selC(event,${i})" oncontextmenu="showConnCtx(event,${i})">`;
 if(c.anim==='flow'||c.anim==='dash')h+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${c.speed*0.6}s" repeatCount="indefinite"/>`;
 else if(c.anim==='pulse')h+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
 h+=`</path>`;
@@ -579,7 +605,7 @@ c.flows.forEach((fl,fi)=>{h+=`<circle r="${Math.max(2,4-fi)}" fill="${fl.color}"
 svg.innerHTML=h;
 }
 
-function selC(e,i){e.stopPropagation();selConn=i;selBox=null;selEl=null;clearSel();document.getElementById('cClr').value=conns[i].color;document.getElementById('cAnm').value=conns[i].anim;document.getElementById('cSpd').value=conns[i].speed;document.getElementById('cType').value=conns[i].lineType||'auto';render();}
+function selC(e,i){e.stopPropagation();selConn=i;selBox=null;selEl=null;clearSel();document.getElementById('cClr').value=conns[i].color;document.getElementById('cAnm').value=conns[i].anim;document.getElementById('cSpd').value=conns[i].speed;document.getElementById('cType').value=conns[i].lineType||'auto';document.getElementById('cStart').value=conns[i].startArrow||'none';document.getElementById('cEnd').value=conns[i].endArrow||'arrow';render();}
 function showConnCtx(e,i){e.preventDefault();e.stopPropagation();selConn=i;var m=document.getElementById('connCtxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
 function setConnType(t){if(selConn===null)return;conns[selConn].lineType=t;document.getElementById('cType').value=t;document.getElementById('connCtxMenu').classList.remove('show');render();}
 function clearSel(){document.querySelectorAll('.box.selected,.el.selected,.shape.selected').forEach(e=>e.classList.remove('selected'));selShape=null;multiSel=[];}
@@ -821,7 +847,7 @@ else if(selEl){const id=selEl.dataset.id;conns=conns.filter(c=>c.from!==id&&c.to
 function showCtx(e,el){e.preventDefault();ctxTarget=el;const m=document.getElementById('ctxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
 document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');document.getElementById('connCtxMenu').classList.remove('show');});
 function ctxConnect(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(!id)return;connSrc=id;ctxTarget.style.outline='3px solid #ffc107';connMode=true;document.getElementById('connBtn').style.background='#ffc107';document.getElementById('connBtn').textContent='Cancel';document.getElementById('canvas').classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}
-function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
+function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
 function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';cl.classList.remove('selected');document.getElementById('canvas').appendChild(cl);if(cl.classList.contains('shape'))initShape(cl);else initEl(cl);}
 function ctxEdit(){if(!ctxTarget)return;const lbl=ctxTarget.querySelector('.el-label,.shape-note,.shape-text,.shape-pill,[contenteditable]');if(lbl){lbl.focus();}}
 function ctxDelete(){if(!ctxTarget)return;snapshot();const id=ctxTarget.dataset.id;if(id)conns=conns.filter(c=>c.from!==id&&c.to!==id);ctxTarget.remove();ctxTarget=null;render();}
@@ -917,7 +943,7 @@ setTimeout(render,150);
 function initEl(el){
 el.addEventListener('mousedown',function(e){
 if(e.target.getAttribute('contenteditable'))return;
-if(connMode){const id=el.dataset.id;if(!id)return;if(!connSrc){connSrc=id;el.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el').forEach(x=>x.style.outline='');connSrc=null;}return;}
+if(connMode){const id=el.dataset.id;if(!id)return;if(!connSrc){connSrc=id;el.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el').forEach(x=>x.style.outline='');connSrc=null;}return;}
 e.preventDefault();drag=el;el.classList.add('dragging');if(!e.ctrlKey){clearSel();}el.classList.add('selected');addToSel(el);selEl=el;selConn=null;selBox=null;const r=el.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 el.addEventListener('contextmenu',function(e){showCtx(e,el);});
 }
@@ -933,7 +959,7 @@ s.addEventListener('mousedown',function(e){
 if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s;var inner=s.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note,.shape-textbox');rStart={x:e.clientX,y:e.clientY,w:inner?inner.offsetWidth:s.offsetWidth,h:inner?inner.offsetHeight:s.offsetHeight};return;}
 if(e.detail>=2&&e.target.getAttribute('contenteditable')){return;}
 if(e.target.getAttribute('contenteditable')&&document.activeElement===e.target){return;}
-if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;s.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;}return;}
+if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;s.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;}return;}
 e.preventDefault();drag=s;s.classList.add('dragging');if(!e.ctrlKey){clearSel();}s.classList.add('selected');addToSel(s);selShape=s;selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 s.addEventListener('contextmenu',function(e){showCtx(e,s);});
 s.addEventListener('dblclick',function(e){var ed=s.querySelector('[contenteditable]');if(ed)ed.focus();});
@@ -965,6 +991,8 @@ document.getElementById('cClr').addEventListener('input',function(){if(selConn!=
 document.getElementById('cAnm').addEventListener('change',function(){if(selConn!==null){conns[selConn].anim=this.value;render();}});
 document.getElementById('cSpd').addEventListener('input',function(){if(selConn!==null){conns[selConn].speed=parseFloat(this.value)||1.5;render();}});
 document.getElementById('cType').addEventListener('change',function(){if(selConn!==null){conns[selConn].lineType=this.value;render();}});
+document.getElementById('cStart').addEventListener('change',function(){if(selConn!==null){conns[selConn].startArrow=this.value;render();}});
+document.getElementById('cEnd').addEventListener('change',function(){if(selConn!==null){conns[selConn].endArrow=this.value;render();}});
 
 // Click canvas to deselect or start rubber-band
 var rubberBand=false,rbStart={x:0,y:0};
