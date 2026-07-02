@@ -175,6 +175,63 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .ico-remote{width:44px;height:44px;border:2px solid #5a9eb0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85em;background:rgba(90,158,176,0.06);animation:rmRing 3s ease-in-out infinite}
 @keyframes rmRing{0%,100%{box-shadow:0 0 0 0 rgba(90,158,176,0.3)}50%{box-shadow:0 0 0 5px rgba(90,158,176,0)}}
 
+
+/* NEW CISCO CVD ICONS */
+.ico-ipphone{width:32px;height:48px;background:linear-gradient(180deg,#3a3a5a,#1a1a30);border:1.5px solid #5a8090;border-radius:3px;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:.4em;font-weight:700;color:#5a9eb0}
+.ico-ipphone::before{content:'';position:absolute;top:3px;left:3px;right:3px;height:16px;background:rgba(0,188,235,0.1);border:1px solid rgba(0,188,235,0.25);border-radius:2px;animation:ippScr 3s ease-in-out infinite}
+.ico-ipphone::after{content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:18px;height:10px;background:repeating-linear-gradient(0deg,#3a5a6a 0px,#3a5a6a 2px,transparent 2px,transparent 4px);border-radius:1px}
+@keyframes ippScr{0%,100%{background:rgba(0,188,235,0.1)}50%{background:rgba(0,188,235,0.25)}}
+.ico-camera{width:44px;height:34px;background:linear-gradient(135deg,#3a3a5a,#1a1a30);border:1.5px solid #5a8090;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-camera::before{content:'';width:16px;height:16px;border:2px solid #5a9eb0;border-radius:50%;animation:camRec 2s ease-in-out infinite}
+.ico-camera::after{content:'';position:absolute;top:-4px;right:6px;width:10px;height:4px;background:#5a8090;border-radius:2px 2px 0 0}
+@keyframes camRec{0%,100%{box-shadow:0 0 3px rgba(220,53,69,0.5)}50%{box-shadow:0 0 8px rgba(220,53,69,0.9)}}
+.ico-asa{width:55px;height:30px;background:linear-gradient(180deg,#dc3545,#8b0000);border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center;font-size:.4em;font-weight:700;color:#fff;box-shadow:0 2px 8px rgba(220,53,69,0.4)}
+.ico-asa::before{content:'';position:absolute;left:4px;top:50%;transform:translateY(-50%);width:4px;height:4px;background:#6cc04a;border-radius:50%;animation:asaLed 1s ease-in-out infinite}
+@keyframes asaLed{0%,100%{opacity:1}50%{opacity:.3}}
+.ico-nac{width:46px;height:46px;background:linear-gradient(135deg,#4a6e7f,#2c4450);border:2px solid #5a9eb0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.4em;font-weight:700;color:#5a9eb0;position:relative}
+.ico-nac::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:linear-gradient(90deg,#6cc04a,#00bceb,#6cc04a);border-radius:2px;animation:nacBar 2s linear infinite}
+@keyframes nacBar{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+.ico-ise{width:46px;height:46px;background:linear-gradient(135deg,#4a6e7f,#2c4450);border:2px solid #00bceb;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.4em;font-weight:700;color:#00bceb;animation:iseGl 3s ease-in-out infinite}
+@keyframes iseGl{0%,100%{box-shadow:0 0 5px rgba(0,188,235,0.2)}50%{box-shadow:0 0 12px rgba(0,188,235,0.5)}}
+.ico-vpnc{width:50px;height:36px;background:linear-gradient(180deg,#4a6e7f,#2c4450);border:1.5px solid #5a9eb0;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;font-size:.35em;font-weight:700;color:#5a9eb0}
+.ico-vpnc::before{content:'';position:absolute;top:3px;left:3px;width:6px;height:6px;background:#fd7e14;border-radius:50%;animation:vpnLed 1.5s ease-in-out infinite}
+.ico-vpnc::after{content:'';position:absolute;top:3px;right:3px;width:6px;height:6px;background:#6cc04a;border-radius:50%;animation:vpnLed 1.5s ease-in-out infinite .5s}
+@keyframes vpnLed{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.ico-shield{width:38px;height:46px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-shield::before{content:'';position:absolute;width:34px;height:42px;background:linear-gradient(180deg,#5a9eb0,#3a6e7f);clip-path:polygon(50% 0%,100% 20%,100% 65%,50% 100%,0% 65%,0% 20%);animation:shldGl 3s ease-in-out infinite}
+@keyframes shldGl{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
+.ico-shield::after{content:'';position:absolute;width:14px;height:14px;border:2px solid #fff;border-radius:50%;top:40%;left:50%;transform:translate(-50%,-50%)}
+.ico-lock{width:30px;height:42px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-lock::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:18px;height:14px;border:3px solid #5a9eb0;border-bottom:none;border-radius:10px 10px 0 0}
+.ico-lock::after{content:'';position:absolute;bottom:0;width:24px;height:24px;background:linear-gradient(135deg,#5a9eb0,#3a6e7f);border-radius:3px}
+.ico-nexus{width:50px;height:38px;background:linear-gradient(180deg,#2c4450,#1a2a35);border:1.5px solid #5a8090;border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-nexus::before{content:'';position:absolute;top:4px;left:4px;right:4px;height:3px;background:linear-gradient(90deg,#00bceb,transparent,#00bceb);animation:nxScan 2s linear infinite}
+@keyframes nxScan{0%{background-position:-50px 0}100%{background-position:50px 0}}
+.ico-nexus::after{content:'';position:absolute;bottom:5px;left:6px;width:4px;height:4px;background:#6cc04a;border-radius:50%;box-shadow:7px 0 0 #6cc04a,14px 0 0 #fd7e14,21px 0 0 #6cc04a,28px 0 0 #6cc04a;animation:swBl 1.5s ease-in-out infinite}
+.ico-wlc{width:50px;height:36px;background:linear-gradient(180deg,#4a6e7f,#2c4450);border:1.5px solid #5a9eb0;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;font-size:.35em;font-weight:700;color:#5a9eb0}
+.ico-wlc::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:3px;height:8px;background:#5a9eb0;border-radius:2px}
+.ico-wlc::after{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:16px;height:8px;border:2px solid #5a9eb0;border-bottom:none;border-radius:8px 8px 0 0;animation:wlcSig 1.5s ease-in-out infinite}
+@keyframes wlcSig{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.4;transform:translateX(-50%) scale(1.2)}}
+.ico-ap{width:36px;height:36px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-ap::before{content:'';width:20px;height:20px;background:linear-gradient(135deg,#4a6e7f,#2c4450);border:1.5px solid #5a9eb0;border-radius:50%}
+.ico-ap::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:12px;border:2px solid #5a9eb0;border-bottom:none;border-radius:12px 12px 0 0;animation:apSig 2s ease-in-out infinite}
+@keyframes apSig{0%,100%{opacity:.5;transform:translateX(-50%) scaleX(1)}50%{opacity:1;transform:translateX(-50%) scaleX(1.15)}}
+.ico-mlswitch{width:48px;height:48px;background:linear-gradient(135deg,#4a6e7f,#2c4450);border:1.5px solid #5a9eb0;border-radius:6px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-mlswitch::before{content:'';position:absolute;width:20px;height:20px;border:2px solid rgba(220,53,69,0.6);border-radius:50%;animation:mlRot 3s linear infinite}
+@keyframes mlRot{to{transform:rotate(360deg)}}
+.ico-mlswitch::after{content:'';width:8px;height:8px;background:#dc3545;border-radius:50%;box-shadow:12px 0 0 #dc3545,-12px 0 0 #dc3545,0 12px 0 #dc3545,0 -12px 0 #dc3545}
+.ico-tablet{width:34px;height:46px;background:linear-gradient(180deg,#2a3a4a,#1a2030);border:1.5px solid #4a6a7a;border-radius:5px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-tablet::before{content:'';position:absolute;top:4px;left:3px;right:3px;bottom:8px;border:1px solid rgba(0,188,235,0.15);border-radius:2px;animation:tabScr 4s ease-in-out infinite}
+@keyframes tabScr{0%,100%{background:rgba(0,188,235,0.03)}50%{background:rgba(0,188,235,0.1)}}
+.ico-tablet::after{content:'';position:absolute;bottom:2px;width:8px;height:3px;background:#3a5a6a;border-radius:2px}
+.ico-workstation{width:44px;height:42px;background:linear-gradient(180deg,#2a3a4a,#1a2030);border:1.5px solid #4a6a7a;border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center;font-size:.6em;color:#5a9eb0}
+.ico-workstation::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:34px;height:5px;background:#3a4a5a;border-radius:0 0 3px 3px}
+.ico-workstation::before{content:'';position:absolute;top:4px;left:4px;right:4px;bottom:10px;border:1px solid rgba(0,188,235,0.2);border-radius:2px}
+.ico-printer{width:44px;height:36px;background:linear-gradient(180deg,#4a5a6a,#2a3a4a);border:1.5px solid #5a7080;border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center}
+.ico-printer::before{content:'';position:absolute;top:-6px;left:8px;right:8px;height:8px;background:#3a4a5a;border:1px solid #5a7080;border-radius:2px 2px 0 0}
+.ico-printer::after{content:'';position:absolute;bottom:-4px;left:10px;right:10px;height:6px;background:#eee;border-radius:0 0 2px 2px;animation:prtFeed 3s ease-in-out infinite}
+@keyframes prtFeed{0%,80%{transform:translateY(0)}90%{transform:translateY(3px)}100%{transform:translateY(0)}}
+
 /* SVG connections */
 #csvg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible}
 .cp{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
@@ -192,7 +249,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="tb"><span class="tb-mode" id="modeLbl">Select</span></div>
 <div class="tb">
 <label>Device:</label>
-<select id="devSel"><option value="">--</option><option value="firewall">Firewall</option><option value="switch">Switch</option><option value="router">Router</option><option value="server">Server</option><option value="proxy">Proxy</option><option value="vm">VM</option><option value="cloud">Cloud</option><option value="loadbalancer">LB</option><option value="waf">WAF</option><option value="ids">IDS</option><option value="wireless">WiFi AP</option><option value="storage">Storage</option><option value="pc">PC</option><option value="laptop">Laptop</option><option value="phone">Phone</option><option value="mobile">Mobile</option><option value="user">User</option><option value="admin">Admin</option><option value="guest">Guest</option><option value="remote">Remote User</option></select>
+<select id="devSel"><option value="">--</option><option value="firewall">Firewall</option><option value="switch">Switch</option><option value="router">Router</option><option value="server">Server</option><option value="proxy">Proxy</option><option value="vm">VM</option><option value="cloud">Cloud</option><option value="loadbalancer">LB</option><option value="waf">WAF</option><option value="ids">IDS</option><option value="wireless">WiFi AP</option><option value="storage">Storage</option><option value="pc">PC</option><option value="laptop">Laptop</option><option value="phone">Phone</option><option value="mobile">Mobile</option><option value="user">User</option><option value="admin">Admin</option><option value="guest">Guest</option><option value="remote">Remote User</option><optgroup label="--- Cisco CVD ---"><option value="ipphone">IP Phone</option><option value="camera">Camera</option><option value="asa">ASA 5500</option><option value="nac">NAC Appliance</option><option value="ise">ISE</option><option value="vpnconc">VPN Concentrator</option><option value="shield">Shield</option><option value="lock">Lock</option><option value="nexus">Nexus Switch</option><option value="wlc">WLC</option><option value="accesspoint">Access Point</option><option value="mlswitch">Multilayer Switch</option><option value="tablet">Tablet</option><option value="workstation">Workstation</option><option value="printer">Printer</option></optgroup></select>
 <button class="btn-primary" onclick="addDevice()">+</button>
 </div>
 <div class="tb">
@@ -427,6 +484,21 @@ case'user':ico='<div class="ico-user"></div>';nm='User';break;
 case'admin':ico='<div class="ico-admin"></div>';nm='Admin';break;
 case'guest':ico='<div class="ico-guest"></div>';nm='Guest';break;
 case'remote':ico='<div class="ico-remote">&#x1F464;</div>';nm='Remote';break;
+case'ipphone':ico='<div class="ico-ipphone">IP</div>';nm='IP Phone';break;
+case'camera':ico='<div class="ico-camera"></div>';nm='Camera';break;
+case'asa':ico='<div class="ico-asa">ASA</div>';nm='ASA 5500';break;
+case'nac':ico='<div class="ico-nac">NAC</div>';nm='NAC';break;
+case'ise':ico='<div class="ico-ise">ISE</div>';nm='ISE';break;
+case'vpnconc':ico='<div class="ico-vpnc">VPN</div>';nm='VPN Conc';break;
+case'shield':ico='<div class="ico-shield"></div>';nm='Shield';break;
+case'lock':ico='<div class="ico-lock"></div>';nm='Lock';break;
+case'nexus':ico='<div class="ico-nexus"></div>';nm='Nexus';break;
+case'wlc':ico='<div class="ico-wlc">WLC</div>';nm='WLC';break;
+case'accesspoint':ico='<div class="ico-ap"></div>';nm='AP';break;
+case'mlswitch':ico='<div class="ico-mlswitch"></div>';nm='ML Switch';break;
+case'tablet':ico='<div class="ico-tablet"></div>';nm='Tablet';break;
+case'workstation':ico='<div class="ico-workstation">WS</div>';nm='Workstation';break;
+case'printer':ico='<div class="ico-printer"></div>';nm='Printer';break;
 }
 d.innerHTML=`<div class="el-icon">${ico}</div><div class="el-label" contenteditable="true">${nm}</div>`;
 document.getElementById('canvas').appendChild(d);initEl(d);}
