@@ -50,6 +50,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .toolbar input[type=text]{width:65px}
 .toolbar button{border:none;color:#fff;padding:5px 9px;border-radius:4px;font-size:0.63em;font-weight:600;cursor:pointer;transition:all 0.15s}
 .toolbar button:hover{transform:scale(1.05)}
+.te{background:#3a3a50 !important;border:1px solid #666 !important;color:#eee !important;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:0.75em;border-radius:3px;cursor:pointer;padding:0}
+.te:hover{background:#5a5a70 !important;border-color:#888 !important}
 .btn-primary{background:linear-gradient(135deg,#0076d5,#00bceb)}
 .btn-danger{background:linear-gradient(135deg,#dc3545,#a71d2a)}
 .btn-success{background:linear-gradient(135deg,#198754,#0f5132)}
@@ -280,27 +282,27 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <select id="txtSize" onchange="applySize()" style="width:48px"><option value="">--</option><option value="1">8pt</option><option value="2">10pt</option><option value="3">12pt</option><option value="4">14pt</option><option value="5">18pt</option><option value="6">24pt</option><option value="7">36pt</option></select>
 </div>
 <div style="display:flex;gap:2px;flex-wrap:wrap;align-items:center">
-<button onclick="document.execCommand('bold')" title="Bold" style="font-weight:900;width:22px">B</button>
-<button onclick="document.execCommand('italic')" title="Italic" style="font-style:italic;width:22px">I</button>
-<button onclick="document.execCommand('underline')" title="Underline" style="width:22px"><u>U</u></button>
-<button onclick="document.execCommand('strikeThrough')" title="Strikethrough" style="width:22px"><s>S</s></button>
-<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
-<button onclick="document.execCommand('superscript')" title="Superscript" style="width:22px;font-size:.5em">A<sup>x</sup></button>
-<button onclick="document.execCommand('subscript')" title="Subscript" style="width:22px;font-size:.5em">A<sub>x</sub></button>
-<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
-<input type="color" id="txtColor" value="#ffffff" onchange="document.execCommand('foreColor',false,this.value)" title="Text Color" style="width:22px;height:20px">
-<input type="color" id="txtBg" value="#000000" onchange="document.execCommand('hiliteColor',false,this.value)" title="Highlight" style="width:22px;height:20px">
+<button class="te" onclick="document.execCommand('bold')" title="Bold"><b>B</b></button>
+<button class="te" onclick="document.execCommand('italic')" title="Italic"><i>I</i></button>
+<button class="te" onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
+<button class="te" onclick="document.execCommand('strikeThrough')" title="Strikethrough"><s>S</s></button>
+<span style="width:1px;height:16px;background:#555;margin:0 3px"></span>
+<button class="te" onclick="document.execCommand('superscript')" title="Superscript">A&#x207F;</button>
+<button class="te" onclick="document.execCommand('subscript')" title="Subscript">A&#x2093;</button>
+<span style="width:1px;height:16px;background:#555;margin:0 3px"></span>
+<input type="color" id="txtColor" value="#ffffff" onchange="document.execCommand('foreColor',false,this.value)" title="Text Color" style="width:22px;height:20px;border:1px solid #666">
+<input type="color" id="txtBg" value="#000000" onchange="document.execCommand('hiliteColor',false,this.value)" title="Highlight" style="width:22px;height:20px;border:1px solid #666">
 </div>
 <div style="display:flex;gap:2px;flex-wrap:wrap;align-items:center">
-<button onclick="document.execCommand('justifyLeft')" title="Align Left" style="width:22px">&#x2261;</button>
-<button onclick="document.execCommand('justifyCenter')" title="Center" style="width:22px">&#x2263;</button>
-<button onclick="document.execCommand('justifyRight')" title="Align Right" style="width:22px">&#x2262;</button>
-<button onclick="document.execCommand('justifyFull')" title="Justify" style="width:22px;font-size:.5em">&#x2630;</button>
-<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
-<button onclick="document.execCommand('insertUnorderedList')" title="Bullet List" style="width:22px;font-size:.6em">&#x2022;&#x2261;</button>
-<button onclick="document.execCommand('insertOrderedList')" title="Numbered List" style="width:22px;font-size:.55em">1.&#x2261;</button>
-<button onclick="document.execCommand('indent')" title="Indent" style="width:22px;font-size:.55em">&#x21E5;</button>
-<button onclick="document.execCommand('outdent')" title="Outdent" style="width:22px;font-size:.55em">&#x21E4;</button>
+<button class="te" onclick="document.execCommand('justifyLeft')" title="Align Left">&#x2261;</button>
+<button class="te" onclick="document.execCommand('justifyCenter')" title="Center">&#x2263;</button>
+<button class="te" onclick="document.execCommand('justifyRight')" title="Right">&#x2262;</button>
+<button class="te" onclick="document.execCommand('justifyFull')" title="Justify">&#x2630;</button>
+<span style="width:1px;height:16px;background:#555;margin:0 3px"></span>
+<button class="te" onclick="document.execCommand('insertUnorderedList')" title="Bullets">&#x2022;=</button>
+<button class="te" onclick="document.execCommand('insertOrderedList')" title="Numbers">1.=</button>
+<button class="te" onclick="document.execCommand('indent')" title="Indent">&#x21E5;</button>
+<button class="te" onclick="document.execCommand('outdent')" title="Outdent">&#x21E4;</button>
 </div>
 </div>
 <div class="tb">
