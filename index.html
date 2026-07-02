@@ -69,8 +69,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 
 /* ELEMENTS */
 .el{position:absolute;cursor:grab;z-index:25}
-.el-group{position:absolute;cursor:grab;z-index:24;border:1px dashed rgba(0,188,235,0.3);border-radius:8px;padding:5px;min-width:50px;min-height:50px}
-.el-group.selected{border-color:#ffc107;outline:none}
+.el-group{position:absolute;cursor:grab;z-index:24;border:none;border-radius:8px;padding:0;min-width:20px;min-height:20px}
+.el-group.selected{border:1px dashed #ffc107;padding:4px;outline:none}
 .el:hover{filter:brightness(1.15)}
 .el.dragging{cursor:grabbing;z-index:200;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.4))}
 .el.selected{outline:2px solid #ffc107;outline-offset:2px;border-radius:4px}
@@ -288,6 +288,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .conn-mode .el{cursor:crosshair !important}
 .conn-mode .el:hover{outline:3px solid #ffc107;outline-offset:2px;border-radius:6px}
 #trailCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+#selBox{position:absolute;border:1px dashed #ffc107;background:rgba(255,193,7,0.05);display:none;z-index:9000;pointer-events:none}
 </style>
 </head>
 <body>
@@ -322,6 +323,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <option value="sa-float">Float</option>
 <option value="sa-flash">Flash</option>
 <option value="sa-breathe">Breathe</option>
+</select>
+<input type="color" id="shapeFill" value="#00bceb" title="Fill Color" style="width:22px;height:20px">
+<button class="te" onclick="applyShapeFill()" title="Fill Shape">&#x25A0;</button>
+<select id="shapeBorder" onchange="applyShapeBorder(this.value)" style="width:52px" title="Border">
+<option value="">Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dash</option>
+<option value="dotted">Dot</option>
+<option value="none">None</option>
 </select>
 </div>
 <div class="tb" style="flex-direction:column;align-items:flex-start;gap:6px">
@@ -366,6 +376,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <option value="ta-rainbow">Rainbow</option>
 <option value="ta-typewriter">Typewriter</option>
 </select>
+<button class="te" onclick="toggleTextBorder()" title="Toggle Border">&#x25A1;</button>
 </div>
 </div>
 <div class="tb">
@@ -422,12 +433,16 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="ctx-item" onclick="ctxDuplicate()">&#x1F4CB; Duplicate</div>
 <div class="ctx-item" onclick="ctxEdit()">&#x270F; Edit Label</div>
 <div class="ctx-sep"></div>
+<div class="ctx-item" onclick="groupSelected()">&#x1F4E6; Group Selected</div>
+<div class="ctx-item" onclick="ungroupSelected()">&#x1F4E4; Ungroup</div>
+<div class="ctx-sep"></div>
 <div class="ctx-item danger" onclick="ctxDelete()">&#x1F5D1; Delete</div>
 </div>
 
 <!-- CANVAS -->
 <div id="canvas" class="bg-cyber">
 <svg id="csvg"></svg>
+<div id="selBox"></div>
 
 <!-- DEFAULT ELEMENTS -->
 <div class="el" style="top:80px;left:580px" data-id="cloud"><div class="el-icon"><div class="ico-cloud">&#x2601; NET</div></div><div class="el-label" contenteditable="true">Internet</div></div>
@@ -588,7 +603,7 @@ var l=parseInt(el.style.left||0);
 if(t<minY)minY=t;
 if(l<minX)minX=l;
 });
-group.style.cssText='position:absolute;top:'+minY+'px;left:'+minX+'px;border:1px dashed rgba(0,188,235,0.4);border-radius:8px;padding:5px;z-index:24';
+group.style.cssText='position:absolute;top:'+minY+'px;left:'+minX+'px;z-index:24';
 // Move elements into group
 var cv=document.getElementById('canvas');
 multiSel.forEach(function(el){
@@ -668,6 +683,33 @@ if(!selShape)return;
 var old=['sa-glow','sa-pulse','sa-spin','sa-bounce','sa-shake','sa-float','sa-flash','sa-breathe'];
 old.forEach(function(c){selShape.classList.remove(c);});
 if(cls)selShape.classList.add(cls);
+}
+function applyShapeFill(){
+if(!selShape)return;
+var color=document.getElementById('shapeFill').value;
+var inner=selShape.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-hexagon,.shape-star,.shape-textbox,.shape-note');
+if(inner){inner.style.background=color;}
+else{selShape.style.background=color;}
+}
+function applyShapeBorder(style){
+if(!selShape)return;
+var color=document.getElementById('shapeFill').value;
+var inner=selShape.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-hexagon,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-textbox,.shape-note');
+if(inner){
+if(style==='none'){inner.style.border='none';}
+else{inner.style.borderStyle=style;inner.style.borderWidth='2px';inner.style.borderColor=color;}
+}
+}
+function toggleTextBorder(){
+var sel=window.getSelection();
+if(!sel.rangeCount)return;
+var el=sel.anchorNode;
+while(el&&el.nodeType!==1)el=el.parentNode;
+if(!el)return;
+var target=el.closest('.shape-textbox,.shape-note,[contenteditable]');
+if(!target)return;
+if(target.style.border&&target.style.border!=='none'){target.style.border='none';}
+else{target.style.border='1.5px solid rgba(255,255,255,0.4)';target.style.borderRadius='4px';target.style.padding='6px 10px';}
 }
 
 function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
@@ -885,17 +927,34 @@ if(multiSel.length>1){multiSel.forEach(function(item){if(item!==drag){item.style
 render();
 }
 if(boxDrag){boxDrag.style.left=(e.clientX-cr.left-bOff.x)+'px';boxDrag.style.top=(e.clientY-cr.top-bOff.y)+'px';}
+if(rubberBand){var sb=document.getElementById('selBox');var cx=e.clientX-cr.left;var cy=e.clientY-cr.top;sb.style.left=Math.min(rbStart.x,cx)+'px';sb.style.top=Math.min(rbStart.y,cy)+'px';sb.style.width=Math.abs(cx-rbStart.x)+'px';sb.style.height=Math.abs(cy-rbStart.y)+'px';}
 if(resizing){const dw=e.clientX-rStart.x;const dh=e.clientY-rStart.y;if(resizing.classList.contains('box')){resizing.style.width=Math.max(100,rStart.w+dw)+'px';resizing.style.height=Math.max(50,rStart.h+dh)+'px';}else if(resizing.classList.contains('shape')){var inner=resizing.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note');if(inner){inner.style.width=Math.max(15,rStart.w+dw)+'px';inner.style.height=Math.max(10,rStart.h+dh)+'px';}else{resizing.style.width=Math.max(30,rStart.w+dw)+'px';resizing.style.height=Math.max(20,rStart.h+dh)+'px';}}}
 });
-document.addEventListener('mouseup',function(){if(drag){drag.classList.remove('dragging');drag=null;}boxDrag=null;resizing=null;});
+document.addEventListener('mouseup',function(){if(drag){drag.classList.remove('dragging');drag=null;}boxDrag=null;resizing=null;
+if(rubberBand){rubberBand=false;var sb=document.getElementById('selBox');var r={x:parseInt(sb.style.left),y:parseInt(sb.style.top),w:parseInt(sb.style.width),h:parseInt(sb.style.height)};sb.style.display='none';
+if(r.w>5||r.h>5){document.querySelectorAll('#canvas .el,#canvas .shape,#canvas .box').forEach(function(el){var t=parseInt(el.style.top||0);var l=parseInt(el.style.left||0);var ew=el.offsetWidth;var eh=el.offsetHeight;if(l+ew>r.x&&l<r.x+r.w&&t+eh>r.y&&t<r.y+r.h){el.classList.add('selected');addToSel(el);}});}
+}});
 
 // Property updates
 document.getElementById('cClr').addEventListener('input',function(){if(selConn!==null){conns[selConn].color=this.value;render();}});
 document.getElementById('cAnm').addEventListener('change',function(){if(selConn!==null){conns[selConn].anim=this.value;render();}});
 document.getElementById('cSpd').addEventListener('input',function(){if(selConn!==null){conns[selConn].speed=parseFloat(this.value)||1.5;render();}});
 
-// Click canvas to deselect
-document.getElementById('canvas').addEventListener('click',function(e){if(e.target===this){selConn=null;selBox=null;selEl=null;clearSel();render();}});
+// Click canvas to deselect or start rubber-band
+var rubberBand=false,rbStart={x:0,y:0};
+document.getElementById('canvas').addEventListener('mousedown',function(e){
+if(e.target===this||e.target.id==='selBox'){
+if(!e.ctrlKey)clearSel();
+selConn=null;selBox=null;selEl=null;
+// Start rubber-band selection
+var cr=this.getBoundingClientRect();
+rbStart.x=e.clientX-cr.left;rbStart.y=e.clientY-cr.top;
+rubberBand=true;
+var sb=document.getElementById('selBox');
+sb.style.left=rbStart.x+'px';sb.style.top=rbStart.y+'px';sb.style.width='0';sb.style.height='0';sb.style.display='block';
+}
+});
+document.getElementById('canvas').addEventListener('click',function(e){if(e.target===this&&!rubberBand){selConn=null;selBox=null;selEl=null;clearSel();render();}});
 
 // Init existing
 document.querySelectorAll('.el').forEach(initEl);
