@@ -242,6 +242,42 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .ico-printer::after{content:'';position:absolute;bottom:-4px;left:10px;right:10px;height:6px;background:#eee;border-radius:0 0 2px 2px;animation:prtFeed 3s ease-in-out infinite}
 @keyframes prtFeed{0%,80%{transform:translateY(0)}90%{transform:translateY(3px)}100%{transform:translateY(0)}}
 
+/* TEXT ANIMATIONS */
+.ta-glow{animation:taGlow 2s ease-in-out infinite}
+@keyframes taGlow{0%,100%{text-shadow:0 0 4px currentColor}50%{text-shadow:0 0 12px currentColor,0 0 24px currentColor}}
+.ta-flow{background:linear-gradient(90deg,currentColor 0%,#00bceb 50%,currentColor 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:taFlow 3s linear infinite}
+@keyframes taFlow{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+.ta-blink{animation:taBlink 1s step-end infinite}
+@keyframes taBlink{0%,100%{opacity:1}50%{opacity:0}}
+.ta-highlight{animation:taHl 2s ease-in-out infinite}
+@keyframes taHl{0%,100%{background:transparent}50%{background:rgba(255,193,7,0.3);border-radius:3px}}
+.ta-dim{animation:taDim 3s ease-in-out infinite}
+@keyframes taDim{0%,100%{opacity:0.3}50%{opacity:1}}
+.ta-neon{animation:taNeon 1.5s ease-in-out infinite;color:#00bceb}
+@keyframes taNeon{0%,100%{text-shadow:0 0 4px #00bceb,0 0 8px #00bceb}50%{text-shadow:0 0 8px #00bceb,0 0 16px #00bceb,0 0 30px #0076d5}}
+.ta-rainbow{animation:taRainbow 4s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#dc3545,#fd7e14,#ffc107,#6cc04a,#00bceb,#6f42c1,#dc3545);background-size:300% auto}
+@keyframes taRainbow{0%{background-position:0% 0%}100%{background-position:300% 0%}}
+.ta-typewriter{animation:taTw 3s steps(20) infinite;overflow:hidden;white-space:nowrap;border-right:2px solid currentColor}
+@keyframes taTw{0%{max-width:0}50%{max-width:100%}100%{max-width:100%}}
+
+/* SHAPE ANIMATIONS */
+.sa-glow{animation:saGlow 2s ease-in-out infinite}
+@keyframes saGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(0,188,235,0.3))}50%{filter:drop-shadow(0 0 10px rgba(0,188,235,0.7)) drop-shadow(0 0 20px rgba(0,188,235,0.3))}}
+.sa-pulse{animation:saPulse 2s ease-in-out infinite}
+@keyframes saPulse{0%,100%{transform:scale(1);opacity:0.8}50%{transform:scale(1.08);opacity:1}}
+.sa-spin{animation:saSpin 4s linear infinite}
+@keyframes saSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.sa-bounce{animation:saBounce 2s ease-in-out infinite}
+@keyframes saBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.sa-shake{animation:saShake 0.5s ease-in-out infinite}
+@keyframes saShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.sa-float{animation:saFloat 3s ease-in-out infinite}
+@keyframes saFloat{0%,100%{transform:translate(0,0)}33%{transform:translate(3px,-4px)}66%{transform:translate(-3px,2px)}}
+.sa-flash{animation:saFlash 1.5s ease-in-out infinite}
+@keyframes saFlash{0%,50%,100%{opacity:1}25%,75%{opacity:0.2}}
+.sa-breathe{animation:saBreathe 4s ease-in-out infinite}
+@keyframes saBreathe{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.05);opacity:1}}
+
 /* SVG connections */
 #csvg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible}
 .cp{fill:none;stroke-width:2;pointer-events:stroke;cursor:pointer}
@@ -274,6 +310,17 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <label>Shape:</label>
 <select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option><option value="circle">Circle</option><option value="rectangle">Rectangle</option><option value="diamond">Diamond</option><option value="line-h">Line Horizontal</option><option value="line-v">Line Vertical</option><option value="bracket-l">Bracket Left</option><option value="bracket-r">Bracket Right</option><option value="hexagon">Hexagon</option><option value="pill">Pill/Badge</option><option value="star">Star</option></select>
 <button class="btn-purple" onclick="addShape()">+Shape</button>
+<select id="shapeAnim" onchange="applyShapeAnim(this.value)" style="width:62px" title="Shape Animation">
+<option value="">Anim</option>
+<option value="sa-glow">Glow</option>
+<option value="sa-pulse">Pulse</option>
+<option value="sa-spin">Spin</option>
+<option value="sa-bounce">Bounce</option>
+<option value="sa-shake">Shake</option>
+<option value="sa-float">Float</option>
+<option value="sa-flash">Flash</option>
+<option value="sa-breathe">Breathe</option>
+</select>
 </div>
 <div class="tb" style="flex-direction:column;align-items:flex-start;gap:6px">
 <label>&#x270F; Text Editor:</label>
@@ -303,6 +350,20 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <button class="te" onclick="document.execCommand('insertOrderedList')" title="Numbers">1.=</button>
 <button class="te" onclick="document.execCommand('indent')" title="Indent">&#x21E5;</button>
 <button class="te" onclick="document.execCommand('outdent')" title="Outdent">&#x21E4;</button>
+</div>
+<div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:2px">
+<label style="width:auto;margin:0;font-size:.55em">Animate:</label>
+<select id="txtAnim" onchange="applyTextAnim(this.value)" style="width:70px">
+<option value="">None</option>
+<option value="ta-glow">Glow</option>
+<option value="ta-flow">Flow</option>
+<option value="ta-blink">Blink</option>
+<option value="ta-highlight">Highlight</option>
+<option value="ta-dim">Dim Light</option>
+<option value="ta-neon">Neon</option>
+<option value="ta-rainbow">Rainbow</option>
+<option value="ta-typewriter">Typewriter</option>
+</select>
 </div>
 </div>
 <div class="tb">
@@ -490,6 +551,26 @@ if(font)document.execCommand('fontName',false,font);
 function applySize(){
 var size=document.getElementById('txtSize').value;
 if(size)document.execCommand('fontSize',false,size);
+}
+function applyTextAnim(cls){
+var sel=window.getSelection();
+if(!sel.rangeCount)return;
+var el=sel.anchorNode;
+while(el&&el.nodeType!==1)el=el.parentNode;
+if(!el)return;
+// Find the closest contenteditable or shape/el
+var target=el.closest('[contenteditable]')||el.closest('.shape')||el.closest('.el');
+if(!target)return;
+// Remove old text animations
+var old=['ta-glow','ta-flow','ta-blink','ta-highlight','ta-dim','ta-neon','ta-rainbow','ta-typewriter'];
+old.forEach(function(c){target.classList.remove(c);});
+if(cls)target.classList.add(cls);
+}
+function applyShapeAnim(cls){
+if(!selShape)return;
+var old=['sa-glow','sa-pulse','sa-spin','sa-bounce','sa-shake','sa-float','sa-flash','sa-breathe'];
+old.forEach(function(c){selShape.classList.remove(c);});
+if(cls)selShape.classList.add(cls);
 }
 
 function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
