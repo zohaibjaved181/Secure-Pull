@@ -69,8 +69,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 
 /* ELEMENTS */
 .el{position:absolute;cursor:grab;z-index:25}
-.el-group{position:absolute;cursor:grab;z-index:24;border:none;border-radius:8px;padding:0;min-width:20px;min-height:20px}
-.el-group.selected{border:1px dashed #ffc107;padding:4px;outline:none}
+.el-group{position:absolute;cursor:grab;z-index:24;border:none;border-radius:0;padding:0;min-width:0;min-height:0;background:transparent}
+.el-group.selected{outline:1px dashed #ffc107;outline-offset:3px;border:none}
 .el:hover{filter:brightness(1.15)}
 .el.dragging{cursor:grabbing;z-index:200;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.4))}
 .el.selected{outline:2px solid #ffc107;outline-offset:2px;border-radius:4px}
@@ -326,6 +326,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 </select>
 <input type="color" id="shapeFill" value="#00bceb" title="Fill Color" style="width:22px;height:20px">
 <button class="te" onclick="applyShapeFill()" title="Fill Shape">&#x25A0;</button>
+<button class="te" onclick="clearShapeFill()" title="Clear Fill">&#x25A1;</button>
 <select id="shapeBorder" onchange="applyShapeBorder(this.value)" style="width:52px" title="Border">
 <option value="">Border</option>
 <option value="solid">Solid</option>
@@ -438,6 +439,17 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div class="ctx-item" onclick="ungroupSelected()">&#x1F4E4; Ungroup</div>
 <div class="ctx-sep"></div>
 <div class="ctx-item danger" onclick="ctxDelete()">&#x1F5D1; Delete</div>
+</div>
+
+<!-- CONNECTION CONTEXT MENU -->
+<div class="ctx-menu" id="connCtxMenu">
+<div class="ctx-item" onclick="setConnType('straight')">&#x2500; Straight</div>
+<div class="ctx-item" onclick="setConnType('curved')">&#x223F; Curved</div>
+<div class="ctx-item" onclick="setConnType('ortho')">&#x2510; Orthogonal</div>
+<div class="ctx-item" onclick="setConnType('iso')">&#x2571; Isometric</div>
+<div class="ctx-item" onclick="setConnType('auto')">&#x2609; Auto</div>
+<div class="ctx-sep"></div>
+<div class="ctx-item danger" onclick="delSelected()">&#x1F5D1; Delete Connection</div>
 </div>
 
 <!-- CANVAS -->
@@ -558,7 +570,7 @@ else if(lt==='iso'){var mx=x1+(x2-x1)*0.5;var my=y1;p=`M${x1},${y1} L${mx},${my}
 else{if(Math.abs(dx)<40)p=`M${x1},${y1} L${x2},${y2}`;else p=`M${x1},${y1} Q${(x1+x2)/2+(dy>80?-20:20)},${(y1+y2)/2} ${x2},${y2}`;}
 let da=c.anim==='solid'?'none':c.anim==='pulse'?'3,8':'6,4';
 const sel=selConn===i?' sel':'';
-h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}" marker-end="url(#m${c.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selC(event,${i})">`;
+h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}" marker-end="url(#m${c.color.replace('#','')})" style="pointer-events:stroke;cursor:pointer" onclick="selC(event,${i})" oncontextmenu="showConnCtx(event,${i})">`;
 if(c.anim==='flow'||c.anim==='dash')h+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${c.speed*0.6}s" repeatCount="indefinite"/>`;
 else if(c.anim==='pulse')h+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
 h+=`</path>`;
@@ -568,6 +580,8 @@ svg.innerHTML=h;
 }
 
 function selC(e,i){e.stopPropagation();selConn=i;selBox=null;selEl=null;clearSel();document.getElementById('cClr').value=conns[i].color;document.getElementById('cAnm').value=conns[i].anim;document.getElementById('cSpd').value=conns[i].speed;document.getElementById('cType').value=conns[i].lineType||'auto';render();}
+function showConnCtx(e,i){e.preventDefault();e.stopPropagation();selConn=i;var m=document.getElementById('connCtxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
+function setConnType(t){if(selConn===null)return;conns[selConn].lineType=t;document.getElementById('cType').value=t;document.getElementById('connCtxMenu').classList.remove('show');render();}
 function clearSel(){document.querySelectorAll('.box.selected,.el.selected,.shape.selected').forEach(e=>e.classList.remove('selected'));selShape=null;multiSel=[];}
 
 function addToSel(el){
@@ -696,6 +710,12 @@ var inner=selShape.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shap
 if(inner){inner.style.background=color;}
 else{selShape.style.background=color;}
 }
+function clearShapeFill(){
+if(!selShape)return;
+var inner=selShape.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-hexagon,.shape-star,.shape-textbox,.shape-note');
+if(inner){inner.style.background='transparent';inner.style.backgroundColor='';}
+else{selShape.style.background='transparent';selShape.style.backgroundColor='';}
+}
 function applyShapeBorder(style){
 if(!selShape)return;
 var color=document.getElementById('shapeFill').value;
@@ -799,7 +819,7 @@ else if(selEl){const id=selEl.dataset.id;conns=conns.filter(c=>c.from!==id&&c.to
 
 // Context menu
 function showCtx(e,el){e.preventDefault();ctxTarget=el;const m=document.getElementById('ctxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
-document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');});
+document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');document.getElementById('connCtxMenu').classList.remove('show');});
 function ctxConnect(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(!id)return;connSrc=id;ctxTarget.style.outline='3px solid #ffc107';connMode=true;document.getElementById('connBtn').style.background='#ffc107';document.getElementById('connBtn').textContent='Cancel';document.getElementById('canvas').classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}
 function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
 function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';cl.classList.remove('selected');document.getElementById('canvas').appendChild(cl);if(cl.classList.contains('shape'))initShape(cl);else initEl(cl);}
