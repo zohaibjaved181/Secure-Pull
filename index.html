@@ -112,8 +112,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .shape-text{font-size:0.85em;color:#fff;font-weight:600;outline:none;min-width:40px}
 .sh-label{font-size:0.55em;color:rgba(255,255,255,0.7);text-align:center;margin-top:2px;outline:none}
 .sh-label:focus{outline:1px dashed #00bceb;border-radius:2px}
-.shape-textbox{min-width:100px;min-height:30px;padding:8px 12px;font-size:0.8em;color:#fff;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.2);border-radius:6px;outline:none;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap;line-height:1.5}
-.shape-textbox:focus{border-color:#00bceb;background:rgba(0,188,235,0.03)}
+.shape-textbox{min-width:60px;min-height:20px;padding:6px 10px;font-size:0.8em;color:#fff;background:transparent;border:none;border-radius:4px;outline:none;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap;line-height:1.5}
+.shape-textbox:focus{outline:1px dashed rgba(0,188,235,0.4)}
 .shape-circle{width:60px;height:60px;border:2px solid #00bceb;border-radius:50%}
 .shape-rect{width:100px;height:60px;border:2px solid #00bceb;border-radius:6px}
 .shape-diamond{width:50px;height:50px;border:2px solid #fd7e14;transform:rotate(45deg)}
@@ -279,6 +279,19 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 @keyframes saFlash{0%,50%,100%{opacity:1}25%,75%{opacity:0.2}}
 .sa-breathe{animation:saBreathe 4s ease-in-out infinite}
 @keyframes saBreathe{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.05);opacity:1}}
+
+
+/* CONNECTION PORTS */
+.conn-mode .el::after,.conn-mode .shape::after{content:'';position:absolute;top:50%;left:-6px;width:8px;height:8px;background:#ffc107;border-radius:50%;transform:translateY(-50%);opacity:0.8;box-shadow:0 0 4px #ffc107}
+.conn-mode .el::before,.conn-mode .shape::before{content:'';position:absolute;top:-6px;left:50%;width:8px;height:8px;background:#ffc107;border-radius:50%;transform:translateX(-50%);opacity:0.8;box-shadow:0 0 4px #ffc107}
+.conn-port{position:absolute;width:10px;height:10px;background:#ffc107;border-radius:50%;opacity:0;transition:opacity 0.2s;z-index:30;cursor:crosshair;box-shadow:0 0 5px rgba(255,193,7,0.6)}
+.conn-port.top{top:-5px;left:50%;transform:translateX(-50%)}
+.conn-port.bottom{bottom:-5px;left:50%;transform:translateX(-50%)}
+.conn-port.left{left:-5px;top:50%;transform:translateY(-50%)}
+.conn-port.right{right:-5px;top:50%;transform:translateY(-50%)}
+.conn-mode .conn-port{opacity:1}
+.conn-mode .el:hover .conn-port,.conn-mode .shape:hover .conn-port{opacity:1;transform:scale(1.3)}
+#lasso-line{position:absolute;pointer-events:none;z-index:9998}
 
 /* SVG connections */
 #csvg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible}
@@ -458,6 +471,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <div id="canvas" class="bg-cyber">
 <svg id="csvg"></svg>
 <div id="selBox"></div>
+<svg id="lasso-line"><line id="lasso" stroke="#ffc107" stroke-width="1.5" stroke-dasharray="4,4" x1="0" y1="0" x2="0" y2="0"/></svg>
 
 <!-- DEFAULT ELEMENTS -->
 <div class="el" style="top:80px;left:580px" data-id="cloud"><div class="el-icon"><div class="ico-cloud">&#x2601; NET</div></div><div class="el-label" contenteditable="true">Internet</div></div>
@@ -520,6 +534,8 @@ let conns=[
 {from:'trellix',to:'dmzfw',color:'#00bceb',anim:'flow',speed:1.8,flows:[{color:'#00bceb',speed:1.8}]}
 ];
 let connMode=false,connSrc=null,selConn=null,selBox=null,selEl=null;
+let connSrcPort='center';
+let lassoActive=false;
 let drag=null,dOff={x:0,y:0},boxDrag=null,bOff={x:0,y:0},resizing=null,rStart={};
 let idC=200,boxC=50,shapeC=50;
 let ctxTarget=null;
@@ -547,6 +563,23 @@ moveSelected(dx,dy);
 }
 });
 
+function startLasso(e){
+lassoActive=true;
+var svg=document.getElementById('lasso-line');
+svg.style.display='block';
+var cr=document.getElementById('canvas').getBoundingClientRect();
+var line=document.getElementById('lasso');
+line.setAttribute('x1',e.clientX-cr.left);
+line.setAttribute('y1',e.clientY-cr.top);
+line.setAttribute('x2',e.clientX-cr.left);
+line.setAttribute('y2',e.clientY-cr.top);
+}
+function stopLasso(){
+lassoActive=false;
+var svg=document.getElementById('lasso-line');
+svg.style.display='none';
+}
+
 function render(){
 const svg=document.getElementById('csvg');
 const cv=document.getElementById('canvas');
@@ -554,16 +587,16 @@ const cr=cv.getBoundingClientRect();
 let h='<defs>';
 const cls=[...new Set(conns.flatMap(c=>[c.color,...c.flows.map(f=>f.color)]))];
 cls.forEach(c=>{var id=c.replace('#','');
-h+=`<marker id="ma${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
-h+=`<marker id="mf${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7 Z" fill="${c}"/></marker>`;
-h+=`<marker id="mo${id}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
-h+=`<marker id="md${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M4,0 L8,4 L4,8 L0,4 Z" fill="${c}"/></marker>`;
-h+=`<marker id="mc${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><circle cx="4" cy="4" r="3" fill="${c}"/></marker>`;
-h+=`<marker id="mas${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
-h+=`<marker id="mfs${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7 Z" fill="${c}"/></marker>`;
-h+=`<marker id="mos${id}" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M1,1 L7,4 L1,7 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
-h+=`<marker id="mds${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><path d="M4,0 L8,4 L4,8 L0,4 Z" fill="${c}"/></marker>`;
-h+=`<marker id="mcs${id}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><circle cx="4" cy="4" r="3" fill="${c}"/></marker>`;
+h+=`<marker id="ma${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
+h+=`<marker id="mf${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mo${id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
+h+=`<marker id="md${id}" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M3,0 L6,3 L3,6 L0,3 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mc${id}" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><circle cx="3" cy="3" r="2.5" fill="${c}"/></marker>`;
+h+=`<marker id="mas${id}" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`;
+h+=`<marker id="mfs${id}" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mos${id}" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" fill="none" stroke="${c}" stroke-width="1"/></marker>`;
+h+=`<marker id="mds${id}" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto-start-reverse"><path d="M3,0 L6,3 L3,6 L0,3 Z" fill="${c}"/></marker>`;
+h+=`<marker id="mcs${id}" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto-start-reverse"><circle cx="3" cy="3" r="2.5" fill="${c}"/></marker>`;
 });
 h+='</defs>';
 conns.forEach((c,i)=>{
@@ -941,9 +974,24 @@ setTimeout(render,150);
 
 // Init element
 function initEl(el){
+// Add connection ports if not present
+if(!el.querySelector('.conn-port')){
+['top','bottom','left','right'].forEach(function(pos){
+var port=document.createElement('div');port.className='conn-port '+pos;port.dataset.port=pos;
+port.addEventListener('mousedown',function(ev){
+if(!connMode)return;
+ev.stopPropagation();ev.preventDefault();
+connSrc=el.dataset.id;connSrcPort=pos;
+el.style.outline='3px solid #ffc107';
+startLasso(ev);
+});
+el.appendChild(port);
+});
+}
 el.addEventListener('mousedown',function(e){
+if(e.target.classList.contains('conn-port'))return;
 if(e.target.getAttribute('contenteditable'))return;
-if(connMode){const id=el.dataset.id;if(!id)return;if(!connSrc){connSrc=id;el.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el').forEach(x=>x.style.outline='');connSrc=null;}return;}
+if(connMode){const id=el.dataset.id;if(!id)return;if(!connSrc){connSrc=id;connSrcPort='center';el.style.outline='3px solid #ffc107';startLasso(e);}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;stopLasso();}return;}
 e.preventDefault();drag=el;el.classList.add('dragging');if(!e.ctrlKey){clearSel();}el.classList.add('selected');addToSel(el);selEl=el;selConn=null;selBox=null;const r=el.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 el.addEventListener('contextmenu',function(e){showCtx(e,el);});
 }
@@ -955,11 +1003,26 @@ e.preventDefault();boxDrag=b;clearSel();b.classList.add('selected');selBox=b;sel
 }
 function initShape(s){
 if(!s.dataset.id)s.dataset.id='shape-'+Date.now()+Math.random().toString(36).substr(2,4);
+// Add connection ports if not present
+if(!s.querySelector('.conn-port')){
+['top','bottom','left','right'].forEach(function(pos){
+var port=document.createElement('div');port.className='conn-port '+pos;port.dataset.port=pos;
+port.addEventListener('mousedown',function(ev){
+if(!connMode)return;
+ev.stopPropagation();ev.preventDefault();
+connSrc=s.dataset.id;connSrcPort=pos;
+s.style.outline='3px solid #ffc107';
+startLasso(ev);
+});
+s.appendChild(port);
+});
+}
 s.addEventListener('mousedown',function(e){
+if(e.target.classList.contains('conn-port'))return;
 if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s;var inner=s.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note,.shape-textbox');rStart={x:e.clientX,y:e.clientY,w:inner?inner.offsetWidth:s.offsetWidth,h:inner?inner.offsetHeight:s.offsetHeight};return;}
 if(e.detail>=2&&e.target.getAttribute('contenteditable')){return;}
 if(e.target.getAttribute('contenteditable')&&document.activeElement===e.target){return;}
-if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;s.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;}return;}
+if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;connSrcPort='center';s.style.outline='3px solid #ffc107';startLasso(e);}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;stopLasso();}return;}
 e.preventDefault();drag=s;s.classList.add('dragging');if(!e.ctrlKey){clearSel();}s.classList.add('selected');addToSel(s);selShape=s;selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 s.addEventListener('contextmenu',function(e){showCtx(e,s);});
 s.addEventListener('dblclick',function(e){var ed=s.querySelector('[contenteditable]');if(ed)ed.focus();});
@@ -979,6 +1042,7 @@ render();
 }
 if(boxDrag){boxDrag.style.left=(e.clientX-cr.left-bOff.x)+'px';boxDrag.style.top=(e.clientY-cr.top-bOff.y)+'px';}
 if(rubberBand){var sb=document.getElementById('selBox');var cx=e.clientX-cr.left;var cy=e.clientY-cr.top;sb.style.left=Math.min(rbStart.x,cx)+'px';sb.style.top=Math.min(rbStart.y,cy)+'px';sb.style.width=Math.abs(cx-rbStart.x)+'px';sb.style.height=Math.abs(cy-rbStart.y)+'px';}
+if(lassoActive){var line=document.getElementById('lasso');line.setAttribute('x2',e.clientX-cr.left);line.setAttribute('y2',e.clientY-cr.top);}
 if(resizing){const dw=e.clientX-rStart.x;const dh=e.clientY-rStart.y;if(resizing.classList.contains('box')){resizing.style.width=Math.max(100,rStart.w+dw)+'px';resizing.style.height=Math.max(50,rStart.h+dh)+'px';}else if(resizing.classList.contains('shape')){var inner=resizing.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note');if(inner){inner.style.width=Math.max(15,rStart.w+dw)+'px';inner.style.height=Math.max(10,rStart.h+dh)+'px';}else{resizing.style.width=Math.max(30,rStart.w+dw)+'px';resizing.style.height=Math.max(20,rStart.h+dh)+'px';}}}
 });
 document.addEventListener('mouseup',function(){if(drag){drag.classList.remove('dragging');drag=null;}boxDrag=null;resizing=null;
