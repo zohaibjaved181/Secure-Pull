@@ -404,10 +404,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <select id="cEnd" title="End Arrow"><option value="arrow">&#x2192; Arrow</option><option value="filled">&#x25B6; Filled</option><option value="open">&#x25B7; Open</option><option value="none">&#x2500; No End</option><option value="diamond">&#x25C6; Diamond</option><option value="circle">&#x25CF; Circle</option></select>
 </div>
 <div class="tb">
-<label>+Flow:</label>
-<button class="btn-warn" onclick="addFlow()">+</button>
+<label>Flow:</label>
+<button class="btn-warn" onclick="addFlow()">+Flow</button>
+<button class="te" onclick="removeFlow()" title="Remove Last Flow">-</button>
 <input type="color" id="fClr" value="#6cc04a">
-<input type="number" id="fSpd" value="2.5" min="0.3" max="8" step="0.1">
+<input type="number" id="fSpd" value="2" min="0.3" max="8" step="0.1" title="Speed">
+<select id="fDir" title="Direction"><option value="forward">Forward</option><option value="reverse">Reverse</option><option value="alternate">Alternate</option></select>
 </div>
 <div class="tb">
 <button class="btn-danger" onclick="delSelected()">Delete</button>
@@ -576,7 +578,7 @@ if(connSrc!==id){
 var cl=document.getElementById('cClr').value;
 var an=document.getElementById('cAnm').value;
 var sp=parseFloat(document.getElementById('cSpd').value)||1.5;
-conns.push({from:connSrc,fromPort:connSrcPort,to:id,toPort:port,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});
+conns.push({from:connSrc,fromPort:connSrcPort,to:id,toPort:port,color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[]});
 render();
 }
 document.querySelectorAll('.el,.shape').forEach(function(x){x.style.outline='';});
@@ -648,7 +650,17 @@ h+=`<path class="cp${sel}" d="${p}" stroke="${c.color}" stroke-dasharray="${da}"
 if(c.anim==='flow'||c.anim==='dash')h+=`<animate attributeName="stroke-dashoffset" values="0;-20" dur="${c.speed*0.6}s" repeatCount="indefinite"/>`;
 else if(c.anim==='pulse')h+=`<animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>`;
 h+=`</path>`;
-c.flows.forEach((fl,fi)=>{h+=`<circle r="${Math.max(2,4-fi)}" fill="${fl.color}" opacity="${0.9-fi*0.12}"><animateMotion path="${p}" dur="${fl.speed}s" begin="${fi*0.35}s" repeatCount="indefinite"/></circle>`;});
+c.flows.forEach((fl,fi)=>{
+var dir=fl.dir||'forward';
+var animPath=p;
+if(dir==='reverse'){
+// Reverse the path by swapping start/end in animateMotion
+animPath=`M${x2},${y2} L${x1},${y1}`;
+if(p.indexOf('Q')!==-1||p.indexOf('C')!==-1||p.indexOf('L')===-1){animPath=p;}
+}
+var keyTimes=dir==='alternate'?' keyPoints="0;1;0" keyTimes="0;0.5;1"':'';
+h+=`<circle r="${Math.max(2,4-fi)}" fill="${fl.color}" opacity="${0.9-fi*0.12}"><animateMotion path="${dir==='reverse'?animPath:p}" dur="${fl.speed}s" begin="${fi*0.35}s" repeatCount="indefinite"${keyTimes}/></circle>`;
+});
 });
 svg.innerHTML=h;
 }
@@ -813,7 +825,8 @@ else{target.style.border='1.5px solid rgba(255,255,255,0.4)';target.style.border
 
 function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
 
-function addFlow(){if(selConn===null){alert('Select a connection first');return;}snapshot();conns[selConn].flows.push({color:document.getElementById('fClr').value,speed:parseFloat(document.getElementById('fSpd').value)||2});render();}
+function addFlow(){if(selConn===null){alert('Select a connection first');return;}snapshot();conns[selConn].flows.push({color:document.getElementById('fClr').value,speed:parseFloat(document.getElementById('fSpd').value)||2,dir:document.getElementById('fDir').value});render();}
+function removeFlow(){if(selConn===null||!conns[selConn].flows.length)return;snapshot();conns[selConn].flows.pop();render();}
 
 function addBox(){snapshot();boxC++;const lb=document.getElementById('boxLbl').value||'Zone';const cl=document.getElementById('boxClr').value;const bd=document.getElementById('boxBdr').value;const an=document.getElementById('boxAnm').value;const b=document.createElement('div');b.className='box '+(an||'');b.dataset.bid='b'+boxC;b.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${bd} ${cl};color:${cl}`;b.innerHTML=`<div class="box-label" contenteditable="true">${lb}</div><div class="resize-handle"></div>`;document.getElementById('canvas').appendChild(b);initBox(b);}
 
@@ -895,7 +908,7 @@ else if(selEl){const id=selEl.dataset.id;conns=conns.filter(c=>c.from!==id&&c.to
 function showCtx(e,el){e.preventDefault();ctxTarget=el;const m=document.getElementById('ctxMenu');m.style.top=e.clientY+'px';m.style.left=e.clientX+'px';m.classList.add('show');}
 document.addEventListener('click',function(){document.getElementById('ctxMenu').classList.remove('show');document.getElementById('connCtxMenu').classList.remove('show');});
 function ctxConnect(){if(!ctxTarget)return;const id=ctxTarget.dataset.id;if(!id)return;connSrc=id;ctxTarget.style.outline='3px solid #ffc107';connMode=true;document.getElementById('connBtn').style.background='#ffc107';document.getElementById('connBtn').textContent='Cancel';document.getElementById('canvas').classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}
-function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,fromPort:connSrcPort,to:id,toPort:'center',color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[{color:cl,speed:sp}]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
+function ctxConnectTo(){if(!ctxTarget||!connSrc)return;const id=ctxTarget.dataset.id;if(!id||id===connSrc)return;const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,fromPort:connSrcPort,to:id,toPort:'center',color:cl,anim:an,speed:sp,lineType:document.getElementById('cType').value,startArrow:document.getElementById('cStart').value,endArrow:document.getElementById('cEnd').value,flows:[]});connSrc=null;document.querySelectorAll('.el,.shape').forEach(e=>e.style.outline='');if(connMode)toggleConn();render();}
 function ctxDuplicate(){if(!ctxTarget)return;const cl=ctxTarget.cloneNode(true);idC++;cl.dataset.id=(ctxTarget.dataset.id||'dup')+'-'+idC;cl.style.top=(parseInt(ctxTarget.style.top)+30)+'px';cl.style.left=(parseInt(ctxTarget.style.left)+30)+'px';cl.classList.remove('selected');document.getElementById('canvas').appendChild(cl);if(cl.classList.contains('shape'))initShape(cl);else initEl(cl);}
 function ctxEdit(){if(!ctxTarget)return;const lbl=ctxTarget.querySelector('.el-label,.shape-note,.shape-text,.shape-pill,[contenteditable]');if(lbl){lbl.focus();}}
 function ctxDelete(){if(!ctxTarget)return;snapshot();const id=ctxTarget.dataset.id;if(id)conns=conns.filter(c=>c.from!==id&&c.to!==id);ctxTarget.remove();ctxTarget=null;render();}
