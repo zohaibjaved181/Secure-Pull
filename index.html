@@ -30,10 +30,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 @keyframes bgRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes bgFloat{0%{transform:translate(0,0)}100%{transform:translate(30px,30px)}}
 #canvas.bg-light-grid .el-label,#canvas.bg-light-clean .el-label,#canvas.bg-light-dots .el-label{color:#333}
-#canvas.bg-light-grid .el-sub,#canvas.bg-light-clean .el-sub,#canvas.bg-light-dots .el-sub{color:#666}
+#canvas.bg-light-grid .el-sub,#canvas.bg-light-clean .el-sub,#canvas.bg-light-dots .el-sub{color:#555}
+#canvas.bg-light-grid .sh-label,#canvas.bg-light-clean .sh-label,#canvas.bg-light-dots .sh-label{color:#444}
+#canvas.bg-light-grid .shape-textbox,#canvas.bg-light-clean .shape-textbox,#canvas.bg-light-dots .shape-textbox{color:#222;border-color:rgba(0,0,0,0.2)}
+#canvas.bg-light-grid .ico-bar,#canvas.bg-light-clean .ico-bar,#canvas.bg-light-dots .ico-bar{color:#555;border-color:#bbb}
 #canvas.bg-light-grid .box .box-label,#canvas.bg-light-clean .box .box-label,#canvas.bg-light-dots .box .box-label{background:#f0f4f8}
 #canvas.bg-light-clean .box .box-label{background:#f5f7fa}
 #canvas.bg-light-dots .box .box-label{background:#fafbfc}
+#canvas.bg-light-grid .box .lyr-details,#canvas.bg-light-clean .box .lyr-details,#canvas.bg-light-dots .box .lyr-details{color:rgba(0,0,0,0.6)}
 
 /* LEFT SIDEBAR TOOLBAR */
 .toolbar{position:fixed;top:0;left:0;bottom:0;width:210px;z-index:2000;background:rgba(20,20,35,0.98);border-right:1px solid #333;padding:12px 10px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;backdrop-filter:blur(12px)}
@@ -102,6 +106,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .shape-arrow.up{border-bottom:25px solid #00bceb}
 .shape-note{background:rgba(255,255,200,0.92);border:1px solid #cca;border-radius:6px;padding:8px 10px;font-size:0.65em;color:#333;font-weight:500;min-width:80px;min-height:30px;outline:none;resize:both;overflow:auto}
 .shape-text{font-size:0.85em;color:#fff;font-weight:600;outline:none;min-width:40px}
+.sh-label{font-size:0.55em;color:rgba(255,255,255,0.7);text-align:center;margin-top:2px;outline:none}
+.sh-label:focus{outline:1px dashed #00bceb;border-radius:2px}
+.shape-textbox{min-width:100px;min-height:30px;padding:8px 12px;font-size:0.8em;color:#fff;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.2);border-radius:6px;outline:none;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap;line-height:1.5}
+.shape-textbox:focus{border-color:#00bceb;background:rgba(0,188,235,0.03)}
 .shape-circle{width:60px;height:60px;border:2px solid #00bceb;border-radius:50%}
 .shape-rect{width:100px;height:60px;border:2px solid #00bceb;border-radius:6px}
 .shape-diamond{width:50px;height:50px;border:2px solid #fd7e14;transform:rotate(45deg)}
@@ -264,6 +272,17 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <label>Shape:</label>
 <select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option><option value="circle">Circle</option><option value="rectangle">Rectangle</option><option value="diamond">Diamond</option><option value="line-h">Line Horizontal</option><option value="line-v">Line Vertical</option><option value="bracket-l">Bracket Left</option><option value="bracket-r">Bracket Right</option><option value="hexagon">Hexagon</option><option value="pill">Pill/Badge</option><option value="star">Star</option></select>
 <button class="btn-purple" onclick="addShape()">+Shape</button>
+</div>
+<div class="tb">
+<label>Text Format:</label>
+<select id="txtSize" onchange="applyTxtFmt()"><option value="">Size</option><option value="0.6em">S</option><option value="0.8em">M</option><option value="1em">L</option><option value="1.4em">XL</option><option value="2em">XXL</option></select>
+<input type="color" id="txtColor" value="#ffffff" onchange="applyTxtFmt()" title="Text Color">
+<button onclick="document.execCommand('bold')" title="Bold" style="font-weight:900">B</button>
+<button onclick="document.execCommand('italic')" title="Italic" style="font-style:italic">I</button>
+<button onclick="document.execCommand('underline')" title="Underline" style="text-decoration:underline">U</button>
+<button onclick="document.execCommand('justifyLeft')" title="Left">&#x2190;</button>
+<button onclick="document.execCommand('justifyCenter')" title="Center">&#x2194;</button>
+<button onclick="document.execCommand('justifyRight')" title="Right">&#x2192;</button>
 </div>
 <div class="tb">
 <label>Link:</label>
@@ -429,7 +448,29 @@ svg.innerHTML=h;
 function selC(e,i){e.stopPropagation();selConn=i;selBox=null;selEl=null;clearSel();document.getElementById('cClr').value=conns[i].color;document.getElementById('cAnm').value=conns[i].anim;document.getElementById('cSpd').value=conns[i].speed;render();}
 function clearSel(){document.querySelectorAll('.box.selected,.el.selected,.shape.selected').forEach(e=>e.classList.remove('selected'));selShape=null;}
 
-function changeBg(cls){const cv=document.getElementById('canvas');cv.className='';if(cls)cv.classList.add(cls);}
+function changeBg(cls){const cv=document.getElementById('canvas');cv.className='';if(cls)cv.classList.add(cls);autoThemeColors(cls);}
+
+function autoThemeColors(cls){
+var isLight=cls&&cls.indexOf('light')!==-1;
+var textColor=isLight?'#222':'rgba(255,255,255,0.85)';
+var subColor=isLight?'#555':'rgba(255,255,255,0.5)';
+var labelColor=isLight?'#333':'rgba(255,255,255,0.7)';
+document.querySelectorAll('.el-label').forEach(function(el){el.style.color=textColor;});
+document.querySelectorAll('.el-sub').forEach(function(el){el.style.color=subColor;});
+document.querySelectorAll('.sh-label').forEach(function(el){el.style.color=labelColor;});
+document.querySelectorAll('.shape-textbox').forEach(function(el){el.style.color=isLight?'#222':'#fff';el.style.borderColor=isLight?'rgba(0,0,0,0.2)':'rgba(255,255,255,0.2)';});
+document.querySelectorAll('.ico-bar').forEach(function(el){el.style.color=isLight?'#555':'#aaa';});
+}
+
+function applyTxtFmt(){
+var size=document.getElementById('txtSize').value;
+var color=document.getElementById('txtColor').value;
+var sel=window.getSelection();
+if(!sel.rangeCount)return;
+if(size)document.execCommand('fontSize',false,'7');
+if(color)document.execCommand('foreColor',false,color);
+if(size){var fonts=document.querySelectorAll('font[size="7"]');fonts.forEach(function(f){f.removeAttribute('size');f.style.fontSize=size;});}
+}
 
 function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
 
@@ -437,23 +478,23 @@ function addFlow(){if(selConn===null){alert('Select a connection first');return;
 
 function addBox(){snapshot();boxC++;const lb=document.getElementById('boxLbl').value||'Zone';const cl=document.getElementById('boxClr').value;const bd=document.getElementById('boxBdr').value;const an=document.getElementById('boxAnm').value;const b=document.createElement('div');b.className='box '+(an||'');b.dataset.bid='b'+boxC;b.style.cssText=`top:500px;left:600px;width:200px;height:150px;border:2px ${bd} ${cl};color:${cl}`;b.innerHTML=`<div class="box-label" contenteditable="true">${lb}</div><div class="resize-handle"></div>`;document.getElementById('canvas').appendChild(b);initBox(b);}
 
-function addShape(){snapshot();const t=document.getElementById('shapeSel').value;if(!t)return;shapeC++;const s=document.createElement('div');s.className='shape';s.dataset.sid='s'+shapeC;s.style.cssText='top:500px;left:700px';
-if(t==='arrow-right')s.innerHTML='<div class="shape-arrow right"></div><div class="sh-resize"></div>';
-else if(t==='arrow-down')s.innerHTML='<div class="shape-arrow down"></div><div class="sh-resize"></div>';
-else if(t==='arrow-left')s.innerHTML='<div class="shape-arrow left"></div><div class="sh-resize"></div>';
-else if(t==='arrow-up')s.innerHTML='<div class="shape-arrow up"></div><div class="sh-resize"></div>';
+function addShape(){snapshot();const t=document.getElementById('shapeSel').value;if(!t)return;shapeC++;const s=document.createElement('div');s.className='shape';s.dataset.sid='s'+shapeC;s.dataset.id='shape-'+shapeC;s.style.cssText='top:500px;left:700px';
+if(t==='arrow-right')s.innerHTML='<div class="shape-arrow right"></div><div class="sh-label" contenteditable="true">Arrow</div><div class="sh-resize"></div>';
+else if(t==='arrow-down')s.innerHTML='<div class="shape-arrow down"></div><div class="sh-label" contenteditable="true">Arrow</div><div class="sh-resize"></div>';
+else if(t==='arrow-left')s.innerHTML='<div class="shape-arrow left"></div><div class="sh-label" contenteditable="true">Arrow</div><div class="sh-resize"></div>';
+else if(t==='arrow-up')s.innerHTML='<div class="shape-arrow up"></div><div class="sh-label" contenteditable="true">Arrow</div><div class="sh-resize"></div>';
 else if(t==='note')s.innerHTML='<div class="shape-note" contenteditable="true">Note text here</div><div class="sh-resize"></div>';
-else if(t==='text')s.innerHTML='<div class="shape-text" contenteditable="true">Text</div><div class="sh-resize"></div>';
-else if(t==='circle')s.innerHTML='<div class="shape-circle"></div><div class="sh-resize"></div>';
-else if(t==='rectangle')s.innerHTML='<div class="shape-rect"></div><div class="sh-resize"></div>';
-else if(t==='diamond')s.innerHTML='<div class="shape-diamond"></div><div class="sh-resize"></div>';
-else if(t==='line-h')s.innerHTML='<div class="shape-line-h"></div><div class="sh-resize"></div>';
-else if(t==='line-v')s.innerHTML='<div class="shape-line-v"></div><div class="sh-resize"></div>';
-else if(t==='bracket-l')s.innerHTML='<div class="shape-bracket-l"></div><div class="sh-resize"></div>';
-else if(t==='bracket-r')s.innerHTML='<div class="shape-bracket-r"></div><div class="sh-resize"></div>';
-else if(t==='hexagon')s.innerHTML='<div class="shape-hexagon"></div><div class="sh-resize"></div>';
+else if(t==='text')s.innerHTML='<div class="shape-textbox" contenteditable="true">Double-click to edit</div><div class="sh-resize"></div>';
+else if(t==='circle')s.innerHTML='<div class="shape-circle"></div><div class="sh-label" contenteditable="true">Circle</div><div class="sh-resize"></div>';
+else if(t==='rectangle')s.innerHTML='<div class="shape-rect"></div><div class="sh-label" contenteditable="true">Rectangle</div><div class="sh-resize"></div>';
+else if(t==='diamond')s.innerHTML='<div class="shape-diamond"></div><div class="sh-label" contenteditable="true">Diamond</div><div class="sh-resize"></div>';
+else if(t==='line-h')s.innerHTML='<div class="shape-line-h"></div><div class="sh-label" contenteditable="true"></div><div class="sh-resize"></div>';
+else if(t==='line-v')s.innerHTML='<div class="shape-line-v"></div><div class="sh-label" contenteditable="true"></div><div class="sh-resize"></div>';
+else if(t==='bracket-l')s.innerHTML='<div class="shape-bracket-l"></div><div class="sh-label" contenteditable="true"></div><div class="sh-resize"></div>';
+else if(t==='bracket-r')s.innerHTML='<div class="shape-bracket-r"></div><div class="sh-label" contenteditable="true"></div><div class="sh-resize"></div>';
+else if(t==='hexagon')s.innerHTML='<div class="shape-hexagon"></div><div class="sh-label" contenteditable="true">Hexagon</div><div class="sh-resize"></div>';
 else if(t==='pill')s.innerHTML='<div class="shape-pill" contenteditable="true">Label</div><div class="sh-resize"></div>';
-else if(t==='star')s.innerHTML='<div class="shape-star"></div><div class="sh-resize"></div>';
+else if(t==='star')s.innerHTML='<div class="shape-star"></div><div class="sh-label" contenteditable="true">Star</div><div class="sh-resize"></div>';
 document.getElementById('canvas').appendChild(s);initShape(s);}
 
 function addDevice(){snapshot();const t=document.getElementById('devSel').value;if(!t)return;
@@ -624,11 +665,13 @@ e.preventDefault();boxDrag=b;clearSel();b.classList.add('selected');selBox=b;sel
 function initShape(s){
 if(!s.dataset.id)s.dataset.id='shape-'+Date.now()+Math.random().toString(36).substr(2,4);
 s.addEventListener('mousedown',function(e){
-if(e.target.getAttribute('contenteditable'))return;
-if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s;var inner=s.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note');rStart={x:e.clientX,y:e.clientY,w:inner?inner.offsetWidth:s.offsetWidth,h:inner?inner.offsetHeight:s.offsetHeight};return;}
+if(e.target.classList.contains('sh-resize')){e.preventDefault();resizing=s;var inner=s.querySelector('.shape-circle,.shape-rect,.shape-diamond,.shape-line-h,.shape-line-v,.shape-bracket-l,.shape-bracket-r,.shape-hexagon,.shape-star,.shape-note,.shape-textbox');rStart={x:e.clientX,y:e.clientY,w:inner?inner.offsetWidth:s.offsetWidth,h:inner?inner.offsetHeight:s.offsetHeight};return;}
+if(e.detail>=2&&e.target.getAttribute('contenteditable')){return;}
+if(e.target.getAttribute('contenteditable')&&document.activeElement===e.target){return;}
 if(connMode){const id=s.dataset.id;if(!connSrc){connSrc=id;s.style.outline='3px solid #ffc107';}else{if(connSrc!==id){const cl=document.getElementById('cClr').value;const an=document.getElementById('cAnm').value;const sp=parseFloat(document.getElementById('cSpd').value)||1.5;conns.push({from:connSrc,to:id,color:cl,anim:an,speed:sp,flows:[{color:cl,speed:sp}]});render();}document.querySelectorAll('.el,.shape').forEach(x=>x.style.outline='');connSrc=null;}return;}
 e.preventDefault();drag=s;s.classList.add('dragging');clearSel();s.classList.add('selected');selShape=s;selEl=null;selBox=null;selConn=null;const r=s.getBoundingClientRect();dOff.x=e.clientX-r.left;dOff.y=e.clientY-r.top;});
 s.addEventListener('contextmenu',function(e){showCtx(e,s);});
+s.addEventListener('dblclick',function(e){var ed=s.querySelector('[contenteditable]');if(ed)ed.focus();});
 }
 
 document.addEventListener('mousemove',function(e){
