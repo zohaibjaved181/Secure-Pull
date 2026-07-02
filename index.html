@@ -525,7 +525,11 @@ function saveState(){
 const cv=document.getElementById('canvas');
 const data={html:cv.innerHTML,conns:JSON.stringify(conns),bg:cv.className};
 localStorage.setItem('securepull_diagram',JSON.stringify(data));
-alert('Diagram saved!');
+// Also export clean read-only copy
+var saveNum=parseInt(localStorage.getItem('securepull_savenum')||'0')+1;
+localStorage.setItem('securepull_savenum',saveNum.toString());
+exportCleanCopy(cv,saveNum);
+alert('Diagram saved! Clean copy: index'+saveNum+'.html downloaded.');
 }
 function loadState(){
 const raw=localStorage.getItem('securepull_diagram');
@@ -537,6 +541,59 @@ if(data.bg)cv.className=data.bg;
 conns=JSON.parse(data.conns);
 reinit();
 setTimeout(render,100);
+}
+
+function exportCleanCopy(cv,num){
+// Get all styles from current document
+var styles='';
+var sheets=document.styleSheets;
+for(var i=0;i<sheets.length;i++){try{var rules=sheets[i].cssRules;for(var j=0;j<rules.length;j++)styles+=rules[j].cssText+'\n';}catch(e){}}
+// Remove toolbar-related styles and adjust canvas
+styles=styles.replace(/\.toolbar[^}]*\}/g,'').replace(/\.tb[^}]*\}/g,'').replace(/\.ctx-menu[^}]*\}/g,'');
+// Build clean HTML
+var bgClass=cv.className||'';
+var canvasHTML=cv.innerHTML;
+// Remove the SVG connections and re-render them statically
+var svgContent=document.getElementById('csvg').outerHTML;
+// Build connection SVG fresh
+var cleanHTML='<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Secure Pull Architecture - View '+num+'</title>\n<style>\n';
+cleanHTML+='*{margin:0;padding:0;box-sizing:border-box}\n';
+cleanHTML+='body{font-family:\"Segoe UI\",Tahoma,sans-serif;background:#1e1e2e;min-height:100vh;overflow:auto;color:#fff}\n';
+cleanHTML+='#canvas{position:relative;width:100%;min-height:100vh;padding:30px;background:#1a1a2e;transition:background 0.5s}\n';
+// Add all bg classes
+var bgStyles=document.querySelector('style').textContent.match(/#canvas\.bg[^}]+\}(::before\{[^}]+\})?/g);
+if(bgStyles)cleanHTML+=bgStyles.join('\n')+'\n';
+// Add element styles
+var elStyles=document.querySelector('style').textContent;
+var keepPatterns=['.el{','.el:hover','.el.dragging','.el-icon','.el-label','.el-sub','.box{','.box .box-label','.box .lyr-badge','.box .lyr-details','.box .resize-handle','.box.anim','.l5','.l4','.l3','.l2','.l1','.shape','.ico-','.fw-','@keyframes'];
+var allLines=elStyles.split('\n');
+for(var i=0;i<allLines.length;i++){
+var line=allLines[i];
+for(var k=0;k<keepPatterns.length;k++){
+if(line.indexOf(keepPatterns[k])!==-1){cleanHTML+=line+'\n';break;}
+}
+}
+cleanHTML+='.box .resize-handle{display:none}\n';
+cleanHTML+='</style>\n</head>\n<body>\n';
+cleanHTML+='<div id="canvas" class="'+bgClass+'">\n';
+cleanHTML+=svgContent+'\n';
+// Add all elements except SVG (already added)
+var tempDiv=document.createElement('div');
+tempDiv.innerHTML=canvasHTML;
+var svgEl=tempDiv.querySelector('#csvg');
+if(svgEl)svgEl.remove();
+cleanHTML+=tempDiv.innerHTML+'\n';
+cleanHTML+='</div>\n</body>\n</html>';
+// Download
+var blob=new Blob([cleanHTML],{type:'text/html'});
+var url=URL.createObjectURL(blob);
+var a=document.createElement('a');
+a.href=url;
+a.download='index'+num+'.html';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
 }
 
 // Auto-load on start
