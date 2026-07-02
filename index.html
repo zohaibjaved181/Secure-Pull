@@ -66,9 +66,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 .ctx-sep{height:1px;background:#444;margin:4px 0}
 
 /* ELEMENTS */
-.el{position:absolute;cursor:grab;z-index:20}
+.el{position:absolute;cursor:grab;z-index:25}
 .el:hover{filter:brightness(1.15)}
-.el.dragging{cursor:grabbing;z-index:100;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.4))}
+.el.dragging{cursor:grabbing;z-index:200;filter:brightness(1.3) drop-shadow(0 0 8px rgba(0,188,235,0.4))}
 .el.selected{outline:2px solid #ffc107;outline-offset:2px;border-radius:4px}
 .el-icon{display:flex;align-items:center;justify-content:center}
 .el-label{font-size:0.6em;color:rgba(255,255,255,0.85);margin-top:2px;font-weight:600;text-align:center;white-space:nowrap;outline:none}
@@ -95,7 +95,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 @keyframes bGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px currentColor,0 0 40px currentColor}}
 
 /* SHAPES */
-.shape{position:absolute;z-index:15;cursor:grab}
+.shape{position:absolute;z-index:22;cursor:grab}
 .shape.selected{outline:2px solid #ffc107;outline-offset:3px}
 .shape .sh-resize{position:absolute;bottom:-4px;right:-4px;width:10px;height:10px;background:#ffc107;border-radius:2px;cursor:nwse-resize;opacity:0;transition:opacity 0.2s}
 .shape.selected .sh-resize{opacity:1}
@@ -273,16 +273,35 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1e1e2e;min-height:100v
 <select id="shapeSel"><option value="">--</option><option value="arrow-right">Arrow Right</option><option value="arrow-down">Arrow Down</option><option value="arrow-left">Arrow Left</option><option value="arrow-up">Arrow Up</option><option value="note">Note</option><option value="text">Text</option><option value="circle">Circle</option><option value="rectangle">Rectangle</option><option value="diamond">Diamond</option><option value="line-h">Line Horizontal</option><option value="line-v">Line Vertical</option><option value="bracket-l">Bracket Left</option><option value="bracket-r">Bracket Right</option><option value="hexagon">Hexagon</option><option value="pill">Pill/Badge</option><option value="star">Star</option></select>
 <button class="btn-purple" onclick="addShape()">+Shape</button>
 </div>
-<div class="tb">
-<label>Text Format:</label>
-<select id="txtSize" onchange="applyTxtFmt()"><option value="">Size</option><option value="0.6em">S</option><option value="0.8em">M</option><option value="1em">L</option><option value="1.4em">XL</option><option value="2em">XXL</option></select>
-<input type="color" id="txtColor" value="#ffffff" onchange="applyTxtFmt()" title="Text Color">
-<button onclick="document.execCommand('bold')" title="Bold" style="font-weight:900">B</button>
-<button onclick="document.execCommand('italic')" title="Italic" style="font-style:italic">I</button>
-<button onclick="document.execCommand('underline')" title="Underline" style="text-decoration:underline">U</button>
-<button onclick="document.execCommand('justifyLeft')" title="Left">&#x2190;</button>
-<button onclick="document.execCommand('justifyCenter')" title="Center">&#x2194;</button>
-<button onclick="document.execCommand('justifyRight')" title="Right">&#x2192;</button>
+<div class="tb" style="flex-direction:column;align-items:flex-start;gap:6px">
+<label>&#x270F; Text Editor:</label>
+<div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center">
+<select id="txtFont" onchange="applyFont()" style="width:75px"><option value="Segoe UI">Segoe UI</option><option value="Arial">Arial</option><option value="Courier New">Courier</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times</option><option value="Tahoma">Tahoma</option></select>
+<select id="txtSize" onchange="applySize()" style="width:48px"><option value="">--</option><option value="1">8pt</option><option value="2">10pt</option><option value="3">12pt</option><option value="4">14pt</option><option value="5">18pt</option><option value="6">24pt</option><option value="7">36pt</option></select>
+</div>
+<div style="display:flex;gap:2px;flex-wrap:wrap;align-items:center">
+<button onclick="document.execCommand('bold')" title="Bold" style="font-weight:900;width:22px">B</button>
+<button onclick="document.execCommand('italic')" title="Italic" style="font-style:italic;width:22px">I</button>
+<button onclick="document.execCommand('underline')" title="Underline" style="width:22px"><u>U</u></button>
+<button onclick="document.execCommand('strikeThrough')" title="Strikethrough" style="width:22px"><s>S</s></button>
+<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
+<button onclick="document.execCommand('superscript')" title="Superscript" style="width:22px;font-size:.5em">A<sup>x</sup></button>
+<button onclick="document.execCommand('subscript')" title="Subscript" style="width:22px;font-size:.5em">A<sub>x</sub></button>
+<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
+<input type="color" id="txtColor" value="#ffffff" onchange="document.execCommand('foreColor',false,this.value)" title="Text Color" style="width:22px;height:20px">
+<input type="color" id="txtBg" value="#000000" onchange="document.execCommand('hiliteColor',false,this.value)" title="Highlight" style="width:22px;height:20px">
+</div>
+<div style="display:flex;gap:2px;flex-wrap:wrap;align-items:center">
+<button onclick="document.execCommand('justifyLeft')" title="Align Left" style="width:22px">&#x2261;</button>
+<button onclick="document.execCommand('justifyCenter')" title="Center" style="width:22px">&#x2263;</button>
+<button onclick="document.execCommand('justifyRight')" title="Align Right" style="width:22px">&#x2262;</button>
+<button onclick="document.execCommand('justifyFull')" title="Justify" style="width:22px;font-size:.5em">&#x2630;</button>
+<span style="width:1px;height:14px;background:#444;margin:0 2px"></span>
+<button onclick="document.execCommand('insertUnorderedList')" title="Bullet List" style="width:22px;font-size:.6em">&#x2022;&#x2261;</button>
+<button onclick="document.execCommand('insertOrderedList')" title="Numbered List" style="width:22px;font-size:.55em">1.&#x2261;</button>
+<button onclick="document.execCommand('indent')" title="Indent" style="width:22px;font-size:.55em">&#x21E5;</button>
+<button onclick="document.execCommand('outdent')" title="Outdent" style="width:22px;font-size:.55em">&#x21E4;</button>
+</div>
 </div>
 <div class="tb">
 <label>Link:</label>
@@ -462,14 +481,13 @@ document.querySelectorAll('.shape-textbox').forEach(function(el){el.style.color=
 document.querySelectorAll('.ico-bar').forEach(function(el){el.style.color=isLight?'#555':'#aaa';});
 }
 
-function applyTxtFmt(){
+function applyFont(){
+var font=document.getElementById('txtFont').value;
+if(font)document.execCommand('fontName',false,font);
+}
+function applySize(){
 var size=document.getElementById('txtSize').value;
-var color=document.getElementById('txtColor').value;
-var sel=window.getSelection();
-if(!sel.rangeCount)return;
-if(size)document.execCommand('fontSize',false,'7');
-if(color)document.execCommand('foreColor',false,color);
-if(size){var fonts=document.querySelectorAll('font[size="7"]');fonts.forEach(function(f){f.removeAttribute('size');f.style.fontSize=size;});}
+if(size)document.execCommand('fontSize',false,size);
 }
 
 function toggleConn(){connMode=!connMode;const b=document.getElementById('connBtn');const cv=document.getElementById('canvas');if(connMode){b.style.background='#ffc107';b.textContent='Cancel';cv.classList.add('conn-mode');document.getElementById('modeLbl').textContent='Connect';}else{b.style.background='';b.textContent='Draw';cv.classList.remove('conn-mode');connSrc=null;document.getElementById('modeLbl').textContent='Select';document.querySelectorAll('.el').forEach(e=>e.style.outline='');}}
